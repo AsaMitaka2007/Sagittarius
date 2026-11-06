@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:angle="270" android:startColor="#8C0A0F1D" android:centerColor="#730C1322" android:endColor="#8C070A12" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="radial" android:gradientRadius="440dp" android:centerX="0.84" android:centerY="0.06" android:startColor="#3843E6C6" android:endColor="#0043E6C6" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="radial" android:gradientRadius="380dp" android:centerX="0.06" android:centerY="0.82" android:startColor="#2E6C7CFB" android:endColor="#006C7CFB" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient android:type="radial" android:gradientRadius="320dp" android:centerX="0.94" android:centerY="0.94" android:startColor="#2EEFA9CC" android:endColor="#00EFA9CC" />
+        </shape>
+    </item>
+    <item>
+        <bitmap android:src="@drawable/noise_tile" android:gravity="fill" android:tileMode="repeat" />
+    </item>
+</layer-list>

@@ -1,0 +1,386 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent"
+    android:clipChildren="false">
+
+    <LinearLayout
+        android:id="@+id/contentRoot"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp">
+
+        <TextView
+            android:id="@+id/btnBack"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:contentDescription="@string/agent_back"
+            android:gravity="center"
+            android:text="‹"
+            android:textColor="?attr/blTextPrimary"
+            android:textSize="24sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/agent_title"
+            android:textColor="?attr/blTextPrimary"
+            android:textSize="17sp" />
+
+        <ImageView
+            android:id="@+id/btnPet"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:contentDescription="@string/agent_pet_toggle"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_pet_silhouette" />
+
+        <ImageView
+            android:id="@+id/btnSettings"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:contentDescription="@string/agent_settings"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_settings" />
+
+        <ImageView
+            android:id="@+id/btnDebug"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:contentDescription="@string/agent_debug"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_debug" />
+
+        <ImageView
+            android:id="@+id/btnMore"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:contentDescription="@string/agent_more"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_more_silhouette" />
+    </LinearLayout>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tvProvider"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:background="@drawable/bg_agent_pill"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:maxWidth="220dp"
+                android:minWidth="128dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:singleLine="true"
+                android:text="@string/agent_provider"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/tvModel"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_agent_pill"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxLines="1"
+                android:maxWidth="220dp"
+                android:minWidth="128dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:singleLine="true"
+                android:text="@string/agent_model"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="18dp"
+        android:paddingTop="2dp"
+        android:paddingEnd="18dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/agent_reasoning_level"
+            android:textColor="?attr/blTextSecondary"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/tvReasoningState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/agent_effort_off"
+            android:textColor="?attr/blAccent"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp">
+
+        <TextView android:id="@+id/tvScaleOff" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="start" android:text="@string/agent_level_off" android:textColor="?attr/blTextTertiary" android:textSize="10sp" />
+        <TextView android:id="@+id/tvScaleLow" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/agent_level_low" android:textColor="?attr/blTextTertiary" android:textSize="10sp" />
+        <TextView android:id="@+id/tvScaleHigh" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="center" android:text="@string/agent_level_high" android:textColor="?attr/blTextTertiary" android:textSize="10sp" />
+        <TextView android:id="@+id/tvScaleMax" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:gravity="end" android:text="@string/agent_level_max" android:textColor="?attr/blTextTertiary" android:textSize="10sp" android:textStyle="bold" />
+    </LinearLayout>
+
+    <com.dsha.sagittarius.agent.ui.ReasoningFlowSlider
+        android:id="@+id/reasoningSlider"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerChat"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingStart="12dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="12dp"
+            android:paddingBottom="8dp" />
+
+        <LinearLayout
+            android:id="@+id/emptyPanel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agent_empty_title"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/chipExpense"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:background="?attr/blIconCircleBackground"
+                android:padding="14dp"
+                android:text="@string/agent_example_expense"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/chipDiet"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="?attr/blIconCircleBackground"
+                android:padding="14dp"
+                android:text="@string/agent_example_diet"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/chipTaxi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:background="?attr/blIconCircleBackground"
+                android:padding="14dp"
+                android:text="@string/agent_example_taxi"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnScrollBottom"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="8dp"
+            android:background="?attr/blIconCircleBackground"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:text="↓"
+            android:textColor="?attr/blTextPrimary"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/btnRetry"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_gravity="center_horizontal"
+        android:background="?attr/blIconCircleBackground"
+        android:gravity="center"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:text="@string/agent_retry"
+        android:textColor="?attr/blAccent"
+        android:textSize="12sp"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/btnSessions"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="6dp"
+            android:background="@drawable/bg_agent_pill"
+            android:contentDescription="@string/agent_sessions"
+            android:padding="10dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_sessions_silhouette" />
+
+        <TextView
+            android:id="@+id/btnWebSearch"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/bg_agent_pill"
+            android:contentDescription="@string/agent_web_search"
+            android:gravity="center"
+            android:text="🌐"
+            android:textSize="16sp" />
+
+        <EditText
+            android:id="@+id/etInput"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/bg_input"
+            android:gravity="top|start"
+            android:hint="@string/agent_input_hint"
+            android:imeOptions="actionNone"
+            android:inputType="textCapSentences|textMultiLine"
+            android:maxLines="4"
+            android:minHeight="48dp"
+            android:paddingStart="14dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="14dp"
+            android:paddingBottom="12dp"
+            android:textColor="?attr/blTextPrimary"
+            android:textColorHint="?attr/blTextTertiary"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/btnSend"
+            android:layout_width="56dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_agent_pill"
+            android:contentDescription="@string/agent_send"
+            android:gravity="center"
+            android:text="@string/agent_send"
+            android:textColor="?attr/blTextPrimary"
+            android:textSize="13sp" />
+    </LinearLayout>
+    </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/petContainer"
+            android:layout_width="128dp"
+            android:layout_height="210dp"
+            android:layout_gravity="top|start"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="2dp">
+
+            <TextView
+                android:id="@+id/tvPetBalance"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:shadowColor="#99000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:text="@string/agent_pet_balance_placeholder"
+                android:textColor="?attr/blAccent"
+                android:textSize="10sp" />
+
+            <TextView
+                android:id="@+id/tvPetTokens"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="1dp"
+                android:shadowColor="#99000000"
+                android:shadowDx="0"
+                android:shadowDy="1"
+                android:shadowRadius="4"
+                android:text="@string/agent_pet_tokens_placeholder"
+                android:textColor="?attr/blAccent"
+                android:textSize="10sp" />
+
+            <ImageView
+                android:id="@+id/petImage"
+                android:layout_width="118dp"
+                android:layout_height="168dp"
+                android:layout_marginTop="2dp"
+                android:contentDescription="@string/agent_pet_toggle"
+                android:scaleType="fitCenter"
+                android:src="@drawable/pet" />
+        </LinearLayout>
+
+</FrameLayout>

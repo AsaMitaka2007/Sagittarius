@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ============ BLACK (default) ============ -->
+    <style name="Theme.Sagittarius.Black" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/accent_teal</item>
+        <item name="colorOnPrimary">#042F2A</item>
+        <item name="colorPrimaryContainer">#134E4A</item>
+        <item name="colorOnPrimaryContainer">@color/text_primary</item>
+        <item name="colorSecondary">@color/accent_blue</item>
+        <item name="colorOnSecondary">@color/text_primary</item>
+        <item name="colorSurface">@color/bg_deep_2</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/surface_card</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="android:colorBackground">@color/bg_deep</item>
+        <item name="android:windowBackground">@drawable/bg_screen_black</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@color/bg_deep</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Sagittarius.Dialog</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
+        <item name="blTextPrimary">#F8FAFC</item>
+        <item name="blTextSecondary">#9AA8BD</item>
+        <item name="blTextTertiary">#64748B</item>
+        <item name="blDivider">#1FFFFFFF</item>
+        <item name="blAccent">#34E7C4</item>
+        <item name="blSuccess">#22C55E</item>
+        <item name="blWarning">#EF4444</item>
+        <item name="blWarningText">#FECACA</item>
+        <item name="blGradientStart">#43E6C6</item>
+        <item name="blGradientMid">#6C7CFB</item>
+        <item name="blGradientEnd">#EFA9CC</item>
+        <item name="blTitleStart">#43E6C6</item>
+        <item name="blTitleMid">#B68BFF</item>
+        <item name="blTitleEnd">#EFA9CC</item>
+        <item name="blTitleStrokeStart">#A6FFF0</item>
+        <item name="blTitleStrokeMid">#B9C1FF</item>
+        <item name="blTitleStrokeEnd">#FFD5E8</item>
+        <item name="blTitleShadow">#60000000</item>
+        <item name="blCardFillTop">#D91A2438</item>
+        <item name="blCardFillBottom">#B30D1524</item>
+        <item name="blCardStrokeStart">#6043E6C6</item>
+        <item name="blCardStrokeMid">#4E6C7CFB</item>
+        <item name="blCardStrokeEnd">#40EFA9CC</item>
+        <item name="blCardHighlight">#1AFFFFFF</item>
+        <item name="blCardShadow">#2A000000</item>
+        <item name="blButtonStart">#43E6C6</item>
+        <item name="blButtonMid">#6C7CFB</item>
+        <item name="blButtonEnd">#EFA9CC</item>
+        <item name="blButtonText">#06131B</item>
+        <item name="blButtonDisabledText">#82FFFFFF</item>
+        <item name="blFlowStart">#A6FFF0</item>
+        <item name="blFlowMid">#B9C1FF</item>
+        <item name="blFlowEnd">#FFD5E8</item>
+        <item name="blSoftStart">#3343E6C6</item>
+        <item name="blSoftMid">#296C7CFB</item>
+        <item name="blSoftEnd">#22EFA9CC</item>
+        <item name="blFloatingButtonFill">#24FFFFFF</item>
+        <item name="blFloatingButtonStroke">#33FFFFFF</item>
+        <item name="blProgressTrack">#1CFFFFFF</item>
+        <item name="blChipSelectedText">#FFFFFF</item>
+        <item name="blChipUnselectedFill">#12FFFFFF</item>
+        <item name="blChipUnselectedStroke">#2DFFFFFF</item>
+        <item name="blChipUnselectedText">#B7C2D4</item>
+        <item name="blTabInactive">#7F8A9F</item>
+        <item name="blInputFill">#16FFFFFF</item>
+        <item name="blInputStroke">#2BFFFFFF</item>
+        <item name="blMetricTile">#0FFFFFFF</item>
+        <item name="blIconCircle">#24FFFFFF</item>
+        <item name="blIconButton">#16FFFFFF</item>
+        <item name="blDialogSurface">#182134</item>
+        <item name="blSpinnerPopup">#182134</item>
+        <item name="blNodeWarning">#EF4444</item>
+        <item name="blNodeNear">#F59E0B</item>
+        <item name="blNodeBarAllocation">#43E6C6</item>
+        <item name="blNodeBarUsed">#EFA9CC</item>
+        <item name="blInputBackground">@drawable/bg_input</item>
+        <item name="blSearchBackground">@drawable/bg_search</item>
+        <item name="blMetricTileBackground">@drawable/bg_metric_tile</item>
+        <item name="blIconCircleBackground">@drawable/bg_icon_circle</item>
+        <item name="blIconButtonBackground">@drawable/bg_glass_icon_button</item>
+        <item name="blGradientSoftBackground">@drawable/bg_gradient_soft</item>
+        <item name="blGradientHairline">@drawable/bg_gradient_hairline</item>
+        <item name="blBottomBarBackground">@drawable/bg_bottom_bar</item>
+        <item name="blFloatingButtonBackground">@drawable/bg_floating_button</item>
+        <item name="blFloatingAccentBackground">@drawable/bg_floating_button_accent</item>
+        <item name="blFloatingChipBackground">@drawable/bg_floating_chip</item>
+    </style>
+
+    <style name="Theme.Sagittarius" parent="Theme.Sagittarius.Black" />
+
+    <!-- ============ LIGHT ============ -->
+    <style name="Theme.Sagittarius.Light.Base" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">#0D9F88</item>
+        <item name="colorOnPrimary">#FFFFFF</item>
+        <item name="colorPrimaryContainer">#D7F4EE</item>
+        <item name="colorOnPrimaryContainer">#172033</item>
+        <item name="colorSecondary">#4657CC</item>
+        <item name="colorOnSecondary">#FFFFFF</item>
+        <item name="colorSurface">#F4F6FB</item>
+        <item name="colorOnSurface">#172033</item>
+        <item name="colorSurfaceVariant">#FFFFFF</item>
+        <item name="colorOnSurfaceVariant">#5A6477</item>
+        <item name="android:colorBackground">#F4F6FB</item>
+        <item name="android:windowBackground">@drawable/bg_screen_light</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">#1B2433</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Sagittarius.Dialog.Light</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
+        <item name="blTextPrimary">#172033</item>
+        <item name="blTextSecondary">#5A6477</item>
+        <item name="blTextTertiary">#8A93A6</item>
+        <item name="blDivider">#1A1B2233</item>
+        <item name="blAccent">#0D9F88</item>
+        <item name="blSuccess">#15803D</item>
+        <item name="blWarning">#DC2626</item>
+        <item name="blWarningText">#B91C1C</item>
+        <item name="blGradientStart">#4FD6C0</item>
+        <item name="blGradientMid">#7B8AF5</item>
+        <item name="blGradientEnd">#F2B5D2</item>
+        <item name="blTitleStart">#0E9F87</item>
+        <item name="blTitleMid">#4356C8</item>
+        <item name="blTitleEnd">#C56A95</item>
+        <item name="blTitleStrokeStart">#0B8F79</item>
+        <item name="blTitleStrokeMid">#3547B8</item>
+        <item name="blTitleStrokeEnd">#B25983</item>
+        <item name="blTitleShadow">#33000000</item>
+        <item name="blCardFillTop">#F2FFFFFF</item>
+        <item name="blCardFillBottom">#D9FFFFFF</item>
+        <item name="blCardStrokeStart">#7A0B8F79</item>
+        <item name="blCardStrokeMid">#6A3547B8</item>
+        <item name="blCardStrokeEnd">#59B25983</item>
+        <item name="blCardHighlight">#99FFFFFF</item>
+        <item name="blCardShadow">#14000000</item>
+        <item name="blButtonStart">#159E86</item>
+        <item name="blButtonMid">#4657CC</item>
+        <item name="blButtonEnd">#B85C8A</item>
+        <item name="blButtonText">#FFFFFF</item>
+        <item name="blButtonDisabledText">#99FFFFFF</item>
+        <item name="blFlowStart">#0B8F79</item>
+        <item name="blFlowMid">#3547B8</item>
+        <item name="blFlowEnd">#B25983</item>
+        <item name="blSoftStart">#4D159E86</item>
+        <item name="blSoftMid">#3D4657CC</item>
+        <item name="blSoftEnd">#33B85C8A</item>
+        <item name="blFloatingButtonFill">#CCFFFFFF</item>
+        <item name="blFloatingButtonStroke">#33172033</item>
+        <item name="blProgressTrack">#E1E6F0</item>
+        <item name="blChipSelectedText">#142030</item>
+        <item name="blChipUnselectedFill">#B3FFFFFF</item>
+        <item name="blChipUnselectedStroke">#40172033</item>
+        <item name="blChipUnselectedText">#4E586C</item>
+        <item name="blTabInactive">#6F7A8E</item>
+        <item name="blInputFill">#F2FFFFFF</item>
+        <item name="blInputStroke">#33172033</item>
+        <item name="blMetricTile">#B3FFFFFF</item>
+        <item name="blIconCircle">#14172033</item>
+        <item name="blIconButton">#B3FFFFFF</item>
+        <item name="blDialogSurface">#FFFFFF</item>
+        <item name="blSpinnerPopup">#FFFFFF</item>
+        <item name="blNodeWarning">#B91C1C</item>
+        <item name="blNodeNear">#B45309</item>
+        <item name="blNodeBarAllocation">#0D9F88</item>
+        <item name="blNodeBarUsed">#C76C96</item>
+        <item name="blInputBackground">@drawable/bg_input</item>
+        <item name="blSearchBackground">@drawable/bg_search</item>
+        <item name="blMetricTileBackground">@drawable/bg_metric_tile</item>
+        <item name="blIconCircleBackground">@drawable/bg_icon_circle</item>
+        <item name="blIconButtonBackground">@drawable/bg_glass_icon_button</item>
+        <item name="blGradientSoftBackground">@drawable/bg_gradient_soft</item>
+        <item name="blGradientHairline">@drawable/bg_gradient_hairline</item>
+        <item name="blBottomBarBackground">@drawable/bg_bottom_bar</item>
+        <item name="blFloatingButtonBackground">@drawable/bg_floating_button</item>
+        <item name="blFloatingAccentBackground">@drawable/bg_floating_button_accent</item>
+        <item name="blFloatingChipBackground">@drawable/bg_floating_chip</item>
+    </style>
+
+    <style name="Theme.Sagittarius.Light" parent="Theme.Sagittarius.Light.Base" />
+
+    <!-- ============ GLASS ============ -->
+    <style name="Theme.Sagittarius.Glass.Base" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">#64F2D4</item>
+        <item name="colorOnPrimary">#052A25</item>
+        <item name="colorPrimaryContainer">#173B3D</item>
+        <item name="colorOnPrimaryContainer">#F7FAFF</item>
+        <item name="colorSecondary">#8290FF</item>
+        <item name="colorOnSecondary">#0B1020</item>
+        <item name="colorSurface">#1A2438</item>
+        <item name="colorOnSurface">#F7FAFF</item>
+        <item name="colorSurfaceVariant">#22304A</item>
+        <item name="colorOnSurfaceVariant">#C7D0E0</item>
+        <item name="android:colorBackground">#0A0F1D</item>
+        <item name="android:windowBackground">@drawable/bg_screen_glass</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">#660A0F1D</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.Sagittarius.Dialog.Glass</item>
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
+
+        <item name="blTextPrimary">#F7FAFF</item>
+        <item name="blTextSecondary">#C7D0E0</item>
+        <item name="blTextTertiary">#8E9AAF</item>
+        <item name="blDivider">#2AFFFFFF</item>
+        <item name="blAccent">#64F2D4</item>
+        <item name="blSuccess">#34D399</item>
+        <item name="blWarning">#F87171</item>
+        <item name="blWarningText">#FECACA</item>
+        <item name="blGradientStart">#65F2D8</item>
+        <item name="blGradientMid">#8290FF</item>
+        <item name="blGradientEnd">#F4B8D5</item>
+        <item name="blTitleStart">#65F2D8</item>
+        <item name="blTitleMid">#A99BFF</item>
+        <item name="blTitleEnd">#F4B8D5</item>
+        <item name="blTitleStrokeStart">#C2FFF3</item>
+        <item name="blTitleStrokeMid">#D4D8FF</item>
+        <item name="blTitleStrokeEnd">#FFE1EE</item>
+        <item name="blTitleShadow">#80000000</item>
+        <item name="blCardFillTop">#7A203048</item>
+        <item name="blCardFillBottom">#66101828</item>
+        <item name="blCardStrokeStart">#7043E6C6</item>
+        <item name="blCardStrokeMid">#5E6C7CFB</item>
+        <item name="blCardStrokeEnd">#4CEFA9CC</item>
+        <item name="blCardHighlight">#33FFFFFF</item>
+        <item name="blCardShadow">#3A000000</item>
+        <item name="blButtonStart">#43E6C6</item>
+        <item name="blButtonMid">#6C7CFB</item>
+        <item name="blButtonEnd">#EFA9CC</item>
+        <item name="blButtonText">#06131B</item>
+        <item name="blButtonDisabledText">#82FFFFFF</item>
+        <item name="blFlowStart">#C2FFF3</item>
+        <item name="blFlowMid">#D4D8FF</item>
+        <item name="blFlowEnd">#FFE1EE</item>
+        <item name="blSoftStart">#3D65F2D8</item>
+        <item name="blSoftMid">#338290FF</item>
+        <item name="blSoftEnd">#2EF4B8D5</item>
+        <item name="blFloatingButtonFill">#2EFFFFFF</item>
+        <item name="blFloatingButtonStroke">#4DFFFFFF</item>
+        <item name="blProgressTrack">#33FFFFFF</item>
+        <item name="blChipSelectedText">#FFFFFF</item>
+        <item name="blChipUnselectedFill">#22FFFFFF</item>
+        <item name="blChipUnselectedStroke">#45FFFFFF</item>
+        <item name="blChipUnselectedText">#E6ECF5</item>
+        <item name="blTabInactive">#A8B3C6</item>
+        <item name="blInputFill">#26FFFFFF</item>
+        <item name="blInputStroke">#45FFFFFF</item>
+        <item name="blMetricTile">#1FFFFFFF</item>
+        <item name="blIconCircle">#33FFFFFF</item>
+        <item name="blIconButton">#2BFFFFFF</item>
+        <item name="blDialogSurface">#1A2438</item>
+        <item name="blSpinnerPopup">#1A2438</item>
+        <item name="blNodeWarning">#F87171</item>
+        <item name="blNodeNear">#FBBF24</item>
+        <item name="blNodeBarAllocation">#65F2D8</item>
+        <item name="blNodeBarUsed">#F4B8D5</item>
+        <item name="blInputBackground">@drawable/bg_input</item>
+        <item name="blSearchBackground">@drawable/bg_search</item>
+        <item name="blMetricTileBackground">@drawable/bg_metric_tile</item>
+        <item name="blIconCircleBackground">@drawable/bg_icon_circle</item>
+        <item name="blIconButtonBackground">@drawable/bg_glass_icon_button</item>
+        <item name="blGradientSoftBackground">@drawable/bg_gradient_soft</item>
+        <item name="blGradientHairline">@drawable/bg_gradient_hairline</item>
+        <item name="blBottomBarBackground">@drawable/bg_bottom_bar</item>
+        <item name="blFloatingButtonBackground">@drawable/bg_floating_button</item>
+        <item name="blFloatingAccentBackground">@drawable/bg_floating_button_accent</item>
+        <item name="blFloatingChipBackground">@drawable/bg_floating_chip</item>
+    </style>
+
+    <style name="Theme.Sagittarius.Glass" parent="Theme.Sagittarius.Glass.Base">
+        <item name="android:windowIsTranslucent">false</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="ThemeOverlay.Sagittarius.Dialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">#182134</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorPrimary">@color/accent_teal</item>
+    </style>
+
+    <style name="ThemeOverlay.Sagittarius.Dialog.Light" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">#FFFFFF</item>
+        <item name="colorOnSurface">#172033</item>
+        <item name="colorPrimary">#0D9F88</item>
+    </style>
+
+    <style name="ThemeOverlay.Sagittarius.Dialog.Glass" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorSurface">#1A2438</item>
+        <item name="colorOnSurface">#F7FAFF</item>
+        <item name="colorPrimary">#64F2D4</item>
+    </style>
+
+    <style name="TextAppearance.Sagittarius.Label" parent="TextAppearance.Material3.LabelMedium">
+        <item name="android:textColor">?attr/blTextSecondary</item>
+        <item name="android:letterSpacing">0.04</item>
+    </style>
+
+    <style name="TextAppearance.Sagittarius.Metric" parent="TextAppearance.Material3.HeadlineSmall">
+        <item name="android:textColor">?attr/blTextPrimary</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:fontFeatureSettings">tnum</item>
+    </style>
+</resources>

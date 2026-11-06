@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.dsha.sagittarius.ui.GlassCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/expenseRoot"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginTop="5dp"
+    android:layout_marginEnd="16dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="68dp"
+        android:orientation="horizontal"
+        android:paddingStart="14dp"
+        android:paddingTop="11dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="11dp">
+
+        <ImageView
+            android:id="@+id/expenseIcon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/blIconCircleBackground"
+            android:contentDescription="@null"
+            android:padding="10dp"
+            app:tint="?attr/blAccent" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvExpenseNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="15sp"
+                tools:text="午餐" />
+
+            <TextView
+                android:id="@+id/tvExpenseMeta"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="?attr/blTextSecondary"
+                android:textSize="11sp"
+                tools:text="餐饮 · 今天" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvExpenseAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:fontFeatureSettings="tnum"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="?attr/blTextPrimary"
+            android:textSize="16sp"
+            tools:text="-¥28.00" />
+    </LinearLayout>
+</com.dsha.sagittarius.ui.GlassCardView>

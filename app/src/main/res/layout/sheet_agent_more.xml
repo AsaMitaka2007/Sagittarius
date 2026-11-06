@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/blCardFillTop"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/agent_more_title"
+        android:textColor="?attr/blTextPrimary"
+        android:textSize="19sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <TextView android:id="@+id/tabPersona" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="@string/agent_tab_persona" android:textColor="?attr/blAccent" android:textSize="13sp" android:textStyle="bold" />
+        <TextView android:id="@+id/tabPermission" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="@string/agent_tab_permission" android:textColor="?attr/blTextTertiary" android:textSize="13sp" />
+        <TextView android:id="@+id/tabContext" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="@string/agent_tab_context" android:textColor="?attr/blTextTertiary" android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/panelPersona"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/etPersona"
+            android:layout_width="match_parent"
+            android:layout_height="110dp"
+            android:background="@drawable/bg_input"
+            android:gravity="top|start"
+            android:hint="@string/agent_persona_hint"
+            android:inputType="textMultiLine"
+            android:maxLines="6"
+            android:padding="12dp"
+            android:textColor="?attr/blTextPrimary"
+            android:textColorHint="?attr/blTextTertiary"
+            android:textSize="13sp" />
+
+        <EditText
+            android:id="@+id/etGreeting"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_input"
+            android:hint="@string/agent_greeting_hint"
+            android:inputType="text"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:textColor="?attr/blTextPrimary"
+            android:textColorHint="?attr/blTextTertiary"
+            android:textSize="13sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/agent_liveliness"
+            android:textColor="?attr/blTextSecondary"
+            android:textSize="12sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:layout_marginTop="6dp"
+            android:orientation="horizontal">
+
+            <TextView android:id="@+id/liveOff" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:gravity="center" android:text="@string/agent_live_off" android:textColor="?attr/blTextPrimary" android:textSize="12sp" />
+            <TextView android:id="@+id/liveLow" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginStart="6dp" android:layout_weight="1" android:gravity="center" android:text="@string/agent_live_low" android:textColor="?attr/blTextPrimary" android:textSize="12sp" />
+            <TextView android:id="@+id/liveHigh" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginStart="6dp" android:layout_weight="1" android:gravity="center" android:text="@string/agent_live_high" android:textColor="?attr/blTextPrimary" android:textSize="12sp" />
+            <TextView android:id="@+id/liveUltra" android:layout_width="0dp" android:layout_height="match_parent" android:layout_marginStart="6dp" android:layout_weight="1" android:gravity="center" android:text="@string/agent_live_ultra" android:textColor="?attr/blTextPrimary" android:textSize="12sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btnSavePersona"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_agent_pill"
+            android:gravity="center"
+            android:text="@string/agent_save_persona"
+            android:textColor="?attr/blAccent"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/panelPermission"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/agent_permission_hint" android:textColor="?attr/blTextSecondary" android:textSize="12sp" />
+
+        <RadioGroup
+            android:id="@+id/permissionGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="vertical">
+
+            <RadioButton android:id="@+id/permView" android:layout_width="match_parent" android:layout_height="44dp" android:text="@string/agent_perm_view" android:textColor="?attr/blTextPrimary" android:textSize="13sp" />
+            <RadioButton android:id="@+id/permAsk" android:layout_width="match_parent" android:layout_height="44dp" android:text="@string/agent_perm_ask" android:textColor="?attr/blTextPrimary" android:textSize="13sp" />
+            <RadioButton android:id="@+id/permFull" android:layout_width="match_parent" android:layout_height="44dp" android:text="@string/agent_perm_full" android:textColor="?attr/blTextPrimary" android:textSize="13sp" />
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/btnSavePermission"
+            android:layout_width="match_parent"
+            android:layout_height="44dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_agent_pill"
+            android:gravity="center"
+            android:text="@string/agent_save_permission"
+            android:textColor="?attr/blAccent"
+            android:textSize="13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/panelContext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView android:id="@+id/tvContextInfo" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:textColor="?attr/blTextPrimary" android:textSize="13sp" />
+        <TextView android:id="@+id/tvTokenInfo" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="?attr/blTextSecondary" android:textSize="13sp" />
+        <TextView android:id="@+id/tvModelInfo" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:textColor="?attr/blTextTertiary" android:textSize="12sp" />
+        <TextView android:id="@+id/btnClearHistory" android:layout_width="match_parent" android:layout_height="44dp" android:layout_marginTop="14dp" android:background="?attr/blIconCircleBackground" android:gravity="center" android:text="@string/agent_clear_context" android:textColor="?attr/blWarning" android:textSize="13sp" />
+    </LinearLayout>
+</LinearLayout>

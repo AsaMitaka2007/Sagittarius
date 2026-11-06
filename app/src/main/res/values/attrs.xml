@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="GradientTabView">
+        <attr name="tabIcon" format="reference" />
+        <attr name="tabLabel" format="string" />
+    </declare-styleable>
+
+    <!-- Theme color tokens -->
+    <attr name="blTextPrimary" format="color" />
+    <attr name="blTextSecondary" format="color" />
+    <attr name="blTextTertiary" format="color" />
+    <attr name="blDivider" format="color" />
+    <attr name="blAccent" format="color" />
+    <attr name="blSuccess" format="color" />
+    <attr name="blWarning" format="color" />
+    <attr name="blWarningText" format="color" />
+
+    <attr name="blGradientStart" format="color" />
+    <attr name="blGradientMid" format="color" />
+    <attr name="blGradientEnd" format="color" />
+    <attr name="blTitleStart" format="color" />
+    <attr name="blTitleMid" format="color" />
+    <attr name="blTitleEnd" format="color" />
+    <attr name="blTitleStrokeStart" format="color" />
+    <attr name="blTitleStrokeMid" format="color" />
+    <attr name="blTitleStrokeEnd" format="color" />
+    <attr name="blTitleShadow" format="color" />
+
+    <attr name="blCardFillTop" format="color" />
+    <attr name="blCardFillBottom" format="color" />
+    <attr name="blCardStrokeStart" format="color" />
+    <attr name="blCardStrokeMid" format="color" />
+    <attr name="blCardStrokeEnd" format="color" />
+    <attr name="blCardHighlight" format="color" />
+    <attr name="blCardShadow" format="color" />
+
+    <attr name="blButtonStart" format="color" />
+    <attr name="blButtonMid" format="color" />
+    <attr name="blButtonEnd" format="color" />
+    <attr name="blButtonText" format="color" />
+    <attr name="blButtonDisabledText" format="color" />
+    <attr name="blFlowStart" format="color" />
+    <attr name="blFlowMid" format="color" />
+    <attr name="blFlowEnd" format="color" />
+    <attr name="blSoftStart" format="color" />
+    <attr name="blSoftMid" format="color" />
+    <attr name="blSoftEnd" format="color" />
+    <attr name="blFloatingButtonFill" format="color" />
+    <attr name="blFloatingButtonStroke" format="color" />
+
+    <attr name="blProgressTrack" format="color" />
+    <attr name="blChipSelectedText" format="color" />
+    <attr name="blChipUnselectedFill" format="color" />
+    <attr name="blChipUnselectedStroke" format="color" />
+    <attr name="blChipUnselectedText" format="color" />
+    <attr name="blTabInactive" format="color" />
+
+    <attr name="blInputFill" format="color" />
+    <attr name="blInputStroke" format="color" />
+    <attr name="blMetricTile" format="color" />
+    <attr name="blIconCircle" format="color" />
+    <attr name="blIconButton" format="color" />
+    <attr name="blDialogSurface" format="color" />
+    <attr name="blSpinnerPopup" format="color" />
+    <attr name="blNodeWarning" format="color" />
+    <attr name="blNodeNear" format="color" />
+    <attr name="blNodeBarAllocation" format="color" />
+    <attr name="blNodeBarUsed" format="color" />
+
+    <attr name="blInputBackground" format="reference" />
+    <attr name="blSearchBackground" format="reference" />
+    <attr name="blMetricTileBackground" format="reference" />
+    <attr name="blIconCircleBackground" format="reference" />
+    <attr name="blIconButtonBackground" format="reference" />
+    <attr name="blGradientSoftBackground" format="reference" />
+    <attr name="blGradientHairline" format="reference" />
+    <attr name="blBottomBarBackground" format="reference" />
+    <attr name="blFloatingButtonBackground" format="reference" />
+    <attr name="blFloatingAccentBackground" format="reference" />
+    <attr name="blFloatingChipBackground" format="reference" />
+</resources>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg_deep">#0A0F1D</color>
+    <color name="bg_deep_2">#111827</color>
+    <color name="surface_glass">#CC151E30</color>
+    <color name="surface_card">#B31A2438</color>
+    <color name="surface_card_stroke">#33FFFFFF</color>
+    <color name="text_primary">#F8FAFC</color>
+    <color name="text_secondary">#9AA8BD</color>
+    <color name="text_tertiary">#64748B</color>
+    <color name="accent_teal">#34E7C4</color>
+    <color name="accent_blue">#3B82F6</color>
+    <color name="accent_purple">#8B5CF6</color>
+    <color name="accent_yellow">#FBBF24</color>
+    <color name="accent_orange">#FB923C</color>
+    <color name="accent_red">#EF4444</color>
+    <color name="accent_deep_red">#991B1B</color>
+    <color name="deep_red_text">#FECACA</color>
+    <color name="income_green">#22C55E</color>
+    <color name="divider">#1FFFFFFF</color>
+    <color name="transparent">#00000000</color>
+
+    <color name="cat_food">#FF8A65</color>
+    <color name="cat_transport">#60A5FA</color>
+    <color name="cat_shopping">#F472B6</color>
+    <color name="cat_entertainment">#A78BFA</color>
+    <color name="cat_housing">#34D399</color>
+    <color name="cat_medical">#F87171</color>
+    <color name="cat_education">#FBBF24</color>
+    <color name="cat_other">#94A3B8</color>
+    <color name="cat_daily">#F59E0B</color>
+    <color name="cat_books">#60A5FA</color>
+    <color name="cat_games">#A78BFA</color>
+
+    <color name="widget_green_start">#0F766E</color>
+    <color name="widget_green_end">#2563EB</color>
+    <color name="widget_blue_start">#1D4ED8</color>
+    <color name="widget_blue_end">#7C3AED</color>
+    <color name="widget_orange_start">#C2410C</color>
+    <color name="widget_orange_end">#D97706</color>
+    <color name="widget_red_start">#B91C1C</color>
+    <color name="widget_red_end">#DC2626</color>
+    <color name="widget_deep_red_start">#450A0A</color>
+    <color name="widget_deep_red_end">#7F1D1D</color>
+
+    <color name="ic_launcher_background">#FFFFFF</color>
+
+    <!-- UI refresh: restrained liquid-glass palette -->
+    <color name="grad_teal">#43E6C6</color>
+    <color name="grad_blue">#6C7CFB</color>
+    <color name="grad_pink">#EFA9CC</color>
+    <color name="grad_teal_bright">#A6FFF0</color>
+    <color name="grad_blue_bright">#B9C1FF</color>
+    <color name="grad_pink_bright">#FFD5E8</color>
+    <color name="glass_fill_top">#D91A2438</color>
+    <color name="glass_fill_bottom">#B30C1322</color>
+    <color name="glass_stroke">#38FFFFFF</color>
+    <color name="tab_inactive">#7F8A9F</color>
+    <color name="text_on_gradient">#07131A</color>
+</resources>

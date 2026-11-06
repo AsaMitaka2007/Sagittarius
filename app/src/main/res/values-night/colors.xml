@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 应用本身固定使用深色玻璃主题。此文件保证系统深色模式下状态栏与导航栏仍是深色。 -->
+    <color name="bg_deep">#0A0F1D</color>
+    <color name="bg_deep_2">#111827</color>
+</resources>

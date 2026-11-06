@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/blCardFillTop"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="22dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/agent_settings_title"
+            android:textColor="?attr/blTextPrimary"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/agent_provider"
+            android:textColor="?attr/blTextSecondary"
+            android:textSize="12sp" />
+
+        <Spinner
+            android:id="@+id/spinnerProvider"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <EditText
+            android:id="@+id/etBaseUrl"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:hint="@string/agent_custom_base_url"
+            android:inputType="textUri"
+            android:textColor="?attr/blTextPrimary"
+            android:textColorHint="?attr/blTextTertiary"
+            android:visibility="gone" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/agent_model"
+            android:textColor="?attr/blTextSecondary"
+            android:textSize="12sp" />
+
+        <Spinner
+            android:id="@+id/spinnerModel"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <EditText
+            android:id="@+id/etProviderKey"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:hint="@string/agent_provider_key_hint"
+            android:importantForAutofill="noExcludeDescendants"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:textColor="?attr/blTextPrimary"
+            android:textColorHint="?attr/blTextTertiary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="@string/agent_search_provider"
+            android:textColor="?attr/blTextSecondary"
+            android:textSize="12sp" />
+
+        <Spinner
+            android:id="@+id/spinnerSearchProvider"
+            android:layout_width="match_parent"
+            android:layout_height="48dp" />
+
+        <EditText
+            android:id="@+id/etSearchKey"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="8dp"
+            android:hint="@string/agent_search_key_hint"
+            android:importantForAutofill="noExcludeDescendants"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:textColor="?attr/blTextPrimary"
+            android:textColorHint="?attr/blTextTertiary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/agent_data_sources"
+            android:textColor="?attr/blTextSecondary"
+            android:textSize="12sp" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchLocalFood"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:checked="true"
+            android:enabled="false"
+            android:text="@string/agent_source_local" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchBocha"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="@string/agent_source_bocha" />
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switchAiEstimate"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:checked="true"
+            android:enabled="false"
+            android:text="@string/agent_source_ai" />
+
+        <TextView
+            android:id="@+id/btnSaveSettings"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="18dp"
+            android:background="?attr/blIconCircleBackground"
+            android:gravity="center"
+            android:text="@string/agent_save_settings"
+            android:textColor="?attr/blAccent"
+            android:textSize="15sp" />
+    </LinearLayout>
+</ScrollView>

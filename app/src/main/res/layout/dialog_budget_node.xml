@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingStart="4dp"
+    android:paddingTop="6dp"
+    android:paddingEnd="4dp"
+    android:paddingBottom="4dp">
+
+    <TextView
+        android:id="@+id/tvParent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="2dp"
+        android:textColor="?attr/blTextSecondary"
+        android:textSize="12sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="分配名称"
+        android:textColor="?attr/blTextSecondary"
+        android:textSize="12sp" />
+
+    <EditText
+        android:id="@+id/etNodeName"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="6dp"
+        android:background="?attr/blInputBackground"
+        android:hint="例如：餐饮、日用、储蓄"
+        android:imeOptions="actionNext"
+        android:inputType="text"
+        android:maxLength="20"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:singleLine="true"
+        android:textColor="?attr/blTextPrimary"
+        android:textColorHint="?attr/blTextTertiary"
+        android:textSize="15sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="分配金额（元）"
+        android:textColor="?attr/blTextSecondary"
+        android:textSize="12sp" />
+
+    <EditText
+        android:id="@+id/etNodeAmount"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="6dp"
+        android:background="?attr/blInputBackground"
+        android:fontFeatureSettings="tnum"
+        android:hint="0.00"
+        android:imeOptions="actionNext"
+        android:inputType="numberDecimal"
+        android:maxLength="12"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:singleLine="true"
+        android:textColor="?attr/blTextPrimary"
+        android:textColorHint="?attr/blTextTertiary"
+        android:textSize="18sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:text="关联类别（可选）"
+        android:textColor="?attr/blTextSecondary"
+        android:textSize="12sp" />
+
+    <Spinner
+        android:id="@+id/spinnerCategory"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="6dp"
+        android:background="?attr/blInputBackground"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:popupBackground="?attr/blSpinnerPopup" />
+
+    <TextView
+        android:id="@+id/tvWarning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:textColor="?attr/blWarningText"
+        android:textSize="11sp"
+        android:visibility="gone" />
+</LinearLayout>

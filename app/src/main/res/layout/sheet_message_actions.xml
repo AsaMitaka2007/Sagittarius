@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/blCardFillTop"
+    android:orientation="vertical"
+    android:padding="18dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/agent_message_actions"
+        android:textColor="?attr/blTextPrimary"
+        android:textSize="17sp"
+        android:textStyle="bold" />
+
+    <TextView android:id="@+id/actionCopy" android:layout_width="match_parent" android:layout_height="48dp" android:layout_marginTop="10dp" android:gravity="center_vertical" android:paddingStart="14dp" android:paddingEnd="14dp" android:text="@string/agent_copy_text" android:textColor="?attr/blTextPrimary" android:textSize="14sp" />
+    <TextView android:id="@+id/actionClear" android:layout_width="match_parent" android:layout_height="48dp" android:gravity="center_vertical" android:paddingStart="14dp" android:paddingEnd="14dp" android:text="@string/agent_clear_current" android:textColor="?attr/blWarning" android:textSize="14sp" />
+</LinearLayout>

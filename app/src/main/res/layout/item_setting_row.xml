@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.dsha.sagittarius.ui.GlassCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/settingRow"
+    android:layout_width="match_parent"
+    android:layout_height="68dp"
+    android:layout_marginBottom="9dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:paddingStart="14dp"
+    android:paddingEnd="14dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/settingIcon"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/blIconCircleBackground"
+            android:contentDescription="@null"
+            android:padding="8dp"
+            app:tint="?attr/blGradientStart" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/settingTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/settingDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?attr/blTextSecondary"
+                android:textSize="11sp" />
+        </LinearLayout>
+
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/settingSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/settingChevron"
+            android:layout_width="19dp"
+            android:layout_height="19dp"
+            android:layout_marginStart="8dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_chevron_right"
+            android:visibility="gone"
+            app:tint="?attr/blTextTertiary" />
+    </LinearLayout>
+</com.dsha.sagittarius.ui.GlassCardView>

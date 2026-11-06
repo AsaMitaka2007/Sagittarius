@@ -1,0 +1,26 @@
+.gradle/
+build/
+app/build/
+.idea/
+*.iml
+local.properties
+dist/
+captures/
+.externalNativeBuild/
+.cxx/
+
+keystore/
+*.jks
+*.keystore
+*.p12
+*.pem
+
+# 密钥/隐私相关
+ApiKeyStore.kt
+.env
+.env.*
+secrets.properties
+google-services.json
+*.db
+*.sqlite
+*.sqlite3

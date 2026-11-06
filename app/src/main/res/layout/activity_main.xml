@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/blBottomBarBackground"
+        android:elevation="18dp"
+        android:orientation="vertical">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?attr/blGradientHairline" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="68dp"
+            android:orientation="horizontal"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp">
+
+            <com.dsha.sagittarius.ui.GradientTabView
+                android:id="@+id/tabAdd"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:tabIcon="@drawable/ic_add"
+                app:tabLabel="@string/tab_add" />
+
+            <com.dsha.sagittarius.ui.GradientTabView
+                android:id="@+id/tabHistory"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:tabIcon="@drawable/ic_history"
+                app:tabLabel="@string/tab_history" />
+
+            <com.dsha.sagittarius.ui.GradientTabView
+                android:id="@+id/tabBudget"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:tabIcon="@drawable/ic_wallet"
+                app:tabLabel="@string/tab_budget" />
+
+            <com.dsha.sagittarius.ui.GradientTabView
+                android:id="@+id/tabStats"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:tabIcon="@drawable/ic_stats"
+                app:tabLabel="@string/tab_stats" />
+
+            <com.dsha.sagittarius.ui.GradientTabView
+                android:id="@+id/tabDietAdd"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:tabIcon="@drawable/ic_diet"
+                app:tabLabel="@string/tab_diet_add" />
+
+            <com.dsha.sagittarius.ui.GradientTabView
+                android:id="@+id/tabDietHistory"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:tabIcon="@drawable/ic_diet_history"
+                app:tabLabel="@string/tab_diet_history" />
+
+            <com.dsha.sagittarius.ui.GradientTabView
+                android:id="@+id/tabNutrition"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:tabIcon="@drawable/ic_nutrition"
+                app:tabLabel="@string/tab_nutrition" />
+
+            <com.dsha.sagittarius.ui.GradientTabView
+                android:id="@+id/tabWeather"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:tabIcon="@drawable/ic_weather"
+                app:tabLabel="@string/tab_weather" />
+
+            <com.dsha.sagittarius.ui.GradientTabView
+                android:id="@+id/tabSettings"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                app:tabIcon="@drawable/ic_settings"
+                app:tabLabel="@string/tab_settings" />
+        </LinearLayout>
+    </LinearLayout>
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/fabAgent"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="84dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/agent_fab_description"
+        android:elevation="0dp"
+        android:padding="0dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/sgr"
+        android:stateListAnimator="@null"
+        app:tint="@null" />
+</FrameLayout>
