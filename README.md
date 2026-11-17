@@ -17,3 +17,8 @@
 4. 系统要求：Android 8.0（API 26）及以上
 
 首次打开后，在设置中填写自己的 API Key 即可使用。
+
+## 从源码构建
+
+环境要求（JDK 17 + Android SDK 34）、Windows / macOS 命令、版本号与数据库改动规则
+见 [BUILDING.md](BUILDING.md)。
