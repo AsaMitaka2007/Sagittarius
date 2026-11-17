@@ -492,3 +492,17 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 
 - 左上角绝对坐标、X/Y 拖动、暂停呼吸动画、位置初始化；ChoiceParser、选项 UI、点击发送。
 - 42 单测通过；Lint 0 errors / 395 warnings；未真机验收拖动与选项点击。
+
+
+## 1.0 维护基线（2026-11-17）
+
+- 环境：Windows 11、JDK 17、Android SDK 34；命令与注意事项见 `BUILDING.md`。
+- `assembleDebug --rerun-tasks`：BUILD SUCCESSFUL，40s，42/42 task 实际执行。
+- `testDebugUnitTest --rerun-tasks`：17 个测试类 / 42 用例 / 0 失败 / 0 跳过，BUILD SUCCESSFUL，36s。
+- `lintDebug`：0 error / 394 warning（UnusedResources 181、HardcodedText 44、SmallSp 20、DrawAllocation 18 等）。仅记录基线，本轮未为消除 warning 改代码。
+- Kotlin 编译警告：16 条（既有问题，本轮未处理）。
+- 修复：`ApiKeyStore.kt` 此前被 `.gitignore` 按文件名误排除，`SagittariusApp.kt` 三处引用它，导致任何 clone 均无法编译。已移除忽略规则并纳入版本控制。该文件仅含 AES-GCM + Android Keystore 加解密逻辑，不含任何密钥值。
+- 干净副本验证：`git clone` 到临时目录后执行 `assembleDebug` + `testDebugUnitTest`，BUILD SUCCESSFUL（50 tasks，28 executed / 22 from cache），验证后临时目录已删除。
+- 新增 `.github/workflows/android.yml`：push / PR 时用 JDK 17 执行 `assembleDebug` 与 `testDebugUnitTest`。
+- 版本号：当前 `versionCode 62 / versionName 1.0`，与 `dist/sgr-release-1.0.apk` 实测一致；规则已写入 `BUILDING.md`。
+- 未完成：本轮未 push，CI 尚未在 GitHub 远端实际执行过；lint 的 394 条 warning 未清理。
