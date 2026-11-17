@@ -15,8 +15,7 @@ keystore/
 *.p12
 *.pem
 
-# 密钥/隐私相关
-ApiKeyStore.kt
+# 密钥/隐私相关（注意：ApiKeyStore.kt 只是加解密逻辑，不含任何密钥，必须入库）
 .env
 .env.*
 secrets.properties
