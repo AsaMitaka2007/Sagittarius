@@ -54,8 +54,9 @@ object NutritionGoalSheet {
         val fat = field("脂肪 (g)", goal.fat)
         val protein = field("蛋白质 (g)", goal.protein)
         val fiber = field("纤维 (g)", goal.fiber)
-        val vitamin = field("维生素 (mg)", goal.vitamin)
+        val vitamin = field("维生素总量 (mg)", goal.vitamin)
         val water = field("水 (g)", goal.water)
+        val sodium = field("钠 (mg)", goal.sodium)
         val save = TextView(context).apply {
             text = "保存目标"
             gravity = android.view.Gravity.CENTER
@@ -75,7 +76,8 @@ object NutritionGoalSheet {
                         protein = d(protein),
                         fiber = d(fiber),
                         vitamin = d(vitamin),
-                        water = d(water)
+                        water = d(water),
+                        sodium = d(sodium)
                     )
                 )
                 sheet.dismiss()

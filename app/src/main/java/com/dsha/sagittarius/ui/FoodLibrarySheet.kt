@@ -2,7 +2,6 @@ package com.dsha.sagittarius.ui
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.text.InputType
@@ -14,6 +13,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
+import com.dsha.sagittarius.R
 import com.dsha.sagittarius.data.DietRepository
 import com.dsha.sagittarius.data.FoodCategoryEntity
 import com.dsha.sagittarius.data.FoodEntity
@@ -296,16 +296,16 @@ object FoodLibrarySheet {
                             )
                         }
                     }
-                    val bitmap = food.imageUri?.let { BitmapFactory.decodeFile(it) }
+                    val bitmap = FoodImageLoader.load(context, food.imageUri)
                     if (bitmap != null) image.setImageBitmap(bitmap)
-                    else image.setImageResource(android.R.drawable.ic_menu_gallery)
+                    else image.setImageResource(R.drawable.ic_food_placeholder)
                     row.addView(image, LinearLayout.LayoutParams(dp(42f), dp(42f)))
                     val info = LinearLayout(context).apply {
                         orientation = LinearLayout.VERTICAL
                         setPadding(dp(10f), 0, 0, 0)
                     }
                     info.addView(TextView(context).apply {
-                        text = "${food.icon} ${food.name}"
+                        text = food.name
                         setTextColor(tokens.textPrimary)
                         textSize = 14f
                     })

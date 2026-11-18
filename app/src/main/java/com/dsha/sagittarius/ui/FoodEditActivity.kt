@@ -1,7 +1,6 @@
 package com.dsha.sagittarius.ui
 
 import android.app.Activity
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
@@ -87,14 +86,20 @@ class FoodEditActivity : ComponentActivity() {
             setOnClickListener { chooseImage() }
         })
         field(root, "name", "食物名称", InputType.TYPE_CLASS_TEXT, "")
-        field(root, "icon", "图标（emoji）", InputType.TYPE_CLASS_TEXT, "🍽️")
         field(root, "kcal", "热量", num(), "0", "kcal / 100g")
         field(root, "carbs", "碳水化合物", num(), "0", "g / 100g")
         field(root, "fat", "脂肪", num(), "0", "g / 100g")
         field(root, "protein", "蛋白质", num(), "0", "g / 100g")
         field(root, "fiber", "纤维素", num(), "0", "g / 100g")
-        field(root, "vitamin", "维生素", num(), "0", "mg / 100g")
+        field(root, "vitamin", "维生素总量", num(), "0", "mg / 100g")
         field(root, "water", "水", num(), "0", "g / 100g")
+        field(root, "sodium", "钠", num(), "0", "mg / 100g")
+        field(root, "vitA", "维生素 A", num(), "0", "μg RE / 100g")
+        field(root, "vitB1", "维生素 B1", num(), "0", "mg / 100g")
+        field(root, "vitB2", "维生素 B2", num(), "0", "mg / 100g")
+        field(root, "vitB3", "烟酸 B3", num(), "0", "mg / 100g")
+        field(root, "vitC", "维生素 C", num(), "0", "mg / 100g")
+        field(root, "vitE", "维生素 E", num(), "0", "mg / 100g")
 
         root.addView(TextView(this).apply {
             text = "单位换算"
@@ -258,7 +263,6 @@ class FoodEditActivity : ComponentActivity() {
     private fun populate(food: FoodEntity) {
         imagePath = food.imageUri
         fields["name"]?.setText(food.name)
-        fields["icon"]?.setText(food.icon)
         fields["kcal"]?.setText(food.caloriesPer100g.toString())
         fields["carbs"]?.setText(food.carbsPer100g.toString())
         fields["fat"]?.setText(food.fatPer100g.toString())
@@ -266,12 +270,20 @@ class FoodEditActivity : ComponentActivity() {
         fields["fiber"]?.setText(food.fiberPer100g.toString())
         fields["vitamin"]?.setText(food.vitaminPer100g.toString())
         fields["water"]?.setText(food.waterPer100g.toString())
+        fields["sodium"]?.setText(food.sodiumPer100g.toString())
+        fields["vitA"]?.setText(food.vitaminAPer100g.toString())
+        fields["vitB1"]?.setText(food.vitaminB1Per100g.toString())
+        fields["vitB2"]?.setText(food.vitaminB2Per100g.toString())
+        fields["vitB3"]?.setText(food.vitaminB3Per100g.toString())
+        fields["vitC"]?.setText(food.vitaminCPer100g.toString())
+        fields["vitE"]?.setText(food.vitaminEPer100g.toString())
         renderPreview()
     }
 
     private fun renderPreview() {
-        val bitmap = imagePath?.let { BitmapFactory.decodeFile(it) }
-        if (bitmap != null) preview.setImageBitmap(bitmap) else preview.setImageResource(android.R.drawable.ic_menu_gallery)
+        val bitmap = FoodImageLoader.load(this, imagePath)
+        if (bitmap != null) preview.setImageBitmap(bitmap)
+        else preview.setImageResource(R.drawable.ic_food_placeholder)
     }
 
     private fun saveFood() {
@@ -289,7 +301,6 @@ class FoodEditActivity : ComponentActivity() {
         val food = FoodEntity(
             id = base?.id ?: 0L,
             name = name,
-            icon = text("icon").ifEmpty { "🍽️" },
             unit = "g",
             weightPerUnit = 1.0,
             caloriesPer100g = number("kcal"),
@@ -299,6 +310,13 @@ class FoodEditActivity : ComponentActivity() {
             fiberPer100g = number("fiber"),
             vitaminPer100g = number("vitamin"),
             waterPer100g = number("water"),
+            sodiumPer100g = number("sodium"),
+            vitaminAPer100g = number("vitA"),
+            vitaminB1Per100g = number("vitB1"),
+            vitaminB2Per100g = number("vitB2"),
+            vitaminB3Per100g = number("vitB3"),
+            vitaminCPer100g = number("vitC"),
+            vitaminEPer100g = number("vitE"),
             category = base?.category ?: category,
             favorite = base?.favorite ?: false,
             imageUri = imagePath ?: base?.imageUri,

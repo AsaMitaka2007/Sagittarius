@@ -21,7 +21,7 @@ import com.dsha.sagittarius.data.NutritionValues
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import java.util.Locale
 
-/** 轻量快捷录入：实时热量 + 可展开六项营养。 */
+/** 轻量快捷录入：实时热量 + 可展开营养明细。 */
 object FoodAmountSheet {
     fun show(
         context: Context,
@@ -86,7 +86,14 @@ object FoodAmountSheet {
             visibility = android.view.View.GONE
             setPadding(0, dp(4f), 0, dp(4f))
         }
-        val detailKeys = listOf("碳水", "脂肪", "蛋白质", "纤维素", "维生素", "水")
+        val detailKeys = listOf(
+            "碳水", "脂肪", "蛋白质", "纤维素", "维生素", "水", "钠",
+            "维生素A", "维生素B1", "维生素B2", "烟酸B3", "维生素C", "维生素E"
+        )
+        val detailUnits = listOf(
+            "g", "g", "g", "g", "mg", "g", "mg",
+            "μg", "mg", "mg", "mg", "mg", "mg"
+        )
         val detailViews = mutableListOf<TextView>()
         detailKeys.forEach { label ->
             val cell = TextView(context).apply {
@@ -130,10 +137,14 @@ object FoodAmountSheet {
         fun update() {
             val (_, n) = currentValues()
             kcal.text = String.format(Locale.CHINA, "%.1f", n.calories)
-            val values = listOf(n.carbs, n.fat, n.protein, n.fiber, n.vitamin, n.water)
+            val values = listOf(
+                n.carbs, n.fat, n.protein, n.fiber, n.vitamin, n.water, n.sodium,
+                n.vitaminA, n.vitaminB1, n.vitaminB2, n.vitaminB3, n.vitaminC, n.vitaminE
+            )
             detailViews.forEachIndexed { index, view ->
-                val suffix = if (index == 4) "mg" else "g"
-                view.text = "${detailKeys[index]}  ${String.format(Locale.CHINA, "%.1f", values[index])} $suffix"
+                val digits = if (index == 7) "%.0f" else "%.2f"
+                view.text = "${detailKeys[index]}  " +
+                    String.format(Locale.CHINA, digits, values[index]) + " ${detailUnits[index]}"
             }
         }
         fun toggleDetails() {

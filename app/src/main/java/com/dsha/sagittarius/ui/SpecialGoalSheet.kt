@@ -104,8 +104,9 @@ object SpecialGoalSheet {
         val fat = field("脂肪 (g)", base.fat)
         val protein = field("蛋白质 (g)", base.protein)
         val fiber = field("纤维 (g)", base.fiber)
-        val vitamin = field("维生素 (mg)", base.vitamin)
+        val vitamin = field("维生素总量 (mg)", base.vitamin)
         val water = field("水 (g)", base.water)
+        val sodium = field("钠 (mg)", base.sodium)
         val save = TextView(context).apply {
             text = "保存特殊目标"
             gravity = Gravity.CENTER
@@ -132,7 +133,8 @@ object SpecialGoalSheet {
                     protein = d(protein),
                     fiber = d(fiber),
                     vitamin = d(vitamin),
-                    water = d(water)
+                    water = d(water),
+                    sodium = d(sodium)
                 )
             )
             sheet.dismiss()

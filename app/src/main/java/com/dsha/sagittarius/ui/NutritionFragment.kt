@@ -18,6 +18,7 @@ import com.dsha.sagittarius.R
 import com.dsha.sagittarius.data.DietRecordEntity
 import com.dsha.sagittarius.data.DietRepository
 import com.dsha.sagittarius.data.NutritionGoalEntity
+import com.dsha.sagittarius.data.NutritionMath
 import com.dsha.sagittarius.databinding.FragmentNutritionBinding
 import com.dsha.sagittarius.util.DateText
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -101,17 +102,23 @@ class NutritionFragment : Fragment() {
     }
 
     private fun render(records: List<DietRecordEntity> = currentRecords) {
-        val calories = records.sumOf { it.calories }
-        val carbs = records.sumOf { it.carbs }
-        val fat = records.sumOf { it.fat }
-        val protein = records.sumOf { it.protein }
-        val fiber = records.sumOf { it.fiber }
-        val water = records.sumOf { it.water }
-        binding.nutritionRings.setData(calories, carbs, fat, protein, fiber, water, goal)
-        binding.nutritionLegend.setData(calories, protein, carbs, fat, fiber, water, goal)
+        val totals = NutritionMath.sum(records)
+        binding.nutritionRings.setData(
+            totals.calories, totals.carbs, totals.fat, totals.protein,
+            totals.fiber, totals.water, goal
+        )
+        binding.nutritionLegend.setData(
+            totals.calories, totals.protein, totals.carbs, totals.fat,
+            totals.fiber, totals.water, goal
+        )
+        binding.sodiumBar.setData(totals.sodium, goal.sodium)
+        binding.vitaminGrid.setData(
+            totals.vitaminA, totals.vitaminB1, totals.vitaminB2,
+            totals.vitaminB3, totals.vitaminC, totals.vitaminE
+        )
         binding.tvNutritionDate.text = DateText.full(selectedDate)
         binding.tvNutritionTotal.text = getString(
-            R.string.nutrition_total, calories, goal.calories
+            R.string.nutrition_total, totals.calories, goal.calories
         )
     }
 

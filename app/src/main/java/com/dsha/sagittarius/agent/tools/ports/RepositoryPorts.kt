@@ -99,6 +99,7 @@ class AppSettingsPort(
             ?: throw IllegalArgumentException("营养目标必须是数字")
         val goal = diet.getGoal() ?: NutritionGoalEntity()
         val result = when {
+            text.contains("sodium") || text.contains("钠") -> goal.copy(sodium = numeric).also { diet.saveGoal(it) }
             text.contains("protein") || text.endsWith("g") -> goal.copy(protein = numeric).also { diet.saveGoal(it) }
             text.contains("carb") -> goal.copy(carbs = numeric).also { diet.saveGoal(it) }
             text.contains("fat") -> goal.copy(fat = numeric).also { diet.saveGoal(it) }

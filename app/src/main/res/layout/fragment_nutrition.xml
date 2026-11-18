@@ -59,6 +59,26 @@
             android:layout_height="82dp"
             android:layout_marginTop="2dp" />
 
+        <com.dsha.sagittarius.ui.SodiumBarView
+            android:id="@+id/sodiumBar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="6dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="@string/nutrition_vitamin_breakdown"
+            android:textColor="?attr/blTextSecondary"
+            android:textSize="11sp" />
+
+        <com.dsha.sagittarius.ui.VitaminGridView
+            android:id="@+id/vitaminGrid"
+            android:layout_width="match_parent"
+            android:layout_height="92dp"
+            android:layout_marginTop="2dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

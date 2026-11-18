@@ -18,7 +18,8 @@ enum class MealType {
 data class FoodEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val name: String,
-    val icon: String = "🍽️",
+    /** 已废弃：图标改由图片展示，字段仅为兼容旧库保留，新数据统一写空字符串。 */
+    val icon: String = "",
     /** 默认单位，如 g、份。 */
     val unit: String = "g",
     /** 1 个 unit 等于多少克；g 单位时为 1。 */
@@ -28,13 +29,28 @@ data class FoodEntity(
     val fatPer100g: Double,
     val proteinPer100g: Double,
     val fiberPer100g: Double,
+    /** 维生素总量（mg），用于总体达标参考，不等于下方细分项之和。 */
     val vitaminPer100g: Double,
     val waterPer100g: Double,
+    /** 钠（mg）。 */
+    val sodiumPer100g: Double = 0.0,
+    /** 维生素 A（μg RE）。 */
+    val vitaminAPer100g: Double = 0.0,
+    /** 维生素 B1（mg）。 */
+    val vitaminB1Per100g: Double = 0.0,
+    /** 维生素 B2（mg）。 */
+    val vitaminB2Per100g: Double = 0.0,
+    /** 烟酸 / 维生素 B3（mg）。 */
+    val vitaminB3Per100g: Double = 0.0,
+    /** 维生素 C（mg）。 */
+    val vitaminCPer100g: Double = 0.0,
+    /** 维生素 E（mg）。 */
+    val vitaminEPer100g: Double = 0.0,
     /** FRUIT_VEG / MEAT_EGG / STAPLE / SNACK */
     val category: String = "STAPLE",
     /** 只有收藏食材才进入饮食轮盘。 */
     val favorite: Boolean = false,
-    /** 本地裁剪后的图标文件路径。 */
+    /** 本地图片路径，或 asset:food_images/xxx.jpg 形式的打包图片。 */
     val imageUri: String? = null,
     val isCustom: Boolean = false,
     val sortOrder: Int = 0,
@@ -72,7 +88,8 @@ data class DietRecordEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     val foodId: Long,
     val foodName: String,
-    val icon: String,
+    /** 已废弃：图标改由 imageUri 展示，字段仅为兼容旧库保留，新数据统一写空字符串。 */
+    val icon: String = "",
     val mealType: MealType,
     val amount: Double,
     val unit: String,
@@ -82,8 +99,25 @@ data class DietRecordEntity(
     val fat: Double,
     val protein: Double,
     val fiber: Double,
+    /** 维生素总量（mg）。 */
     val vitamin: Double,
     val water: Double,
+    /** 钠（mg）。 */
+    val sodium: Double = 0.0,
+    /** 维生素 A（μg RE）。 */
+    val vitaminA: Double = 0.0,
+    /** 维生素 B1（mg）。 */
+    val vitaminB1: Double = 0.0,
+    /** 维生素 B2（mg）。 */
+    val vitaminB2: Double = 0.0,
+    /** 烟酸 / 维生素 B3（mg）。 */
+    val vitaminB3: Double = 0.0,
+    /** 维生素 C（mg）。 */
+    val vitaminC: Double = 0.0,
+    /** 维生素 E（mg）。 */
+    val vitaminE: Double = 0.0,
+    /** 记录时的图片快照，避免食材后续换图影响历史。 */
+    val imageUri: String? = null,
     val date: LocalDate,
     val createdAt: Long = System.currentTimeMillis()
 )
@@ -97,7 +131,9 @@ data class NutritionGoalEntity(
     val protein: Double = 60.0,
     val fiber: Double = 25.0,
     val vitamin: Double = 100.0,
-    val water: Double = 2000.0
+    val water: Double = 2000.0,
+    /** 钠（mg），默认按中国居民膳食指南上限 2000mg。 */
+    val sodium: Double = 2000.0
 )
 
 object NutritionMath {
@@ -121,7 +157,14 @@ object NutritionMath {
             protein = food.proteinPer100g * factor,
             fiber = food.fiberPer100g * factor,
             vitamin = food.vitaminPer100g * factor,
-            water = food.waterPer100g * factor
+            water = food.waterPer100g * factor,
+            sodium = food.sodiumPer100g * factor,
+            vitaminA = food.vitaminAPer100g * factor,
+            vitaminB1 = food.vitaminB1Per100g * factor,
+            vitaminB2 = food.vitaminB2Per100g * factor,
+            vitaminB3 = food.vitaminB3Per100g * factor,
+            vitaminC = food.vitaminCPer100g * factor,
+            vitaminE = food.vitaminEPer100g * factor
         )
     }
 
@@ -138,7 +181,6 @@ object NutritionMath {
         return DietRecordEntity(
             foodId = food.id,
             foodName = food.name,
-            icon = food.icon,
             mealType = mealType,
             amount = amount,
             unit = unitName,
@@ -150,9 +192,35 @@ object NutritionMath {
             fiber = n.fiber,
             vitamin = n.vitamin,
             water = n.water,
+            sodium = n.sodium,
+            vitaminA = n.vitaminA,
+            vitaminB1 = n.vitaminB1,
+            vitaminB2 = n.vitaminB2,
+            vitaminB3 = n.vitaminB3,
+            vitaminC = n.vitaminC,
+            vitaminE = n.vitaminE,
+            imageUri = food.imageUri,
             date = date
         )
     }
+
+    /** 汇总一组饮食记录，供营养页与测试共用。 */
+    fun sum(records: List<DietRecordEntity>): NutritionValues = NutritionValues(
+        calories = records.sumOf { it.calories },
+        carbs = records.sumOf { it.carbs },
+        fat = records.sumOf { it.fat },
+        protein = records.sumOf { it.protein },
+        fiber = records.sumOf { it.fiber },
+        vitamin = records.sumOf { it.vitamin },
+        water = records.sumOf { it.water },
+        sodium = records.sumOf { it.sodium },
+        vitaminA = records.sumOf { it.vitaminA },
+        vitaminB1 = records.sumOf { it.vitaminB1 },
+        vitaminB2 = records.sumOf { it.vitaminB2 },
+        vitaminB3 = records.sumOf { it.vitaminB3 },
+        vitaminC = records.sumOf { it.vitaminC },
+        vitaminE = records.sumOf { it.vitaminE }
+    )
 }
 
 data class NutritionValues(
@@ -162,7 +230,14 @@ data class NutritionValues(
     val protein: Double,
     val fiber: Double,
     val vitamin: Double,
-    val water: Double
+    val water: Double,
+    val sodium: Double = 0.0,
+    val vitaminA: Double = 0.0,
+    val vitaminB1: Double = 0.0,
+    val vitaminB2: Double = 0.0,
+    val vitaminB3: Double = 0.0,
+    val vitaminC: Double = 0.0,
+    val vitaminE: Double = 0.0
 )
 
 @Entity(
@@ -179,7 +254,8 @@ data class NutritionGoalOverrideEntity(
     val protein: Double = 60.0,
     val fiber: Double = 25.0,
     val vitamin: Double = 100.0,
-    val water: Double = 2000.0
+    val water: Double = 2000.0,
+    val sodium: Double = 2000.0
 ) {
     fun toGoal(): NutritionGoalEntity = NutritionGoalEntity(
         calories = calories,
@@ -188,6 +264,7 @@ data class NutritionGoalOverrideEntity(
         protein = protein,
         fiber = fiber,
         vitamin = vitamin,
-        water = water
+        water = water,
+        sodium = sodium
     )
 }

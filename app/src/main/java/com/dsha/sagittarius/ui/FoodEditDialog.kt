@@ -33,7 +33,6 @@ object FoodEditDialog {
             return e
         }
         val name = field(R.string.diet_food_name, android.text.InputType.TYPE_CLASS_TEXT)
-        val icon = field(R.string.diet_food_icon, android.text.InputType.TYPE_CLASS_TEXT, "🍽️")
         val unit = field(R.string.diet_food_unit, android.text.InputType.TYPE_CLASS_TEXT, "g")
         val weight = field(R.string.diet_food_weight, text = "1")
         val kcal = field(R.string.diet_food_kcal, text = "0")
@@ -60,7 +59,6 @@ object FoodEditDialog {
                 fun d(e: EditText): Double = e.text?.toString()?.toDoubleOrNull() ?: 0.0
                 val food = FoodEntity(
                     name = foodName,
-                    icon = icon.text?.toString()?.trim().orEmpty().ifEmpty { "🍽️" },
                     unit = unit.text?.toString()?.trim().orEmpty().ifEmpty { "g" },
                     weightPerUnit = d(weight).takeIf { it > 0 } ?: 1.0,
                     caloriesPer100g = d(kcal),

@@ -271,7 +271,6 @@
 <string name="diet_food_carbs">碳水 (g/100g)</string>
 <string name="diet_food_fat">脂肪 (g/100g)</string>
 <string name="diet_food_fiber">纤维 (g/100g)</string>
-<string name="diet_food_icon">图标（emoji）</string>
 <string name="diet_food_kcal">每 100g 热量 (kcal)</string>
 <string name="diet_food_name">食物名称</string>
 <string name="diet_food_protein">蛋白质 (g/100g)</string>
@@ -366,6 +365,7 @@
 <string name="nutrition_subtitle">让身体的每一种需要，都被温柔看见。</string>
 <string name="nutrition_today_calories">今日总热量</string>
 <string name="nutrition_total">%1$.0f / %2$.0f kcal</string>
+<string name="nutrition_vitamin_breakdown">维生素细分（仅参考，不计入达标）</string>
 <string name="over_budget">已超支</string>
 <string name="overlay_guide_dialog_body">将跳转到系统「显示在其他应用上层」页面。\n请找到「Sagittarius」并打开开关。\n\nHyperOS 若没有直接显示该开关，请到：设置 → 应用设置 → 应用管理 → Sagittarius → 权限管理 → 悬浮窗。</string>
 <string name="overlay_guide_dialog_title">开启悬浮窗权限</string>

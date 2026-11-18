@@ -3,6 +3,7 @@ package com.dsha.sagittarius.ui
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.dsha.sagittarius.R
@@ -67,12 +68,14 @@ class DietRecordAdapter(
     }
 
     private inner class RecordHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val icon: TextView = view.findViewById(R.id.tvFoodIcon)
+        private val image: ImageView = view.findViewById(R.id.ivFoodIcon)
         private val name: TextView = view.findViewById(R.id.tvFoodName)
         private val amount: TextView = view.findViewById(R.id.tvFoodAmount)
         private val calories: TextView = view.findViewById(R.id.tvFoodCalories)
         fun bind(record: DietRecordEntity) {
-            icon.text = record.icon
+            val bitmap = FoodImageLoader.load(itemView.context, record.imageUri)
+            if (bitmap != null) image.setImageBitmap(bitmap)
+            else image.setImageResource(R.drawable.ic_food_placeholder)
             name.text = record.foodName
             amount.text = String.format(Locale.CHINA, "%.0f %s · %.0f g", record.amount, record.unit, record.grams)
             calories.text = String.format(Locale.CHINA, "%.0f kcal", record.calories)

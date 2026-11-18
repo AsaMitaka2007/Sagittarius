@@ -58,7 +58,6 @@ class ManageFoodLibraryTool(
                 if (existing != null) return@withContext fail("食材「$name」已存在，请使用 update")
                 val food = FoodEntity(
                     name = name,
-                    icon = "🍽️",
                     unit = "g",
                     weightPerUnit = 1.0,
                     caloriesPer100g = number(args, "calories"),

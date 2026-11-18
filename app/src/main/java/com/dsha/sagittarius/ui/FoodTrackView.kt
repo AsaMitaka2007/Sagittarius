@@ -183,7 +183,7 @@ class FoodTrackView @JvmOverloads constructor(
         fillPaint.color = base
         fillPaint.alpha = alpha
         canvas.drawCircle(x, y, radius, fillPaint)
-        val bitmap: Bitmap? = food.imageUri?.let { FoodImageLoader.load(it) }
+        val bitmap: Bitmap? = FoodImageLoader.load(context, food.imageUri)
         if (bitmap != null) {
             clipPath.reset()
             clipPath.addCircle(x, y, radius - dp(1f), Path.Direction.CW)
@@ -196,9 +196,10 @@ class FoodTrackView @JvmOverloads constructor(
             canvas.restoreToCount(save)
         } else {
             iconPaint.alpha = alpha
-            iconPaint.textSize = dp(18f)
+            iconPaint.textSize = dp(16f)
             iconPaint.color = Color.WHITE
-            canvas.drawText(food.icon.take(2), x, y - dp(1f), iconPaint)
+            // 无图片时显示名称首字，避免回到 emoji。
+            canvas.drawText(food.name.take(1), x, y + dp(5f), iconPaint)
         }
         borderPaint.alpha = alpha
         borderPaint.color = ColorUtils.setAlphaComponent(Color.WHITE, 90)

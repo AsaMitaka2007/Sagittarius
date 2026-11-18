@@ -33,4 +33,49 @@ class DietMathTest {
         assertEquals(60.0, record.grams, 0.0001)
         assertEquals(86.4, record.calories, 0.0001)
     }
+
+    @Test
+    fun sodiumAndVitaminsScaleWithGrams() {
+        val food = egg.copy(
+            sodiumPer100g = 200.0,
+            vitaminAPer100g = 100.0,
+            vitaminB1Per100g = 0.5,
+            vitaminB2Per100g = 0.4,
+            vitaminB3Per100g = 2.0,
+            vitaminCPer100g = 10.0,
+            vitaminEPer100g = 1.0
+        )
+        val n = NutritionMath.scale(food, 50.0)
+        assertEquals(100.0, n.sodium, 0.0001)
+        assertEquals(50.0, n.vitaminA, 0.0001)
+        assertEquals(0.25, n.vitaminB1, 0.0001)
+        assertEquals(5.0, n.vitaminC, 0.0001)
+        assertEquals(0.5, n.vitaminE, 0.0001)
+    }
+
+    @Test
+    fun recordSnapshotKeepsImageAndSodium() {
+        val food = egg.copy(
+            sodiumPer100g = 100.0,
+            imageUri = "asset:food_images/food_01.jpg"
+        )
+        val record = NutritionMath.recordFrom(food, MealType.LUNCH, 100.0, "g", 1.0, LocalDate.now())
+        assertEquals(100.0, record.sodium, 0.0001)
+        assertEquals("asset:food_images/food_01.jpg", record.imageUri)
+    }
+
+    @Test
+    fun sumAggregatesSodiumAndVitamins() {
+        val first = NutritionMath.recordFrom(
+            egg.copy(sodiumPer100g = 10.0, vitaminCPer100g = 2.0),
+            MealType.BREAKFAST, 100.0, "g", 1.0, LocalDate.now()
+        )
+        val second = NutritionMath.recordFrom(
+            egg.copy(sodiumPer100g = 30.0, vitaminCPer100g = 4.0),
+            MealType.LUNCH, 200.0, "g", 1.0, LocalDate.now()
+        )
+        val total = NutritionMath.sum(listOf(first, second))
+        assertEquals(70.0, total.sodium, 0.0001)
+        assertEquals(10.0, total.vitaminC, 0.0001)
+    }
 }

@@ -27,7 +27,7 @@ import java.io.File
         CnFoodEntity::class,
         ChatSessionEntity::class
     ],
-    version = 9,
+    version = 10,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -424,6 +424,72 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // 钠与维生素细分。维生素 A 使用 μg RE，其余为 mg。
+                db.execSQL("ALTER TABLE `foods` ADD COLUMN `sodiumPer100g` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `foods` ADD COLUMN `vitaminAPer100g` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `foods` ADD COLUMN `vitaminB1Per100g` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `foods` ADD COLUMN `vitaminB2Per100g` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `foods` ADD COLUMN `vitaminB3Per100g` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `foods` ADD COLUMN `vitaminCPer100g` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `foods` ADD COLUMN `vitaminEPer100g` REAL NOT NULL DEFAULT 0")
+
+                db.execSQL("ALTER TABLE `diet_records` ADD COLUMN `sodium` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `diet_records` ADD COLUMN `vitaminA` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `diet_records` ADD COLUMN `vitaminB1` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `diet_records` ADD COLUMN `vitaminB2` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `diet_records` ADD COLUMN `vitaminB3` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `diet_records` ADD COLUMN `vitaminC` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `diet_records` ADD COLUMN `vitaminE` REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE `diet_records` ADD COLUMN `imageUri` TEXT")
+
+                db.execSQL("ALTER TABLE `nutrition_goals` ADD COLUMN `sodium` REAL NOT NULL DEFAULT 2000")
+                db.execSQL("ALTER TABLE `nutrition_goal_overrides` ADD COLUMN `sodium` REAL NOT NULL DEFAULT 2000")
+
+                // emoji 退出展示，字段保留兼容；旧数据统一清空。
+                db.execSQL("UPDATE `foods` SET `icon` = ''")
+                db.execSQL("UPDATE `diet_records` SET `icon` = ''")
+
+                // 预置食物的新字段按 v10 快照回填；不覆盖用户已编辑的基础营养值。
+                FoodCatalog.presets.forEach { food ->
+                    db.execSQL(
+                        "UPDATE `foods` SET `sodiumPer100g` = ?, `vitaminAPer100g` = ?, " +
+                            "`vitaminB1Per100g` = ?, `vitaminB2Per100g` = ?, " +
+                            "`vitaminB3Per100g` = ?, `vitaminCPer100g` = ?, " +
+                            "`vitaminEPer100g` = ?, `imageUri` = ? " +
+                            "WHERE `name` = ? AND `isCustom` = 0",
+                        arrayOf<Any?>(
+                            food.sodiumPer100g,
+                            food.vitaminAPer100g,
+                            food.vitaminB1Per100g,
+                            food.vitaminB2Per100g,
+                            food.vitaminB3Per100g,
+                            food.vitaminCPer100g,
+                            food.vitaminEPer100g,
+                            food.imageUri,
+                            food.name
+                        )
+                    )
+                }
+
+                // 历史饮食记录按食材每 100g 含量 × 实际克重回填，并快照当时的图片。
+                db.execSQL(
+                    """
+                    UPDATE `diet_records` SET
+                        `sodium` = COALESCE((SELECT f.`sodiumPer100g` FROM `foods` f WHERE f.`id` = `diet_records`.`foodId`), 0) * `grams` / 100.0,
+                        `vitaminA` = COALESCE((SELECT f.`vitaminAPer100g` FROM `foods` f WHERE f.`id` = `diet_records`.`foodId`), 0) * `grams` / 100.0,
+                        `vitaminB1` = COALESCE((SELECT f.`vitaminB1Per100g` FROM `foods` f WHERE f.`id` = `diet_records`.`foodId`), 0) * `grams` / 100.0,
+                        `vitaminB2` = COALESCE((SELECT f.`vitaminB2Per100g` FROM `foods` f WHERE f.`id` = `diet_records`.`foodId`), 0) * `grams` / 100.0,
+                        `vitaminB3` = COALESCE((SELECT f.`vitaminB3Per100g` FROM `foods` f WHERE f.`id` = `diet_records`.`foodId`), 0) * `grams` / 100.0,
+                        `vitaminC` = COALESCE((SELECT f.`vitaminCPer100g` FROM `foods` f WHERE f.`id` = `diet_records`.`foodId`), 0) * `grams` / 100.0,
+                        `vitaminE` = COALESCE((SELECT f.`vitaminEPer100g` FROM `foods` f WHERE f.`id` = `diet_records`.`foodId`), 0) * `grams` / 100.0,
+                        `imageUri` = (SELECT f.`imageUri` FROM `foods` f WHERE f.`id` = `diet_records`.`foodId`)
+                    """.trimIndent()
+                )
+            }
+        }
+
         private val MIGRATION_7_8 = object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
@@ -456,7 +522,7 @@ abstract class AppDatabase : RoomDatabase() {
                         AppDatabase::class.java,
                         DB_NAME
                     )
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
                         .addCallback(object : androidx.room.RoomDatabase.Callback() {
                             override fun onCreate(db: SupportSQLiteDatabase) {
                                 CategoryCatalog.presetEntities.forEach { category ->

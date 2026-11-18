@@ -30,7 +30,7 @@ class QueryAppDataToolTest {
         override suspend fun budgetSummary() = "剩余 ¥100.00"
         override suspend fun expensesBetween(start: LocalDate, end: LocalDate) = emptyList<ExpenseEntity>()
         override suspend fun dietBetween(start: LocalDate, end: LocalDate) = listOf(
-            DietRecordEntity(foodId = 1, foodName = "米饭", icon = "🍚", mealType = MealType.LUNCH, amount = 200.0, unit = "g", grams = 200.0, calories = 232.0, carbs = 0.0, fat = 0.0, protein = 0.0, fiber = 0.0, vitamin = 0.0, water = 0.0, date = start)
+            DietRecordEntity(foodId = 1, foodName = "米饭", mealType = MealType.LUNCH, amount = 200.0, unit = "g", grams = 200.0, calories = 232.0, carbs = 0.0, fat = 0.0, protein = 0.0, fiber = 0.0, vitamin = 0.0, water = 0.0, date = start)
         )
     }
 
