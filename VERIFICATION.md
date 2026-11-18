@@ -506,3 +506,16 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 新增 `.github/workflows/android.yml`：push / PR 时用 JDK 17 执行 `assembleDebug` 与 `testDebugUnitTest`。
 - 版本号：当前 `versionCode 62 / versionName 1.0`，与 `dist/sgr-release-1.0.apk` 实测一致；规则已写入 `BUILDING.md`。
 - 未完成：本轮未 push，CI 尚未在 GitHub 远端实际执行过；lint 的 394 条 warning 未清理。
+
+
+## 1.1 钠与维生素细分（2026-11-18）
+
+- 数据库升级到 v10：`foods` 与 `diet_records` 新增钠及维生素 A/B1/B2/B3/C/E 字段，`nutrition_goals` 与 `nutrition_goal_overrides` 新增钠目标（默认 2000mg）。
+- 迁移 9→10：新增列、清空 emoji 字段、按 `FoodCatalog` 回填预置食物、按克重回填历史饮食记录并快照图片。
+- 预置 36 种食物补齐钠与 6 项维生素，来源为 `assets/cn_food.json` 对应条目；饺子与咖啡营养库无对应条目，使用估算值并在代码注释标明。
+- 营养页新增钠进度条（参考上限 2000mg，超量警示色）与 6 项维生素细分展示（仅参考，不参与达标）；食物编辑、快捷录入、每日/特殊目标同步支持。
+- 食材库、饮食记录、食材轮盘移除 emoji，改用 36 张 Pexels 真实图片（480×480，约 1.4MB），来源与作者记录在 `CREDITS.md`；无图自定义食物使用占位图。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 18 个测试类 / 47 用例 / 0 失败。
+- Lint：0 error / 401 warning（新增为未使用资源等 warning，本轮未处理）。
+- 迁移验证：用 Python sqlite3 按 `9.json` 建库、执行迁移 SQL，4 张表结构与 `10.json` 一致，200g 米饭记录的钠回填为 6.6mg，预置图片路径回填正确。
+- 未完成：本机无设备/模拟器，未做真机 UI 验收；本轮未 push；APK 为 debug 签名，覆盖安装已发布的 release 版本会因签名不同失败。
