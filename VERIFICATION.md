@@ -519,3 +519,13 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - Lint：0 error / 401 warning（新增为未使用资源等 warning，本轮未处理）。
 - 迁移验证：用 Python sqlite3 按 `9.json` 建库、执行迁移 SQL，4 张表结构与 `10.json` 一致，200g 米饭记录的钠回填为 6.6mg，预置图片路径回填正确。
 - 未完成：本机无设备/模拟器，未做真机 UI 验收；本轮未 push；APK 为 debug 签名，覆盖安装已发布的 release 版本会因签名不同失败。
+
+
+## 1.1.1 营养圆环交互（2026-11-19）
+
+- 钠由横向进度条改为圆形进度环；维生素 A/B1/B2/B3/C/E 改为 6 个圆形进度环。
+- 圆环中心显示摄入值，下方显示名称与百分比；钠使用目标值（默认 2000mg），维生素使用成人参考摄入量（A 800μg、B1/B2 1.4mg、B3 14mg、C 100mg、E 14mg），仅参考、不计入达标。
+- 触摸或鼠标移入圆环时，明细行显示「摄入量 / 参考值（百分比）」；钠超过目标时圆环与文字转为警示色。
+- 移除 `SodiumBarView` 与 `VitaminGridView`，统一复用 `NutrientRingView`。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 18 个测试类 / 47 用例 / 0 失败；`lintDebug` 0 error / 403 warning。
+- 未完成：本机无设备/模拟器，圆环触摸区域与文字排版未做真机验收。
