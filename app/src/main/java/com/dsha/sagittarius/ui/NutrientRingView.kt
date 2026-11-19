@@ -182,7 +182,7 @@ class NutrientRingView @JvmOverloads constructor(
     }
 
     private fun detail(): String {
-        val overText = if (warnWhenOver && target > 0.0 && value > target) "，已超出参考上限" else ""
+        val overText = if (warnWhenOver && target > 0.0 && value > target) "，已超出" else ""
         return "$fullLabel：${formatValue(value)} $unit / $referenceLabel ${formatTarget()} $unit（${percent()}%）$overText"
     }
 
