@@ -155,7 +155,7 @@ class AgentChatFragment : Fragment() {
                         }
                         adapter.submitList(messages)
                         binding.emptyPanel.visibility =
-                            if (messages.isEmpty()) View.VISIBLE else View.GONE
+                            if (messages.none { it.role == ChatItem.Role.USER }) View.VISIBLE else View.GONE
                         binding.recyclerChat.post {
                             if (userNearBottom && (grew || signature != lastSignature)) {
                                 scrollToBottom()

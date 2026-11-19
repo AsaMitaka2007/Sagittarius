@@ -114,7 +114,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         rebuildEngine()
         refreshBalance()
         loadModels()
-        loadSessions()
+        loadSessions(startFresh = prefs.newSessionOnEnter.value)
     }
 
     private fun addWelcome() {
@@ -127,7 +127,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         )
     }
 
-    private fun loadSessions() {
+    private fun loadSessions(startFresh: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
             var all = runCatching { app.chatSessionDao.getAll() }.getOrDefault(emptyList())
             if (all.isEmpty()) {
@@ -137,9 +137,20 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                 all = runCatching { app.chatSessionDao.getAll() }.getOrDefault(emptyList())
                 if (all.isEmpty()) all = listOf(ChatSessionEntity(id = id, title = "新对话"))
             }
+            var freshId: Long? = null
+            if (startFresh) {
+                freshId = runCatching {
+                    app.chatSessionDao.insert(ChatSessionEntity(title = "新对话"))
+                }.getOrNull()
+                if (freshId != null) {
+                    all = runCatching { app.chatSessionDao.getAll() }.getOrDefault(all)
+                }
+            }
             withContext(Dispatchers.Main) {
                 _sessions.value = all
-                val current = all.firstOrNull { it.id == _sessionId.value }?.id ?: all.first().id
+                val current = freshId
+                    ?: all.firstOrNull { it.id == _sessionId.value }?.id
+                    ?: all.first().id
                 _sessionId.value = current
                 loadHistory(current)
             }

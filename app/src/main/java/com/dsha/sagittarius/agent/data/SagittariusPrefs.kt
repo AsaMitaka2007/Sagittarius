@@ -27,6 +27,7 @@ object AgentPrefsKeys {
     val PERSONA_GREETING = stringPreferencesKey("persona_greeting")
     val TOOL_PERMISSION = stringPreferencesKey("tool_permission")
     val LIVELINESS = stringPreferencesKey("ai_liveliness")
+    val NEW_SESSION_ON_ENTER = booleanPreferencesKey("new_session_on_enter")
     val TOTAL_TOKENS = longPreferencesKey("total_tokens")
     fun model(provider: String) = stringPreferencesKey("model_id_$provider")
     fun thinking(provider: String) = stringPreferencesKey("thinking_$provider")
@@ -42,6 +43,7 @@ class SagittariusPrefs(private val context: Context) {
     private val _personaGreeting = MutableStateFlow("")
     private val _toolPermission = MutableStateFlow(ToolPermissionMode.ASK)
     private val _liveliness = MutableStateFlow("high")
+    private val _newSessionOnEnter = MutableStateFlow(true)
     private val _totalTokens = MutableStateFlow(0L)
 
     val provider: StateFlow<String> = _provider
@@ -53,6 +55,7 @@ class SagittariusPrefs(private val context: Context) {
     val personaGreeting: StateFlow<String> = _personaGreeting
     val toolPermission: StateFlow<ToolPermissionMode> = _toolPermission
     val liveliness: StateFlow<String> = _liveliness
+    val newSessionOnEnter: StateFlow<Boolean> = _newSessionOnEnter
     val totalTokens: StateFlow<Long> = _totalTokens
 
     init {
@@ -79,6 +82,7 @@ class SagittariusPrefs(private val context: Context) {
             )
             _liveliness.value = prefs?.get(AgentPrefsKeys.LIVELINESS)
                 ?.takeIf { it in setOf("off", "low", "high", "ultra") } ?: "high"
+            _newSessionOnEnter.value = prefs?.get(AgentPrefsKeys.NEW_SESSION_ON_ENTER) ?: true
             _totalTokens.value = prefs?.get(AgentPrefsKeys.TOTAL_TOKENS) ?: 0L
             runCatching {
                 context.sagittariusDataStore.edit { mutable ->
@@ -124,6 +128,11 @@ class SagittariusPrefs(private val context: Context) {
         val safe = value.takeIf { it in setOf("off", "low", "high", "ultra") } ?: "high"
         _liveliness.value = safe
         context.sagittariusDataStore.edit { it[AgentPrefsKeys.LIVELINESS] = safe }
+    }
+
+    suspend fun setNewSessionOnEnter(enabled: Boolean) {
+        _newSessionOnEnter.value = enabled
+        context.sagittariusDataStore.edit { it[AgentPrefsKeys.NEW_SESSION_ON_ENTER] = enabled }
     }
 
     suspend fun addTokens(delta: Long) {

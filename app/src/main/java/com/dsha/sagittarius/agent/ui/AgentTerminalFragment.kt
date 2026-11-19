@@ -55,6 +55,8 @@ class AgentTerminalFragment : Fragment() {
         binding.btnExportLogs.setOnClickListener { requestLogExport() }
         binding.btnExportTools.setOnClickListener { requestToolExport() }
         AgentTypography.apply(binding.root)
+        // 代码框保持等宽字体，覆盖统一的 sans-serif
+        binding.tvLogWindow.typeface = Typeface.MONOSPACE
         observe()
     }
 
@@ -89,9 +91,10 @@ class AgentTerminalFragment : Fragment() {
         container.removeAllViews()
         if (tools.isEmpty()) {
             container.addView(TextView(requireContext()).apply {
-                text = "暂无工具"
+                text = "// 暂无工具"
                 setTextColor(AgentInkColors.TEXT_TERTIARY)
-                textSize = 11f
+                textSize = 10f
+                typeface = Typeface.MONOSPACE
                 setPadding(0, 8, 0, 8)
             })
             return
@@ -103,21 +106,28 @@ class AgentTerminalFragment : Fragment() {
                 setPadding(0, 7, 0, 7)
             }
             row.addView(TextView(requireContext()).apply {
-                text = meta.displayName + "  [" + meta.category + "]" +
-                    if (meta.readOnly) " 只读" else ""
-                setTextColor(AgentInkColors.TEXT_PRIMARY)
-                textSize = 12f
-                setTypeface(typeface, Typeface.BOLD)
+                text = "▸ " + tool.name
+                setTextColor(AgentInkColors.CREAM)
+                textSize = 11f
+                typeface = Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)
             })
             row.addView(TextView(requireContext()).apply {
-                text = tool.name + " · " + tool.description
+                text = "// " + meta.displayName + " · " + meta.category +
+                    if (meta.readOnly) " · 只读" else ""
                 setTextColor(AgentInkColors.TEXT_TERTIARY)
-                textSize = 10f
+                textSize = 9.5f
+                typeface = Typeface.MONOSPACE
                 setPadding(0, 2, 0, 0)
+            })
+            row.addView(TextView(requireContext()).apply {
+                text = "   " + tool.description
+                setTextColor(AgentInkColors.TEXT_SECONDARY)
+                textSize = 9.5f
+                typeface = Typeface.MONOSPACE
+                setPadding(0, 1, 0, 0)
             })
             container.addView(row)
         }
-        AgentTypography.apply(container)
     }
 
     private fun requestLogExport() {

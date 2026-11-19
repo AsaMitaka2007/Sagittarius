@@ -14,6 +14,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 import android.graphics.Shader
+import android.os.SystemClock
 import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
@@ -53,9 +54,11 @@ class VerticalLevelSliderView @JvmOverloads constructor(
     private val sparklePath = Path()
     private val starMatrix = Matrix()
     private val starfield = ArrayList<StarDot>()
+    private val spawnRandom = Random(System.nanoTime())
     private var progress = 0f
     private var starMode = false
-    private var phase = 0f
+    private var time = 0f
+    private var lastTick = 0L
     private var starAnimator: ValueAnimator? = null
     private var snapAnimator: ValueAnimator? = null
     private var starFrame: Bitmap? = null
@@ -74,21 +77,28 @@ class VerticalLevelSliderView @JvmOverloads constructor(
         sparklePath.quadTo(-0.18f, 0.18f, -1f, 0f)
         sparklePath.quadTo(-0.18f, -0.18f, 0f, -1f)
         sparklePath.close()
-        val random = Random(7)
-        repeat(26) {
-            starfield += StarDot(
-                x = 0.06f + random.nextFloat() * 0.88f,
-                y = 0.05f + random.nextFloat() * 0.90f,
-                size = 1.1f + random.nextFloat() * 1.8f,
-                phase = random.nextFloat() * 6.28f,
-                twinkleSpeed = 0.55f + random.nextFloat() * 0.85f,
-                driftSpeedX = 0.35f + random.nextFloat() * 0.45f,
-                driftSpeedY = 0.28f + random.nextFloat() * 0.38f,
-                driftX = 0.015f + random.nextFloat() * 0.035f,
-                driftY = 0.02f + random.nextFloat() * 0.05f,
-                rotationSpeed = 0.32f + random.nextFloat() * 0.55f
-            )
-        }
+        repeat(26) { starfield += newStar(initial = true) }
+    }
+
+    /** 每颗星有自己的寿命，淡入、下落、淡出后独立重生。 */
+    private fun newStar(initial: Boolean): StarDot {
+        val random = spawnRandom
+        val lifeSpan = 4.5f + random.nextFloat() * 4.5f
+        return StarDot(
+            x = 0.06f + random.nextFloat() * 0.88f,
+            y = if (initial) random.nextFloat() else -0.08f - random.nextFloat() * 0.12f,
+            size = 1.1f + random.nextFloat() * 1.8f,
+            phase = random.nextFloat() * 6.28f,
+            twinkleSpeed = 0.55f + random.nextFloat() * 0.85f,
+            driftSpeedX = 0.35f + random.nextFloat() * 0.45f,
+            driftSpeedY = 0.28f + random.nextFloat() * 0.38f,
+            driftX = 0.015f + random.nextFloat() * 0.035f,
+            driftY = 0.02f + random.nextFloat() * 0.05f,
+            rotationSpeed = 0.32f + random.nextFloat() * 0.55f,
+            fallSpeed = 0.055f + random.nextFloat() * 0.075f,
+            lifeSpan = lifeSpan,
+            age = if (initial) random.nextFloat() * lifeSpan * 0.72f else 0f
+        )
     }
 
     fun setProgress(value: Int) {
@@ -211,8 +221,8 @@ class VerticalLevelSliderView @JvmOverloads constructor(
             starPaint.shader = null
             starPaint.colorFilter = null
         }
-        // 十字星芒粒子：缓慢平移、旋转、呼吸淡入淡出，并带白色荧光
-        val t = phase
+        // 十字星芒粒子：整体缓慢下落，各自平移/旋转/呼吸，寿命结束独立淡出重生
+        val t = time
         starfield.forEach { star ->
             val x = rect.left + rect.width() * (
                 star.x + sin(t * star.driftSpeedX + star.phase) * star.driftX
@@ -220,21 +230,21 @@ class VerticalLevelSliderView @JvmOverloads constructor(
             val y = rect.top + rect.height() * (
                 star.y + cos(t * star.driftSpeedY + star.phase * 1.7f) * star.driftY
             )
+            if (y < rect.top - dp(6f) || y > rect.bottom + dp(6f)) return@forEach
+            val progress = (star.age / star.lifeSpan).coerceIn(0f, 1f)
+            // 每颗星独立的淡入/淡出包络
+            val fade = minOf(1f, progress / 0.18f) * minOf(1f, (1f - progress) / 0.22f)
             val wave = sin(t * star.twinkleSpeed + star.phase) * 0.5f + 0.5f
-            val intensity = 0.12f + 0.88f * wave * wave
-            val alpha = (255 * intensity).toInt().coerceIn(0, 255)
+            val alpha = (255f * fade * (0.55f + 0.45f * wave)).toInt().coerceIn(0, 255)
+            if (alpha <= 2) return@forEach
             val radius = star.size * density
             val rotation = (t * star.rotationSpeed + star.phase) * 57.2958f
-            // 荧光：两层低透明度光晕 + 放大星芒
-            twinklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha / 9)
-            canvas.drawCircle(x, y, radius * 9f, twinklePaint)
-            twinklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha / 5)
-            canvas.drawCircle(x, y, radius * 5.4f, twinklePaint)
+            // 星形荧光轮廓（保留星形，不再画透明圆形光圈）
             canvas.save()
             canvas.translate(x, y)
             canvas.rotate(rotation)
-            canvas.scale(radius * 2.7f, radius * 2.7f)
-            sparklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha / 6)
+            canvas.scale(radius * 2.4f, radius * 2.4f)
+            sparklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha / 7)
             canvas.drawPath(sparklePath, sparklePaint)
             canvas.restore()
 
@@ -245,12 +255,23 @@ class VerticalLevelSliderView @JvmOverloads constructor(
             sparklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha)
             canvas.drawPath(sparklePath, sparklePaint)
             // 中心亮核，增强“星芒”质感
-            sparklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, (alpha * 0.85f).toInt())
-            twinklePaint.color = sparklePaint.color
+            twinklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, (alpha * 0.9f).toInt())
             canvas.drawCircle(0f, 0f, 0.34f, twinklePaint)
             canvas.restore()
         }
         canvas.restoreToCount(layer)
+    }
+
+    /** 推进每颗星自己的生命周期与整体下落；粒子消失后从顶部独立重生。 */
+    private fun updateStars(dt: Float) {
+        for (index in starfield.indices) {
+            val star = starfield[index]
+            star.age += dt
+            star.y += star.fallSpeed * dt
+            if (star.age >= star.lifeSpan || star.y > 1.1f) {
+                starfield[index] = newStar(initial = false)
+            }
+        }
     }
 
     private fun ensureStarFrame() {
@@ -269,13 +290,18 @@ class VerticalLevelSliderView @JvmOverloads constructor(
 
     private fun startStarAnimator() {
         if (starAnimator?.isStarted == true) return
+        lastTick = SystemClock.uptimeMillis()
         starAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 9000L
+            duration = 1000L
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.RESTART
             interpolator = android.view.animation.LinearInterpolator()
             addUpdateListener {
-                phase = (it.animatedValue as Float) * 6.28f
+                val now = SystemClock.uptimeMillis()
+                val dt = ((now - lastTick) / 1000f).coerceIn(0f, 0.05f)
+                lastTick = now
+                time += dt
+                updateStars(dt)
                 invalidate()
             }
             start()
@@ -285,7 +311,7 @@ class VerticalLevelSliderView @JvmOverloads constructor(
     private fun stopStarAnimator() {
         starAnimator?.cancel()
         starAnimator = null
-        phase = 0f
+        lastTick = 0L
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -372,7 +398,7 @@ class VerticalLevelSliderView @JvmOverloads constructor(
 
     private data class StarDot(
         val x: Float,
-        val y: Float,
+        var y: Float,
         val size: Float,
         val phase: Float,
         val twinkleSpeed: Float,
@@ -380,6 +406,9 @@ class VerticalLevelSliderView @JvmOverloads constructor(
         val driftSpeedY: Float,
         val driftX: Float,
         val driftY: Float,
-        val rotationSpeed: Float
+        val rotationSpeed: Float,
+        val fallSpeed: Float,
+        val lifeSpan: Float,
+        var age: Float
     )
 }

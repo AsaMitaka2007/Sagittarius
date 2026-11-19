@@ -43,6 +43,7 @@ object DateConsoleStyleManager {
         DateConsoleStyle("blue", "淡蓝", Color.parseColor("#D9CFE8FF"), Color.parseColor("#B3A8C7F0"), false),
         DateConsoleStyle("pink", "淡粉", Color.parseColor("#E6FFD9E6"), Color.parseColor("#CCF3B8D4"), false),
         DateConsoleStyle("gold", "金色", Color.parseColor("#E6F5D9A8"), Color.parseColor("#D9D9B36C"), false),
+        DateConsoleStyle("caramel", "焦糖", Color.parseColor("#E6C58A66"), Color.parseColor("#E6B87A8E"), true),
         DateConsoleStyle("teal", "青绿", Color.parseColor("#E63AAE9C"), Color.parseColor("#CC1F7A6E"), true),
         DateConsoleStyle("violet", "紫罗兰", Color.parseColor("#E6665CFF"), Color.parseColor("#CCB65CFF"), true),
         DateConsoleStyle("aurora", "极光绿", Color.parseColor("#E62ED9B0"), Color.parseColor("#E60E2E6B"), true),

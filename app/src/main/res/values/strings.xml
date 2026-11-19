@@ -423,6 +423,8 @@
 <string name="settings_overlay_granted">已授权，可在其他应用上层显示</string>
 <string name="settings_overlay_missing">未授权，点击前往开启</string>
 <string name="settings_overlay_permission">悬浮窗权限</string>
+<string name="settings_new_session_on_enter">每次进入新建会话</string>
+<string name="settings_new_session_on_enter_desc">打开 AI 页时自动开始新对话；关闭后回到上次会话</string>
 <string name="settings_page_subtitle">让一切安静地各就各位。</string>
 <string name="settings_privacy">隐私与用户协议</string>
 <string name="settings_privacy_desc">用户协议、AI 数据、权限与卸载说明</string>

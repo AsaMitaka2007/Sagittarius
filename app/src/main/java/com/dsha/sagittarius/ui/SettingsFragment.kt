@@ -212,6 +212,26 @@ class SettingsFragment : Fragment() {
             }
         }
 
+        val newSessionRow = addRow(
+            container = binding.visibilityContainer,
+            iconRes = R.drawable.ic_sessions_silhouette,
+            title = getString(R.string.settings_new_session_on_enter),
+            desc = getString(R.string.settings_new_session_on_enter_desc),
+            showSwitch = true,
+            showChevron = false
+        )
+        val agentPrefs = (requireActivity().application as SagittariusApp).sagittariusPrefs
+        newSessionRow.settingSwitch.isChecked = agentPrefs.newSessionOnEnter.value
+        newSessionRow.settingSwitch.setOnCheckedChangeListener { _, checked ->
+            viewLifecycleOwner.lifecycleScope.launch {
+                agentPrefs.setNewSessionOnEnter(checked)
+            }
+        }
+        newSessionRow.root.setOnClickListener {
+            Haptics.tap(newSessionRow.root)
+            newSessionRow.settingSwitch.toggle()
+        }
+
         val overlayRow = addRow(
             container = binding.visibilityContainer,
             iconRes = R.drawable.ic_layers,

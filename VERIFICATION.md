@@ -667,3 +667,14 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 新增奶油主题（`Theme.Sagittarius.Ins`）：奶油底 + 网上抓取的暖色渐变薄雾（Pexels #7630065，Eva Bronzini，已裁切/模糊/混色，署名见 `CREDITS.md`），焦糖强调色、半透明白卡、暖色细描边、奶油/玫瑰/雾紫按钮渐变；`ThemeMode` 新增 `INS`，设置页、AI `update_theme` 工具与错误文案同步支持 `ins`。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-3.0-themes.apk`（SHA256 `12D7A457…0E55`，17MB）。
 - 未完成：本机无设备/模拟器，真磨砂在 Redmi K80/HyperOS 上是否仍抽搐、奶油主题观感与星芒滑条均未真机验收；未 push。
+
+
+## 2.2 终端代码框、星芒下落与新会话 logo（2026-11-20）
+
+- 终端页：运行日志与工具清单套上代码框（`bg_agent_code_box`：更深的墨底 + 细米白描边 + 10dp 内边距），日志强制等宽字体；工具行改为 `▸ tool_name` + `// 中文名 · 分类 · 只读` + 缩进说明，整体按代码文件排版。
+- 进度条星芒：删除两层透明圆形光圈，只保留星形荧光轮廓；所有粒子在原有水平漂移、旋转、呼吸之外增加持续向下移动的总趋势。每颗星拥有独立寿命（4.5–9s），淡入、下落、淡出后从顶部独立重生，不再整屏周期性重置；时间源改为单调递增的 `SystemClock` 累计值。
+- 顶部时间胶囊色板新增「焦糖」（`#C58A66 → #B87A8E`）。
+- AI 新会话：空态显示 `AgentLogoView`——按 `sag.png` 提取 21 个星点与 25 条连线，星点用进度条同款四角星芒，连线为双层白色发光细线并呼吸减淡；星点小范围漂移/自转，连线实时跟随。空态面板改为不透明墨底，避免欢迎气泡与 logo 重叠。
+- 新增偏好 `new_session_on_enter`（默认开启）：每次进入 AI 页自动新建会话；设置页「可见性与权限」新增「每次进入新建会话」开关，关闭后回到上次会话。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-3.1-terminal-logo.apk`（SHA256 `D08D113B…2DF9`，17MB）。
+- 未完成：本机无设备/模拟器，代码框排版、星芒下落重生、logo 动画与新会话开关未真机验收；未 push。
