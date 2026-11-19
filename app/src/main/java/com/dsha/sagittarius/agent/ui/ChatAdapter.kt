@@ -265,7 +265,7 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
                     text = choice.label
                     textSize = 12f
                     gravity = Gravity.CENTER
-                    setTextColor(if (answered) AgentInkColors.TEXT_TERTIARY else tokens.accent)
+                    setTextColor(if (answered) AgentInkColors.TEXT_TERTIARY else AgentInkColors.CREAM)
                     background = GradientDrawable().apply {
                         cornerRadius = 16f * resources.displayMetrics.density
                         setColor(AgentInkColors.INK_SOFT)

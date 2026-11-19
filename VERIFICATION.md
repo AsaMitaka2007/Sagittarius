@@ -594,3 +594,12 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 透明按钮色回退：发送箭头、联网图标、滑条、页码点在 accent 为透明时使用白色/主题浅色，避免消失。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 435 warning；APK `dist/sgr-debug-2.3-agent-ink2.apk`（SHA256 `EF66C979…F0CD`）。
 - 未完成：本机无设备/模拟器，墨水泵面、胶囊粒子与饮食圆环颜色未做真机验收；未 push。
+
+
+## 1.5 胶囊单实例与米白文字（2026-11-19）
+
+- 会话胶囊与推理胶囊改为单一 `CapsuleOverlay` 实例；打开任一个前先 `dismissNow()` 清空旧遮罩，修复推理按钮同时唤起会话胶囊、遮罩残留卡住全屏的问题。
+- 两个胶囊底部左侧新增「关闭」按钮；会话胶囊高度从 68% 降到 56%、宽度收窄，推理胶囊高度降到 52%，留出点击遮罩关闭的区域。
+- Agent 页 accent 绿色文字统一改为米白 `#F3EBDD`：配置页服务商/模型/记忆选中项、会话列表当前项、聊天选项 chips、推理滑条数值与胶囊操作按钮。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 434 warning；APK `dist/sgr-debug-2.4-agent-fix.apk`（SHA256 `CF37FE19…AF1D`）。
+- 未完成：本机无设备/模拟器，胶囊位置、关闭按钮命中与米白文字观感未做真机验收；未 push。

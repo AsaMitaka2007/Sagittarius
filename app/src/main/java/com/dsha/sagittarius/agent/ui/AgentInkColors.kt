@@ -9,4 +9,6 @@ object AgentInkColors {
     val TEXT_PRIMARY: Int = Color.parseColor("#F2F5FA")
     val TEXT_SECONDARY: Int = Color.parseColor("#C9D2E0")
     val TEXT_TERTIARY: Int = Color.parseColor("#8C95A6")
+    /** 米白强调文字，替代绿色 accent 文字。 */
+    val CREAM: Int = Color.parseColor("#F3EBDD")
 }

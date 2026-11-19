@@ -209,7 +209,7 @@ class AgentConfigFragment : Fragment() {
                 if (memory.enabled) R.string.agent_config_memory_toggle_on
                 else R.string.agent_config_memory_toggle_off
             )
-            setTextColor(tokens.accent)
+            setTextColor(AgentInkColors.CREAM)
             textSize = 11f
             gravity = Gravity.CENTER
             setPadding(dp(6f), 0, dp(6f), 0)
@@ -259,7 +259,7 @@ class AgentConfigFragment : Fragment() {
             chipViews.forEachIndexed { index, view ->
                 val value = AgentMemoryCategory.all[index]
                 val selected = value == category
-                view.setTextColor(if (selected) tokens.accent else Color.parseColor("#B8C0CC"))
+                view.setTextColor(if (selected) AgentInkColors.CREAM else Color.parseColor("#B8C0CC"))
                 view.background = GradientDrawable().apply {
                     cornerRadius = 16f * resources.displayMetrics.density
                     setColor(Color.parseColor("#E60B1220"))
@@ -342,7 +342,7 @@ class AgentConfigFragment : Fragment() {
             typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)
             gravity = Gravity.CENTER
             setPadding(dp(14f), 0, dp(14f), 0)
-            setTextColor(if (selected) tokens.accent else Color.parseColor("#B8C0CC"))
+            setTextColor(if (selected) AgentInkColors.CREAM else Color.parseColor("#B8C0CC"))
             background = GradientDrawable().apply {
                 cornerRadius = 18f * resources.displayMetrics.density
                 setColor(Color.parseColor("#E60B1220"))

@@ -41,13 +41,15 @@ class AgentChatFragment : Fragment() {
     private var lastCount = 0
     private var lastSignature = 0
     private var userNearBottom = true
-    private var sessionOverlay: CapsuleOverlay? = null
+    private var capsuleOverlay: CapsuleOverlay? = null
+    private var activeCapsule: CapsuleKind? = null
     private var sessionAdapter: SessionAdapter? = null
     private var sessionActionRow: LinearLayout? = null
     private var sessionSelectAll: TextView? = null
     private var sessionDelete: TextView? = null
     private var sessionSelectToggle: TextView? = null
-    private var reasoningOverlay: CapsuleOverlay? = null
+
+    private enum class CapsuleKind { SESSION, REASONING }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -203,7 +205,7 @@ class AgentChatFragment : Fragment() {
         binding.btnWebSearch.background =
             ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
         binding.btnWebSearch.imageTintList = android.content.res.ColorStateList.valueOf(
-            if (enabled && !accent.isTransparent) accent.startColor else android.graphics.Color.WHITE
+            if (enabled) AgentInkColors.CREAM else android.graphics.Color.WHITE
         )
         binding.btnWebSearch.contentDescription = getString(
             if (enabled) R.string.agent_web_on else R.string.agent_web_off
@@ -223,8 +225,8 @@ class AgentChatFragment : Fragment() {
         binding.btnSend.background =
             ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
         binding.btnSend.setTextColor(
-            if (binding.btnSend.isEnabled && !accent.isTransparent) {
-                accent.startColor
+            if (binding.btnSend.isEnabled) {
+                AgentInkColors.CREAM
             } else {
                 android.graphics.Color.WHITE
             }
@@ -249,10 +251,11 @@ class AgentChatFragment : Fragment() {
     }
 
     private fun showSessionCapsule() {
-        if (sessionOverlay?.isShowing == true) {
-            sessionOverlay?.dismiss()
+        if (activeCapsule == CapsuleKind.SESSION && capsuleOverlay?.isShowing == true) {
+            capsuleOverlay?.dismiss()
             return
         }
+        capsuleOverlay?.dismissNow()
         val tokens = ThemeTokens.of(requireContext())
         val density = resources.displayMetrics.density
         fun dp(v: Float) = (v * density).toInt()
@@ -272,7 +275,7 @@ class AgentChatFragment : Fragment() {
         }, LinearLayout.LayoutParams(0, dp(40f), 1f))
         val btnNew = TextView(requireContext()).apply {
             text = getString(R.string.agent_session_new)
-            setTextColor(tokens.accent)
+            setTextColor(AgentInkColors.CREAM)
             textSize = 12f
             gravity = Gravity.CENTER
             setPadding(dp(8f), 0, dp(8f), 0)
@@ -303,7 +306,7 @@ class AgentChatFragment : Fragment() {
                 if (session.id != viewModel.sessionId.value) {
                     viewModel.switchSession(session.id)
                 }
-                sessionOverlay?.dismiss()
+                capsuleOverlay?.dismiss()
             },
             onLongClick = { session ->
                 sessionAdapter?.setSelectionMode(true)
@@ -322,7 +325,7 @@ class AgentChatFragment : Fragment() {
         }
         val selectAll = TextView(requireContext()).apply {
             text = getString(R.string.agent_session_select_all)
-            setTextColor(tokens.accent)
+            setTextColor(AgentInkColors.CREAM)
             textSize = 12f
             gravity = Gravity.CENTER
             setPadding(dp(8f), 0, dp(8f), 0)
@@ -338,6 +341,21 @@ class AgentChatFragment : Fragment() {
         }
         actionRow.addView(delete, LinearLayout.LayoutParams(dp(96f), dp(40f)))
         content.addView(actionRow)
+        val closeFooter = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, dp(4f), 0, 0)
+        }
+        val closeButton = TextView(requireContext()).apply {
+            text = getString(R.string.agent_terminal_close)
+            setTextColor(AgentInkColors.CREAM)
+            textSize = 13f
+            gravity = Gravity.CENTER
+            setPadding(dp(8f), 0, dp(8f), 0)
+        }
+        closeFooter.addView(closeButton, LinearLayout.LayoutParams(dp(64f), dp(40f)))
+        closeFooter.addView(View(requireContext()), LinearLayout.LayoutParams(0, 1, 1f))
+        content.addView(closeFooter)
         sessionActionRow = actionRow
         sessionSelectAll = selectAll
         sessionDelete = delete
@@ -356,7 +374,7 @@ class AgentChatFragment : Fragment() {
         }
         btnNew.setOnClickListener {
             viewModel.newSession()
-            sessionOverlay?.dismiss()
+            capsuleOverlay?.dismiss()
         }
         selectToggle.setOnClickListener {
             if (sessionAdapter?.isSelectionMode() == true) exitSelection() else enterSelection()
@@ -373,7 +391,7 @@ class AgentChatFragment : Fragment() {
                 .setNegativeButton(R.string.cancel, null)
                 .setPositiveButton(R.string.delete) { _, _ ->
                     viewModel.deleteSessions(ids.toList())
-                    sessionOverlay?.dismiss()
+                    capsuleOverlay?.dismiss()
                 }
                 .show()
         }
@@ -385,19 +403,24 @@ class AgentChatFragment : Fragment() {
             emptySet()
         )
 
-        val width = minOf((binding.chatRoot.width - dp(32f)).coerceAtLeast(dp(240f)), dp(460f))
-        val height = minOf((binding.chatRoot.height * 0.68f).toInt(), dp(560f))
-            .coerceAtLeast(dp(280f))
+        val width = minOf((binding.chatRoot.width - dp(48f)).coerceAtLeast(dp(240f)), dp(440f))
+        val height = minOf((binding.chatRoot.height * 0.56f).toInt(), dp(460f))
+            .coerceAtLeast(dp(260f))
         val left = (binding.chatRoot.width - width) / 2f
-        val top = (binding.chatRoot.height - height - dp(12f)).toFloat()
+        val top = (binding.chatRoot.height - height - dp(16f)).toFloat()
         val overlay = CapsuleOverlay(binding.capsuleHost, tokens)
-        sessionOverlay = overlay
+        capsuleOverlay = overlay
+        activeCapsule = CapsuleKind.SESSION
+        closeButton.setOnClickListener { overlay.dismiss() }
         overlay.show(
             anchor = binding.btnSessions,
             target = RectF(left, top, left + width, top + height),
             content = content
         ) {
-            sessionOverlay = null
+            if (capsuleOverlay === overlay) {
+                capsuleOverlay = null
+                activeCapsule = null
+            }
             sessionAdapter = null
             sessionActionRow = null
             sessionSelectAll = null
@@ -424,11 +447,11 @@ class AgentChatFragment : Fragment() {
 
     /** 从推理按钮向上展开长条胶囊，内含两个竖向 4 档滑条。 */
     private fun showReasoningCapsule() {
-        if (reasoningOverlay?.isShowing == true) {
-            reasoningOverlay?.dismiss()
+        if (activeCapsule == CapsuleKind.REASONING && capsuleOverlay?.isShowing == true) {
+            capsuleOverlay?.dismiss()
             return
         }
-        sessionOverlay?.dismiss()
+        capsuleOverlay?.dismissNow()
         val tokens = ThemeTokens.of(requireContext())
         val density = resources.displayMetrics.density
         fun dp(v: Float) = (v * density).toInt()
@@ -448,7 +471,7 @@ class AgentChatFragment : Fragment() {
         }, LinearLayout.LayoutParams(0, dp(40f), 1f))
         val done = TextView(requireContext()).apply {
             text = getString(R.string.agent_session_done)
-            setTextColor(tokens.accent)
+            setTextColor(AgentInkColors.CREAM)
             textSize = 12f
             gravity = Gravity.CENTER
             setPadding(dp(8f), 0, dp(8f), 0)
@@ -470,7 +493,7 @@ class AgentChatFragment : Fragment() {
         }
         val effortValue = TextView(requireContext()).apply {
             gravity = Gravity.CENTER
-            setTextColor(tokens.accent)
+            setTextColor(AgentInkColors.CREAM)
             textSize = 12f
             text = reasoningLabelForProgress(
                 effortToProgress(viewModel.effort.value, effortLevels)
@@ -488,7 +511,7 @@ class AgentChatFragment : Fragment() {
         }
         val liveValue = TextView(requireContext()).apply {
             gravity = Gravity.CENTER
-            setTextColor(tokens.accent)
+            setTextColor(AgentInkColors.CREAM)
             textSize = 12f
             text = livelinessLabelForProgress(livelinessToProgress(viewModel.liveliness.value))
         }
@@ -518,15 +541,33 @@ class AgentChatFragment : Fragment() {
         addColumn(getString(R.string.agent_reasoning_effort), effortSlider, effortValue)
         addColumn(getString(R.string.agent_liveliness), liveSlider, liveValue)
 
+        val closeFooter = LinearLayout(requireContext()).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, dp(2f), 0, 0)
+        }
+        val closeButton = TextView(requireContext()).apply {
+            text = getString(R.string.agent_terminal_close)
+            setTextColor(AgentInkColors.CREAM)
+            textSize = 13f
+            gravity = Gravity.CENTER
+            setPadding(dp(8f), 0, dp(8f), 0)
+        }
+        closeFooter.addView(closeButton, LinearLayout.LayoutParams(dp(64f), dp(40f)))
+        closeFooter.addView(View(requireContext()), LinearLayout.LayoutParams(0, 1, 1f))
+        content.addView(closeFooter)
+
         val overlay = CapsuleOverlay(binding.capsuleHost, tokens)
-        reasoningOverlay = overlay
+        capsuleOverlay = overlay
+        activeCapsule = CapsuleKind.REASONING
         done.setOnClickListener { overlay.dismiss() }
+        closeButton.setOnClickListener { overlay.dismiss() }
 
         val hostW = binding.chatRoot.width
         val hostH = binding.chatRoot.height
-        val width = minOf(dp(196f), hostW - dp(24f)).coerceAtLeast(dp(168f))
+        val width = minOf(dp(190f), hostW - dp(32f)).coerceAtLeast(dp(168f))
         val maxHeight = (hostH - dp(24f)).coerceAtLeast(dp(220f))
-        val height = minOf((hostH * 0.62f).toInt(), dp(430f), maxHeight)
+        val height = minOf((hostH * 0.52f).toInt(), dp(380f), maxHeight)
         val anchorLocation = IntArray(2)
         val hostLocation = IntArray(2)
         binding.btnReasoning.getLocationOnScreen(anchorLocation)
@@ -540,7 +581,12 @@ class AgentChatFragment : Fragment() {
             anchor = binding.btnReasoning,
             target = RectF(left.toFloat(), top, right.toFloat(), top + height),
             content = content
-        ) { reasoningOverlay = null }
+        ) {
+            if (capsuleOverlay === overlay) {
+                capsuleOverlay = null
+                activeCapsule = null
+            }
+        }
     }
 
     private fun effortToProgress(effort: String, levels: List<String>): Int = when (effort) {

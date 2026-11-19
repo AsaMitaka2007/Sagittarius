@@ -26,6 +26,7 @@ class CapsuleOverlay(
     private var animator: ValueAnimator? = null
     private var dismissListener: (() -> Unit)? = null
     private var dismissAnimator: ValueAnimator? = null
+    private var generation = 0
 
     val isShowing: Boolean get() = capsule != null
 
@@ -35,7 +36,8 @@ class CapsuleOverlay(
         content: View,
         onDismiss: (() -> Unit)? = null
     ) {
-        if (isShowing) return
+        if (isShowing) dismissNow()
+        generation++
         dismissListener = onDismiss
         host.visibility = View.VISIBLE
         val hostLocation = IntArray(2)
@@ -156,18 +158,19 @@ class CapsuleOverlay(
                     capsule = null
                     scrim = null
                     val pv = particles
+                    val currentGeneration = generation
                     if (pv != null) {
-                        // 让收起粒子完整播放，再移除整个覆盖层
+                        // 让收起粒子完整播放；若期间重新展开，交由新实例接管
                         pv.postDelayed({
                             host.removeView(pv)
                             if (particles === pv) particles = null
-                            if (capsule == null) {
+                            if (capsule == null && generation == currentGeneration) {
                                 host.visibility = View.GONE
                                 dismissListener?.invoke()
                                 dismissListener = null
                             }
                         }, 560L)
-                    } else {
+                    } else if (capsule == null && generation == currentGeneration) {
                         host.visibility = View.GONE
                         dismissListener?.invoke()
                         dismissListener = null
@@ -176,5 +179,20 @@ class CapsuleOverlay(
             })
             start()
         }
+    }
+
+    /** 立即清空，用于在会话/推理胶囊之间切换，避免旧遮罩残留。 */
+    fun dismissNow() {
+        generation++
+        animator?.cancel()
+        dismissAnimator?.cancel()
+        capsule?.let { host.removeView(it) }
+        particles?.let { host.removeView(it) }
+        scrim?.let { host.removeView(it) }
+        capsule = null
+        particles = null
+        scrim = null
+        dismissListener = null
+        host.visibility = View.GONE
     }
 }
