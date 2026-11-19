@@ -115,12 +115,13 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
 
             bubble.background = GradientDrawable().apply {
                 cornerRadius = (20 * context.resources.displayMetrics.density).toFloat()
-                if (isUser) {
-                    setColors(ButtonAccentManager.current.colors)
-                } else {
-                    setColors(intArrayOf(tokens.cardFillTop, tokens.cardFillBottom))
-                    setStroke(1, tokens.cardStrokeStart)
-                }
+                setColors(
+                    if (isUser) {
+                        intArrayOf(AgentInkColors.INK_SOFT, AgentInkColors.INK_SOFT)
+                    } else {
+                        intArrayOf(AgentInkColors.INK, AgentInkColors.INK)
+                    }
+                )
             }
             val pad = (12 * context.resources.displayMetrics.density).toInt()
             bubble.setPadding(pad, pad, pad, pad)
@@ -134,10 +135,7 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
                 choiceScroll.visibility = View.GONE
                 content.visibility = View.VISIBLE
                 content.text = item.content
-                content.setTextColor(
-                    if (ButtonAccentManager.current.isTransparent) tokens.textPrimary
-                    else ButtonAccentManager.current.textColor
-                )
+                content.setTextColor(AgentInkColors.TEXT_PRIMARY)
             } else {
                 val choiceParsed = ChoiceParser.parse(item.content)
                 val parsed = parseDetails(item, choiceParsed.text)
@@ -174,11 +172,12 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
                     val chip = TextView(context).apply {
                         text = toolChipLabel(trace)
                         textSize = 11f
-                        setTextColor(if (trace.failed) tokens.warning else tokens.textSecondary)
+                        setTextColor(
+                            if (trace.failed) tokens.warning else AgentInkColors.TEXT_SECONDARY
+                        )
                         background = GradientDrawable().apply {
                             cornerRadius = 12f * context.resources.displayMetrics.density
-                            setColor(androidx.core.graphics.ColorUtils.setAlphaComponent(tokens.accent, 18))
-                            setStroke(1, androidx.core.graphics.ColorUtils.setAlphaComponent(tokens.accent, 70))
+                            setColor(AgentInkColors.INK_SOFT)
                         }
                         val ph = (9 * context.resources.displayMetrics.density).toInt()
                         val pv = (5 * context.resources.displayMetrics.density).toInt()
@@ -266,11 +265,10 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
                     text = choice.label
                     textSize = 12f
                     gravity = Gravity.CENTER
-                    setTextColor(if (answered) tokens.textTertiary else tokens.accent)
+                    setTextColor(if (answered) AgentInkColors.TEXT_TERTIARY else tokens.accent)
                     background = GradientDrawable().apply {
                         cornerRadius = 16f * resources.displayMetrics.density
-                        setColor(androidx.core.graphics.ColorUtils.setAlphaComponent(tokens.accent, if (answered) 8 else 22))
-                        setStroke(1, androidx.core.graphics.ColorUtils.setAlphaComponent(tokens.accent, if (answered) 30 else 100))
+                        setColor(AgentInkColors.INK_SOFT)
                     }
                     isEnabled = !answered
                     alpha = if (answered) 0.55f else 1f

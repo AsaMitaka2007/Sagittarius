@@ -25,6 +25,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
+import com.dsha.sagittarius.ui.ButtonAccentManager
 import com.dsha.sagittarius.util.Money
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -46,6 +47,7 @@ class BubbleAmountView @JvmOverloads constructor(
 
     private val density = resources.displayMetrics.density
     private val tokens = ThemeTokens.of(context)
+    private val accent = ButtonAccentManager.current
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val highlightPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -205,7 +207,7 @@ class BubbleAmountView @JvmOverloads constructor(
         glowPaint.style = Paint.Style.STROKE
         glowPaint.strokeWidth = 1.2f * density
         for (i in 5 downTo 1) {
-            glowPaint.color = ColorUtils.setAlphaComponent(tokens.gradientStart, 4 + (5 - i) * 4)
+            glowPaint.color = ColorUtils.setAlphaComponent(accent.startColor, 4 + (5 - i) * 4)
             canvas.drawCircle(cx, cy, radius + i * dp(2.2f), glowPaint)
         }
 
@@ -235,7 +237,7 @@ class BubbleAmountView @JvmOverloads constructor(
         canvas.drawCircle(cx, cy, radius, highlightPaint)
         highlightPaint.shader = null
 
-        borderPaint.color = if (error) tokens.warning else tokens.cardStrokeStart
+        borderPaint.color = if (error) tokens.warning else ColorUtils.setAlphaComponent(accent.startColor, 190)
         borderPaint.strokeWidth = if (error) 2.2f * density else 1.3f * density
         canvas.drawCircle(cx, cy, radius, borderPaint)
         // 顶部高光弧线

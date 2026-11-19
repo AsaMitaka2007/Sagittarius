@@ -584,3 +584,13 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - AI 新增 `set_food_unit` 工具：为已有食材设置自定义单位换算（如 1 根香蕉 = 100g），已注册、写入系统提示词与工具目录，补 2 条单测。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 435 warning；APK `dist/sgr-debug-2.2-agent-ink.apk`（SHA256 `5A7407CA…38DE`）。
 - 未完成：本机无设备/模拟器，墨水按钮、字体观感、胶囊收起与透明按钮未做真机验收；未 push。
+
+
+## 1.4 墨水页面与粒子胶囊（2026-11-19）
+
+- 记饮食/记账页面的大圆形边缘改为跟随按钮颜色：`DietBubbleView` 边框、`BubbleAmountView` 外圈光晕与边框、`FoodTrackView` 轨道都读取 `ButtonAccentManager.current`。
+- 对话页、配置页、终端页移除青色/渐变描边：聊天气泡改为墨水黑、文字固定浅色；配置/终端卡片改用黑墨底无描边；输入框、工具/选项 chips 同步墨水黑。
+- 会话胶囊、推理胶囊改用 `InkCapsuleView` 纯黑圆角容器，删除 `LiquidGlassView` 玻璃与外发光；展开/收起由 `ParticleEdgeView` 沿胶囊圆角边缘喷出与入口同款粒子。
+- 透明按钮色回退：发送箭头、联网图标、滑条、页码点在 accent 为透明时使用白色/主题浅色，避免消失。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 435 warning；APK `dist/sgr-debug-2.3-agent-ink2.apk`（SHA256 `ACAA4579…95F4`）。
+- 未完成：本机无设备/模拟器，墨水泵面、胶囊粒子与饮食圆环颜色未做真机验收；未 push。

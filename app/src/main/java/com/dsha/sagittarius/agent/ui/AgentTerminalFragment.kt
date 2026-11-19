@@ -19,7 +19,6 @@ import com.dsha.sagittarius.agent.debug.AgentRuntimeLog
 import com.dsha.sagittarius.agent.tools.AgentTool
 import com.dsha.sagittarius.agent.tools.ToolCatalog
 import com.dsha.sagittarius.databinding.FragmentAgentTerminalBinding
-import com.dsha.sagittarius.ui.ThemeTokens
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -91,13 +90,12 @@ class AgentTerminalFragment : Fragment() {
         if (tools.isEmpty()) {
             container.addView(TextView(requireContext()).apply {
                 text = "暂无工具"
-                setTextColor(ThemeTokens.of(requireContext()).textTertiary)
+                setTextColor(AgentInkColors.TEXT_TERTIARY)
                 textSize = 11f
                 setPadding(0, 8, 0, 8)
             })
             return
         }
-        val tokens = ThemeTokens.of(requireContext())
         tools.forEach { tool ->
             val meta = ToolCatalog.metaFor(tool)
             val row = LinearLayout(requireContext()).apply {
@@ -107,13 +105,13 @@ class AgentTerminalFragment : Fragment() {
             row.addView(TextView(requireContext()).apply {
                 text = meta.displayName + "  [" + meta.category + "]" +
                     if (meta.readOnly) " 只读" else ""
-                setTextColor(tokens.textPrimary)
+                setTextColor(AgentInkColors.TEXT_PRIMARY)
                 textSize = 12f
                 setTypeface(typeface, Typeface.BOLD)
             })
             row.addView(TextView(requireContext()).apply {
                 text = tool.name + " · " + tool.description
-                setTextColor(tokens.textTertiary)
+                setTextColor(AgentInkColors.TEXT_TERTIARY)
                 textSize = 10f
                 setPadding(0, 2, 0, 0)
             })

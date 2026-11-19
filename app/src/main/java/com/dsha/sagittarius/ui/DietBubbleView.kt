@@ -11,6 +11,7 @@ import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.graphics.ColorUtils
+import com.dsha.sagittarius.ui.ButtonAccentManager
 import java.util.Locale
 import kotlin.math.min
 
@@ -22,6 +23,7 @@ class DietBubbleView @JvmOverloads constructor(
 
     private val density = resources.displayMetrics.density
     private val tokens = ThemeTokens.of(context)
+    private val accent = ButtonAccentManager.current
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -69,7 +71,7 @@ class DietBubbleView @JvmOverloads constructor(
         )
         canvas.drawCircle(cx, cy, radius, fillPaint)
         fillPaint.shader = null
-        borderPaint.color = if (error) Color.parseColor("#E35D5D") else tokens.cardStrokeStart
+        borderPaint.color = if (error) Color.parseColor("#E35D5D") else accent.startColor
         borderPaint.strokeWidth = if (error) 2.5f * density else 1.3f * density
         canvas.drawCircle(cx, cy, radius, borderPaint)
         borderPaint.strokeWidth = 1.3f * density

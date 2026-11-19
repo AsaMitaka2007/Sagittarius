@@ -20,6 +20,7 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.widget.Scroller
 import androidx.core.graphics.ColorUtils
+import com.dsha.sagittarius.ui.ButtonAccentManager
 import com.dsha.sagittarius.data.FoodEntity
 import kotlin.math.abs
 import kotlin.math.hypot
@@ -37,6 +38,7 @@ class FoodTrackView @JvmOverloads constructor(
 
     private val density = resources.displayMetrics.density
     private val tokens = ThemeTokens.of(context)
+    private val accent = ButtonAccentManager.current
     private val touchSlop = ViewConfiguration.get(context).scaledTouchSlop
     private val handler = Handler(Looper.getMainLooper())
     private val scroller = Scroller(context)
@@ -44,7 +46,7 @@ class FoodTrackView @JvmOverloads constructor(
         style = Paint.Style.STROKE
         strokeWidth = 1.1f * density
         strokeCap = Paint.Cap.ROUND
-        color = ColorUtils.setAlphaComponent(tokens.textTertiary, 78)
+        color = ColorUtils.setAlphaComponent(accent.startColor, 120)
     }
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }

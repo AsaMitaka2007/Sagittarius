@@ -17,7 +17,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/agent_workflow_collapsed"
-            android:textColor="?attr/blTextTertiary"
+            android:textColor="#8C95A6"
             android:textSize="11sp"
             android:visibility="gone" />
 
@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="?attr/blTextTertiary"
+            android:textColor="#8C95A6"
             android:textSize="11sp"
             android:visibility="gone" />
 
@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:lineSpacingExtra="2dp"
-            android:textColor="?attr/blTextPrimary"
+            android:textColor="#F2F5FA"
             android:textSize="14sp" />
 
         <TextView
@@ -51,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="?attr/blTextTertiary"
+            android:textColor="#8C95A6"
             android:textSize="10sp"
             android:visibility="gone" />
 
@@ -60,7 +60,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:background="?attr/blIconCircleBackground"
+            android:background="#1AFFFFFF"
             android:orientation="vertical"
             android:padding="10dp"
             android:visibility="gone">
@@ -70,7 +70,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/agent_details_collapsed"
-                android:textColor="?attr/blTextSecondary"
+                android:textColor="#C9D2E0"
                 android:textSize="12sp" />
 
             <TextView
@@ -79,7 +79,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="6dp"
                 android:lineSpacingExtra="2dp"
-                android:textColor="?attr/blTextPrimary"
+                android:textColor="#F2F5FA"
                 android:textSize="12sp"
                 android:visibility="gone" />
         </LinearLayout>
@@ -90,7 +90,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:lineSpacingExtra="2dp"
-            android:textColor="?attr/blTextPrimary"
+            android:textColor="#F2F5FA"
             android:textSize="14sp"
             android:visibility="gone" />
 

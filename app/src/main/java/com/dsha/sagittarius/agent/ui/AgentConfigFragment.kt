@@ -159,7 +159,7 @@ class AgentConfigFragment : Fragment() {
         if (memories.isEmpty()) {
             container.addView(TextView(requireContext()).apply {
                 text = getString(R.string.agent_config_memory_empty)
-                setTextColor(tokens.textTertiary)
+                setTextColor(AgentInkColors.TEXT_TERTIARY)
                 textSize = 12f
                 gravity = Gravity.CENTER
                 setPadding(0, 18, 0, 18)
@@ -192,13 +192,13 @@ class AgentConfigFragment : Fragment() {
         }
         info.addView(TextView(requireContext()).apply {
             text = memory.content
-            setTextColor(tokens.textPrimary)
+            setTextColor(AgentInkColors.TEXT_PRIMARY)
             textSize = 13f
             maxLines = 3
         })
         info.addView(TextView(requireContext()).apply {
             text = memory.category + if (memory.enabled) "" else " · 已停用"
-            setTextColor(tokens.textTertiary)
+            setTextColor(AgentInkColors.TEXT_TERTIARY)
             textSize = 10f
             setPadding(0, dp(3f), 0, 0)
         })
@@ -245,10 +245,10 @@ class AgentConfigFragment : Fragment() {
             inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
             minLines = 2
             maxLines = 4
-            setTextColor(tokens.textPrimary)
-            setHintTextColor(tokens.textTertiary)
+            setTextColor(AgentInkColors.TEXT_PRIMARY)
+            setHintTextColor(AgentInkColors.TEXT_TERTIARY)
             setPadding(dp(12f), dp(10f), dp(12f), dp(10f))
-            background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_input)
+            background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
         }
         val chips = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.HORIZONTAL

@@ -124,7 +124,7 @@
                 android:id="@+id/etInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_input"
+                android:background="@drawable/bg_agent_ink"
                 android:gravity="top|start"
                 android:hint="@string/agent_input_hint"
                 android:imeOptions="actionNone"
@@ -135,8 +135,8 @@
                 android:paddingTop="11dp"
                 android:paddingEnd="15dp"
                 android:paddingBottom="11dp"
-                android:textColor="?attr/blTextPrimary"
-                android:textColorHint="?attr/blTextTertiary"
+                android:textColor="#F2F5FA"
+                android:textColorHint="#8C95A6"
                 android:textSize="14sp" />
 
             <LinearLayout

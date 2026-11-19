@@ -25,7 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/agent_config_service_title"
-                android:textColor="?attr/blTextPrimary"
+                android:textColor="#F2F5FA"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -34,7 +34,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:textColor="?attr/blTextSecondary"
+                android:textColor="#C9D2E0"
                 android:textSize="13sp" />
 
             <TextView
@@ -42,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:textColor="?attr/blTextSecondary"
+                android:textColor="#C9D2E0"
                 android:textSize="13sp" />
 
             <HorizontalScrollView
@@ -97,7 +97,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/agent_config_memory_title"
-                android:textColor="?attr/blTextPrimary"
+                android:textColor="#F2F5FA"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -106,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/agent_config_memory_desc"
-                android:textColor="?attr/blTextTertiary"
+                android:textColor="#8C95A6"
                 android:textSize="12sp" />
 
             <HorizontalScrollView
@@ -149,7 +149,7 @@
                 android:background="@drawable/bg_agent_ink"
                 android:gravity="center"
                 android:text="@string/agent_config_advanced"
-                android:textColor="?attr/blTextSecondary"
+                android:textColor="#C9D2E0"
                 android:textSize="13sp" />
         </LinearLayout>
 
@@ -166,7 +166,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/agent_config_appearance_title"
-                android:textColor="?attr/blTextPrimary"
+                android:textColor="#F2F5FA"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
@@ -175,7 +175,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="@string/agent_config_appearance_desc"
-                android:textColor="?attr/blTextTertiary"
+                android:textColor="#8C95A6"
                 android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>

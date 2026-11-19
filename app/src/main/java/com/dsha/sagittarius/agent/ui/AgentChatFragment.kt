@@ -203,7 +203,7 @@ class AgentChatFragment : Fragment() {
         binding.btnWebSearch.background =
             ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
         binding.btnWebSearch.imageTintList = android.content.res.ColorStateList.valueOf(
-            if (enabled) accent.startColor else android.graphics.Color.WHITE
+            if (enabled && !accent.isTransparent) accent.startColor else android.graphics.Color.WHITE
         )
         binding.btnWebSearch.contentDescription = getString(
             if (enabled) R.string.agent_web_on else R.string.agent_web_off
@@ -223,7 +223,11 @@ class AgentChatFragment : Fragment() {
         binding.btnSend.background =
             ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
         binding.btnSend.setTextColor(
-            if (binding.btnSend.isEnabled) accent.startColor else android.graphics.Color.WHITE
+            if (binding.btnSend.isEnabled && !accent.isTransparent) {
+                accent.startColor
+            } else {
+                android.graphics.Color.WHITE
+            }
         )
         binding.btnReasoning.isEnabled = !generating && !viewModel.forcedThinking.value
         binding.btnReasoning.alpha = if (binding.btnReasoning.isEnabled) 1f else 0.5f
@@ -262,7 +266,7 @@ class AgentChatFragment : Fragment() {
         }
         header.addView(TextView(requireContext()).apply {
             text = getString(R.string.agent_session_title)
-            setTextColor(tokens.textPrimary)
+            setTextColor(AgentInkColors.TEXT_PRIMARY)
             textSize = 17f
             setTypeface(typeface, android.graphics.Typeface.BOLD)
         }, LinearLayout.LayoutParams(0, dp(40f), 1f))
@@ -276,7 +280,7 @@ class AgentChatFragment : Fragment() {
         header.addView(btnNew, LinearLayout.LayoutParams(dp(56f), dp(40f)))
         val selectToggle = TextView(requireContext()).apply {
             text = getString(R.string.agent_session_select)
-            setTextColor(tokens.textSecondary)
+            setTextColor(AgentInkColors.TEXT_SECONDARY)
             textSize = 12f
             gravity = Gravity.CENTER
             setPadding(dp(8f), 0, dp(8f), 0)
@@ -438,7 +442,7 @@ class AgentChatFragment : Fragment() {
         }
         header.addView(TextView(requireContext()).apply {
             text = getString(R.string.agent_reasoning_dialog_title)
-            setTextColor(tokens.textPrimary)
+            setTextColor(AgentInkColors.TEXT_PRIMARY)
             textSize = 16f
             setTypeface(typeface, android.graphics.Typeface.BOLD)
         }, LinearLayout.LayoutParams(0, dp(40f), 1f))
@@ -503,7 +507,7 @@ class AgentChatFragment : Fragment() {
             }
             column.addView(TextView(requireContext()).apply {
                 text = title
-                setTextColor(tokens.textSecondary)
+                setTextColor(AgentInkColors.TEXT_SECONDARY)
                 textSize = 11f
                 gravity = Gravity.CENTER
             }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(28f)))

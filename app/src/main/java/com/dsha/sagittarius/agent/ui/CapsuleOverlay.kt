@@ -6,15 +6,14 @@ import android.graphics.RectF
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
-import androidx.dynamicanimation.animation.DynamicAnimation
-import androidx.dynamicanimation.animation.SpringAnimation
-import com.dsha.sagittarius.ui.LiquidGlassView
 import com.dsha.sagittarius.ui.ThemeTokens
 import kotlin.math.max
 
 /**
- * 以按钮为原点的胶囊展开层，沿用预算悬浮窗的展开机制：
- * LiquidGlassView + 圆角/紧凑态切换 + SpringAnimation + 内容 alpha/scaleY 入场。
+ * 以按钮为原点的墨水胶囊展开层。
+ *
+ * 展开/收起使用纯黑圆角容器，边缘由 ParticleEdgeView 喷出与首页入口同款粒子；
+ * 不再使用玻璃、流光或外发光。
  */
 class CapsuleOverlay(
     private val host: FrameLayout,
@@ -22,7 +21,8 @@ class CapsuleOverlay(
 ) {
 
     private var scrim: View? = null
-    private var capsule: LiquidGlassView? = null
+    private var capsule: InkCapsuleView? = null
+    private var particles: ParticleEdgeView? = null
     private var animator: ValueAnimator? = null
     private var dismissListener: (() -> Unit)? = null
     private var dismissAnimator: ValueAnimator? = null
@@ -68,22 +68,17 @@ class CapsuleOverlay(
         scrim = scrimView
 
         val density = host.resources.displayMetrics.density
-        var expandedApplied = false
-        val glass = LiquidGlassView(host.context).apply {
-            clipChildren = false
-            clipToPadding = false
-            setGlowEnabled(false)
-            setCompact(true)
-            setExpanded(false)
+        val ink = InkCapsuleView(host.context).apply {
+            clipChildren = true
+            cornerRadius = start.height() / 2f
             setPadding(
-                (20f * density).toInt(), (18f * density).toInt(),
-                (20f * density).toInt(), (18f * density).toInt()
+                (22f * density).toInt(), (20f * density).toInt(),
+                (22f * density).toInt(), (20f * density).toInt()
             )
-            scaleX = 0.96f
-            scaleY = 0.96f
+            alpha = 0.98f
         }
         AgentTypography.apply(content)
-        glass.addView(content, FrameLayout.LayoutParams(
+        ink.addView(content, FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
         ))
@@ -93,81 +88,90 @@ class CapsuleOverlay(
             leftMargin = start.left.toInt()
             topMargin = start.top.toInt()
         }
-        host.addView(glass, params)
-        capsule = glass
+        host.addView(ink, params)
+        capsule = ink
+
+        val particleView = ParticleEdgeView(host.context)
+        host.addView(particleView, FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        ))
+        particles = particleView
+        particleView.updateBounds(
+            RectF(start.left, start.top, start.right, start.bottom),
+            start.height() / 2f
+        )
+        particleView.burst()
 
         scrimView.animate().alpha(1f).setDuration(180L).start()
         content.alpha = 0f
         content.scaleY = 0.9f
         content.pivotY = 0f
         content.animate().alpha(1f).scaleY(1f)
-            .setStartDelay(120L).setDuration(220L).start()
+            .setStartDelay(110L).setDuration(220L).start()
 
         animator?.cancel()
         animator = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 360L
-            interpolator = DecelerateInterpolator(1.2f)
+            duration = 380L
+            interpolator = DecelerateInterpolator(1.1f)
             addUpdateListener {
                 val p = (it.animatedValue as Float).coerceIn(0f, 1f)
                 val w = start.width() + (end.width() - start.width()) * p
                 val h = start.height() + (end.height() - start.height()) * p
                 val x = start.left + (end.left - start.left) * p
                 val y = start.top + (end.top - start.top) * p
-                val lp = glass.layoutParams as FrameLayout.LayoutParams
+                val lp = ink.layoutParams as FrameLayout.LayoutParams
                 lp.width = w.toInt().coerceAtLeast(1)
                 lp.height = h.toInt().coerceAtLeast(1)
                 lp.leftMargin = x.toInt()
                 lp.topMargin = y.toInt()
-                glass.layoutParams = lp
-                if (p >= 0.22f && !expandedApplied) {
-                    expandedApplied = true
-                    glass.setExpanded(true)
-                    glass.setCompact(false)
-                    if (!com.dsha.sagittarius.ui.MotionUtils.reduceMotion(host.context)) {
-                        SpringAnimation(glass, DynamicAnimation.SCALE_X, 1f).apply {
-                            spring.dampingRatio = 0.42f
-                            spring.stiffness = 300f
-                            start()
-                        }
-                        SpringAnimation(glass, DynamicAnimation.SCALE_Y, 1f).apply {
-                            spring.dampingRatio = 0.42f
-                            spring.stiffness = 300f
-                            start()
-                        }
-                    } else {
-                        glass.scaleX = 1f
-                        glass.scaleY = 1f
-                    }
-                }
+                ink.layoutParams = lp
+                val radius = start.height() / 2f + (24f * density - start.height() / 2f) * p
+                ink.cornerRadius = radius
+                particleView.updateBounds(RectF(x, y, x + w, y + h), radius)
             }
             start()
         }
     }
 
     fun dismiss() {
-        val glass = capsule ?: return
+        val ink = capsule ?: return
         val scrimView = scrim
         animator?.cancel()
+        particles?.burst()
         dismissAnimator?.cancel()
-        // 直接淡出已展开的卡片，不在大尺寸下切回 pill 圆角，避免瞬间变椭圆。
         dismissAnimator = ValueAnimator.ofFloat(1f, 0f).apply {
             duration = 170L
             addUpdateListener {
                 val alpha = it.animatedValue as Float
-                glass.alpha = alpha
-                glass.scaleX = 0.94f + 0.06f * alpha
-                glass.scaleY = 0.94f + 0.06f * alpha
+                ink.alpha = alpha
+                ink.scaleX = 0.94f + 0.06f * alpha
+                ink.scaleY = 0.94f + 0.06f * alpha
                 scrimView?.alpha = alpha
             }
             addListener(object : android.animation.AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
-                    host.removeView(glass)
+                    host.removeView(ink)
                     scrimView?.let { host.removeView(it) }
                     capsule = null
                     scrim = null
-                    host.visibility = View.GONE
-                    dismissListener?.invoke()
-                    dismissListener = null
+                    val pv = particles
+                    if (pv != null) {
+                        // 让收起粒子完整播放，再移除整个覆盖层
+                        pv.postDelayed({
+                            host.removeView(pv)
+                            if (particles === pv) particles = null
+                            if (capsule == null) {
+                                host.visibility = View.GONE
+                                dismissListener?.invoke()
+                                dismissListener = null
+                            }
+                        }, 560L)
+                    } else {
+                        host.visibility = View.GONE
+                        dismissListener?.invoke()
+                        dismissListener = null
+                    }
                 }
             })
             start()

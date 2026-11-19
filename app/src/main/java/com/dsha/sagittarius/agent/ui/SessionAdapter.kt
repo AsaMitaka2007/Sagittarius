@@ -87,7 +87,7 @@ class SessionAdapter(
             time.text = timeFormat.format(Date(session.updatedAt))
             val isCurrent = session.id == currentId
             current.visibility = if (isCurrent && !selectionMode) View.VISIBLE else View.GONE
-            title.setTextColor(if (isCurrent) tokens.accent else tokens.textPrimary)
+            title.setTextColor(if (isCurrent) tokens.accent else AgentInkColors.TEXT_PRIMARY)
             row.background = GradientDrawable().apply {
                 cornerRadius = 14f * row.resources.displayMetrics.density
                 setColor(
@@ -102,7 +102,7 @@ class SessionAdapter(
                     setColor(if (checked) tokens.accent else 0)
                     setStroke(
                         (1.2f * row.resources.displayMetrics.density).toInt(),
-                        if (checked) tokens.accent else tokens.textTertiary
+                        if (checked) tokens.accent else AgentInkColors.TEXT_TERTIARY
                     )
                 }
             }
