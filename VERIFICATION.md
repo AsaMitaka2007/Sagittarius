@@ -592,5 +592,5 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 对话页、配置页、终端页移除青色/渐变描边：聊天气泡改为墨水黑、文字固定浅色；配置/终端卡片改用黑墨底无描边；输入框、工具/选项 chips 同步墨水黑。
 - 会话胶囊、推理胶囊改用 `InkCapsuleView` 纯黑圆角容器，删除 `LiquidGlassView` 玻璃与外发光；展开/收起由 `ParticleEdgeView` 沿胶囊圆角边缘喷出与入口同款粒子。
 - 透明按钮色回退：发送箭头、联网图标、滑条、页码点在 accent 为透明时使用白色/主题浅色，避免消失。
-- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 435 warning；APK `dist/sgr-debug-2.3-agent-ink2.apk`（SHA256 `ACAA4579…95F4`）。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 435 warning；APK `dist/sgr-debug-2.3-agent-ink2.apk`（SHA256 `EF66C979…F0CD`）。
 - 未完成：本机无设备/模拟器，墨水泵面、胶囊粒子与饮食圆环颜色未做真机验收；未 push。

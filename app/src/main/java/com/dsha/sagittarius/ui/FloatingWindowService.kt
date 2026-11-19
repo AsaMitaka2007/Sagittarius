@@ -215,6 +215,7 @@ class FloatingWindowService : Service() {
         val viewBinding = ViewFloatingWindowBinding.inflate(LayoutInflater.from(themed))
         binding = viewBinding
         viewBinding.glass.setCompact(true)
+        viewBinding.glass.setGlowEnabled(false)
         viewBinding.glass.setPadding(0, 0, 0, 0)
         viewBinding.header.visibility = View.GONE
         weatherRepository.state.value.let { state ->
