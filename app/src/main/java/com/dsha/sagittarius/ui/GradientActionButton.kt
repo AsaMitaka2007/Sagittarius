@@ -126,43 +126,25 @@ class GradientActionButton @JvmOverloads constructor(
         clipPath.addRoundRect(rect, radius, radius, Path.Direction.CW)
 
         if (isEnabled) {
-            glowPaint.style = Paint.Style.STROKE
-            glowPaint.strokeWidth = 1.2f * density
-            for (i in 4 downTo 1) {
-                glowPaint.color = ColorUtils.setAlphaComponent(
-                    if (i % 2 == 0) accent.startColor else accent.endColor,
-                    4 + (4 - i) * 3
-                )
-                glowRect.set(
-                    rect.left - i * density,
-                    rect.top - i * density,
-                    rect.right + i * density,
-                    rect.bottom + i * density
-                )
-                canvas.drawRoundRect(glowRect, radius + i * density, radius + i * density, glowPaint)
+            // 静态渐变填充；不再绘制流光/外发光边框
+            if (!accent.isTransparent) {
+                fillShader?.let { shader ->
+                    fillPaint.shader = shader
+                    canvas.drawRoundRect(rect, radius, radius, fillPaint)
+                }
+                highlightPaint.shader = highlightShader
+                canvas.save()
+                canvas.clipPath(clipPath)
+                canvas.drawRect(rect, highlightPaint)
+                canvas.restore()
             }
-
-            fillShader?.let { shader ->
-                val breathing = sin(phase * 2f * PI).toFloat() * width * 0.035f
-                fillMatrix.setTranslate(breathing, 0f)
-                shader.setLocalMatrix(fillMatrix)
-                fillPaint.shader = shader
-                canvas.drawRoundRect(rect, radius, radius, fillPaint)
+            borderPaint.shader = null
+            borderPaint.color = if (accent.isTransparent) {
+                Color.TRANSPARENT
+            } else {
+                ColorUtils.setAlphaComponent(accent.startColor, 210)
             }
-
-            highlightPaint.shader = highlightShader
-            canvas.save()
-            canvas.clipPath(clipPath)
-            canvas.drawRect(rect, highlightPaint)
-            canvas.restore()
-
-            canvas.drawRoundRect(rect, radius, radius, underBorderPaint)
-            borderShader?.let { shader ->
-                borderMatrix.setRotate(phase * 360f, width / 2f, height / 2f)
-                shader.setLocalMatrix(borderMatrix)
-                borderPaint.shader = shader
-                canvas.drawRoundRect(rect, radius, radius, borderPaint)
-            }
+            canvas.drawRoundRect(rect, radius, radius, borderPaint)
         } else {
             fillPaint.shader = null
             fillPaint.color = ColorUtils.setAlphaComponent(tokens.textPrimary, 34)
@@ -194,7 +176,13 @@ class GradientActionButton @JvmOverloads constructor(
     private fun updateTextColor() {
         if (!tokensReady) return
         setTextColor(
-            ColorStateList.valueOf(if (isEnabled) accent.textColor else tokens.buttonDisabledText)
+            ColorStateList.valueOf(
+                when {
+                    !isEnabled -> tokens.buttonDisabledText
+                    accent.isTransparent -> tokens.textPrimary
+                    else -> accent.textColor
+                }
+            )
         )
     }
 
@@ -213,17 +201,9 @@ class GradientActionButton @JvmOverloads constructor(
     }
 
     private fun updateAmbientAnimator() {
-        ambientAllowed = MotionUtils.ambientAllowed(context)
-        val shouldRun = ambientAllowed && isEnabled && isAttachedToWindow &&
-            isShown && windowVisibility == View.VISIBLE
-        if (shouldRun) {
-            ensureAnimator()
-            phaseAnimator?.let {
-                if (it.isPaused) it.resume() else if (!it.isStarted) it.start()
-            }
-        } else {
-            if (phaseAnimator?.isStarted == true) phaseAnimator?.pause()
-        }
+        // 静态按钮：不再运行动画描边/呼吸填充
+        phaseAnimator?.cancel()
+        phaseAnimator = null
     }
 
     override fun onAttachedToWindow() {

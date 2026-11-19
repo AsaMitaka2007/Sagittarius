@@ -103,10 +103,11 @@ class GlassChipView @JvmOverloads constructor(
     }
 
     private fun updateTextColor() {
+        val selectedText = if (accent.isTransparent) tokens.textPrimary else accent.textColor
         setTextColor(
             ColorUtils.blendARGB(
                 tokens.chipUnselectedText,
-                accent.textColor,
+                selectedText,
                 selectionProgress.coerceIn(0f, 1f)
             )
         )
@@ -135,25 +136,17 @@ class GlassChipView @JvmOverloads constructor(
         }
 
         if (p > 0f) {
-            fillPaint.shader = LinearGradient(
-                rect.left, rect.top, rect.right, rect.bottom,
-                intArrayOf(
-                    ColorUtils.setAlphaComponent(colors[0], (52 * p).toInt()),
-                    ColorUtils.setAlphaComponent(colors[1], (40 * p).toInt()),
-                    ColorUtils.setAlphaComponent(colors[2], (34 * p).toInt())
-                ),
-                null,
-                Shader.TileMode.CLAMP
-            )
+            fillPaint.shader = null
+            fillPaint.color = if (accent.isTransparent) {
+                Color.TRANSPARENT
+            } else {
+                ColorUtils.setAlphaComponent(colors[0], (40 * p).toInt())
+            }
             canvas.drawRoundRect(rect, radius, radius, fillPaint)
             borderPaint.strokeWidth = 1.2f * density
             borderPaint.alpha = (255 * p).toInt()
-            borderPaint.shader = LinearGradient(
-                rect.left, rect.top, rect.right, rect.bottom,
-                intArrayOf(colors[0], colors[1], colors[2]),
-                null,
-                Shader.TileMode.CLAMP
-            )
+            borderPaint.shader = null
+            borderPaint.color = if (accent.isTransparent) Color.TRANSPARENT else colors[0]
             canvas.drawRoundRect(rect, radius, radius, borderPaint)
         }
         borderPaint.alpha = 255

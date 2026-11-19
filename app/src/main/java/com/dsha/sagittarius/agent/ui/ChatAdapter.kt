@@ -58,8 +58,12 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
     private val detailsExpanded = mutableSetOf<Long>()
     private val detailsRegex = Regex("\\[DETAILS\\]([\\s\\S]*?)\\[/DETAILS\\]", RegexOption.IGNORE_CASE)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder =
-        Holder(LayoutInflater.from(parent.context).inflate(R.layout.item_chat, parent, false))
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_chat, parent, false)
+        AgentTypography.apply(view)
+        return Holder(view)
+    }
 
     override fun onBindViewHolder(holder: Holder, position: Int) = holder.bind(getItem(position))
 
@@ -130,7 +134,10 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
                 choiceScroll.visibility = View.GONE
                 content.visibility = View.VISIBLE
                 content.text = item.content
-                content.setTextColor(ButtonAccentManager.current.textColor)
+                content.setTextColor(
+                    if (ButtonAccentManager.current.isTransparent) tokens.textPrimary
+                    else ButtonAccentManager.current.textColor
+                )
             } else {
                 val choiceParsed = ChoiceParser.parse(item.content)
                 val parsed = parseDetails(item, choiceParsed.text)

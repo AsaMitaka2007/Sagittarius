@@ -86,7 +86,7 @@ class GradientTabView @JvmOverloads constructor(
         super.onDraw(canvas)
         if (width == 0) return
         val selected = isSelected
-        val shader = if (selected) {
+        val shader = if (selected && !accent.isTransparent) {
             LinearGradient(
                 0f, 0f, width.toFloat(), 0f,
                 shaderColors,
@@ -124,7 +124,13 @@ class GradientTabView @JvmOverloads constructor(
                 shaderPaint.xfermode = null
                 canvas.restoreToCount(layer)
             } else {
-                drawable.setTint(tokens.tabInactive)
+                drawable.setTint(
+                    if (selected) {
+                        if (accent.isTransparent) tokens.textPrimary else accent.startColor
+                    } else {
+                        tokens.tabInactive
+                    }
+                )
                 drawable.bounds = iconRect
                 drawable.draw(canvas)
             }
@@ -136,7 +142,11 @@ class GradientTabView @JvmOverloads constructor(
                 textPaint.shader = shader
             } else {
                 textPaint.shader = null
-                textPaint.color = if (shader != null) accent.textColor else tokens.tabInactive
+                textPaint.color = when {
+                    shader != null -> accent.textColor
+                    accent.isTransparent -> tokens.textPrimary
+                    else -> accent.startColor
+                }
             }
             canvas.drawText(label, cx, baseline, textPaint)
         }

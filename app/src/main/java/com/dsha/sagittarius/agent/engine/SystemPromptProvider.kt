@@ -56,6 +56,7 @@ class SystemPromptProvider(
             - 分类：list_categories / manage_category
             - 饮食：search_food_cn_local 优先；找不到时调用 toggle_network_search(true)，再 web_search；
               仍失败才用自身知识估算；用户明确要求时才 add_food_to_library / add_diet。
+              用户说“一根香蕉=100g / 一个鸡蛋=50g”时调用 set_food_unit，不要改营养值。
             - 查询：query_data（expense/budget/diet/nutrition）
             - 系统：navigate_to_tab、update_theme、update_date_card_color、toggle_floating_window、
               control_weather_debug、toggle_network_search、remember_preference

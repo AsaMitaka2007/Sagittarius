@@ -42,6 +42,7 @@ object ToolRegistryFactory {
             register(AllocateBudgetTreeTool(expense))
             register(AddDietTool(diet, clock))
             register(AddFoodToLibraryTool(diet))
+            register(SetFoodUnitTool(diet))
             register(ManageFoodCategoryTool(diet))
             register(SearchFoodCnLocalTool(cnSource))
             register(GetCnFoodNutritionTool(cnSource))

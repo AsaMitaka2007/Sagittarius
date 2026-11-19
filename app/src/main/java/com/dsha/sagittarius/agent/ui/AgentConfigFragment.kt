@@ -14,7 +14,6 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -81,6 +80,7 @@ class AgentConfigFragment : Fragment() {
             }
         }
         renderMemoryChips()
+        AgentTypography.apply(binding.root)
         observe()
     }
 
@@ -175,6 +175,7 @@ class AgentConfigFragment : Fragment() {
                 ).apply { bottomMargin = dp(6f) }
             )
         }
+        AgentTypography.apply(container)
     }
 
     private fun memoryRow(memory: AgentMemoryEntity): View {
@@ -258,17 +259,11 @@ class AgentConfigFragment : Fragment() {
             chipViews.forEachIndexed { index, view ->
                 val value = AgentMemoryCategory.all[index]
                 val selected = value == category
-                view.setTextColor(if (selected) tokens.accent else tokens.textSecondary)
+                view.setTextColor(if (selected) tokens.accent else Color.parseColor("#B8C0CC"))
                 view.background = GradientDrawable().apply {
-                    cornerRadius = 14f * resources.displayMetrics.density
-                    setColor(
-                        if (selected) ColorUtils.setAlphaComponent(tokens.accent, 30) else 0
-                    )
-                    setStroke(
-                        1,
-                        if (selected) tokens.accent
-                        else ColorUtils.setAlphaComponent(tokens.textTertiary, 50)
-                    )
+                    cornerRadius = 16f * resources.displayMetrics.density
+                    setColor(Color.parseColor("#E60B1220"))
+                    setStroke(0, Color.TRANSPARENT)
                 }
             }
         }
@@ -297,6 +292,7 @@ class AgentConfigFragment : Fragment() {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
             ))
         }
+        AgentTypography.apply(root)
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle(
                 if (existing == null) R.string.agent_config_memory_add_title
@@ -343,21 +339,18 @@ class AgentConfigFragment : Fragment() {
         TextView(requireContext()).apply {
             text = label
             textSize = 11f
+            typeface = android.graphics.Typeface.create("sans-serif", android.graphics.Typeface.NORMAL)
             gravity = Gravity.CENTER
-            setPadding(dp(12f), 0, dp(12f), 0)
-            setTextColor(if (selected) tokens.accent else tokens.textSecondary)
+            setPadding(dp(14f), 0, dp(14f), 0)
+            setTextColor(if (selected) tokens.accent else Color.parseColor("#B8C0CC"))
             background = GradientDrawable().apply {
-                cornerRadius = 16f * resources.displayMetrics.density
-                setColor(if (selected) ColorUtils.setAlphaComponent(tokens.accent, 28) else 0)
-                setStroke(
-                    1,
-                    if (selected) tokens.accent
-                    else ColorUtils.setAlphaComponent(tokens.textTertiary, 45)
-                )
+                cornerRadius = 18f * resources.displayMetrics.density
+                setColor(Color.parseColor("#E60B1220"))
+                setStroke(0, Color.TRANSPARENT)
             }
             setOnClickListener { onClick() }
             layoutParams = LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT, dp(34f)
+                ViewGroup.LayoutParams.WRAP_CONTENT, dp(38f)
             ).apply { marginEnd = dp(6f) }
         }
 

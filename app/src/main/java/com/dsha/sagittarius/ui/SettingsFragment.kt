@@ -257,7 +257,6 @@ class SettingsFragment : Fragment() {
             showSwitch = false,
             showChevron = true
         )
-        privacyRow.root.setFlowEnabled(true)
         privacyRow.root.setOnClickListener {
             startActivity(Intent(requireContext(), PrivacyActivity::class.java))
         }

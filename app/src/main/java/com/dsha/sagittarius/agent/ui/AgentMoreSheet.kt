@@ -29,6 +29,7 @@ class AgentMoreSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         SheetMotion.animateIn(view)
+        AgentTypography.apply(view)
         val app = requireActivity().application as SagittariusApp
         val prefs = app.sagittariusPrefs
         binding.etPersona.setText(prefs.personaDescription.value)

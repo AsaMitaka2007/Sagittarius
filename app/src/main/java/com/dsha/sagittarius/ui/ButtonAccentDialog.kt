@@ -30,13 +30,22 @@ object ButtonAccentDialog {
                 text = item.label
                 gravity = Gravity.CENTER
                 textSize = 11f
-                setTextColor(item.textColor)
-                background = GradientDrawable(
-                    GradientDrawable.Orientation.TL_BR,
-                    intArrayOf(item.startColor, item.endColor)
-                ).apply {
-                    cornerRadius = dp(context, 12f).toFloat()
-                    setStroke(dp(context, 1f), ColorUtils.setAlphaComponent(Color.WHITE, 60))
+                if (item.isTransparent) {
+                    setTextColor(tokens.textPrimary)
+                    background = GradientDrawable().apply {
+                        cornerRadius = dp(context, 12f).toFloat()
+                        setColor(Color.TRANSPARENT)
+                        setStroke(dp(context, 1f), tokens.textTertiary)
+                    }
+                } else {
+                    setTextColor(item.textColor)
+                    background = GradientDrawable(
+                        GradientDrawable.Orientation.TL_BR,
+                        intArrayOf(item.startColor, item.endColor)
+                    ).apply {
+                        cornerRadius = dp(context, 12f).toFloat()
+                        setStroke(dp(context, 1f), ColorUtils.setAlphaComponent(Color.WHITE, 60))
+                    }
                 }
                 setOnClickListener {
                     onPick(item)
@@ -94,12 +103,20 @@ object ButtonAccentDialog {
         val preview = TextView(context).apply {
             text = "Aa"
             gravity = Gravity.CENTER
-            setTextColor(Color.WHITE)
+            setTextColor(if (initial.isTransparent) tokens.textPrimary else Color.WHITE)
             textSize = 20f
-            background = GradientDrawable(
-                GradientDrawable.Orientation.LEFT_RIGHT,
-                intArrayOf(initial.startColor, initial.endColor)
-            ).apply { cornerRadius = dp(context, 14f).toFloat() }
+            background = if (initial.isTransparent) {
+                GradientDrawable().apply {
+                    cornerRadius = dp(context, 14f).toFloat()
+                    setColor(Color.TRANSPARENT)
+                    setStroke(dp(context, 1f), tokens.textTertiary)
+                }
+            } else {
+                GradientDrawable(
+                    GradientDrawable.Orientation.LEFT_RIGHT,
+                    intArrayOf(initial.startColor, initial.endColor)
+                ).apply { cornerRadius = dp(context, 14f).toFloat() }
+            }
         }
         root.addView(preview, LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT, dp(context, 58f)

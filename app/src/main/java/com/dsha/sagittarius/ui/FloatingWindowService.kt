@@ -501,10 +501,13 @@ class FloatingWindowService : Service() {
         binding.collapsedBody.visibility = View.VISIBLE
         binding.customRangePanel.visibility = View.GONE
         binding.budgetEditorPanel.visibility = View.GONE
-        binding.glass.setExpanded(false)
-        binding.glass.setCompact(true)
-        binding.glass.setPadding(0, 0, 0, 0)
         setWindowSize(false)
+        // 等窗口尺寸真正缩回胶囊后再改圆角，否则大卡片会先被 height/2 拉成椭圆。
+        binding.root.postDelayed({
+            binding.glass.setExpanded(false)
+            binding.glass.setCompact(true)
+        }, 40L)
+        binding.glass.setPadding(0, 0, 0, 0)
         if (reduceMotion) {
             binding.glass.scaleX = 1f
             binding.glass.scaleY = 1f

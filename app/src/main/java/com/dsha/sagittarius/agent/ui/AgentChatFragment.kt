@@ -4,7 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.RectF
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import android.view.Gravity
 import android.view.KeyEvent
@@ -139,6 +138,7 @@ class AgentChatFragment : Fragment() {
         observe()
         updateSendButton()
         updateReasoningButton(viewModel.effort.value, viewModel.forcedThinking.value)
+        AgentTypography.apply(binding.root)
     }
 
     private fun observe() {
@@ -200,16 +200,10 @@ class AgentChatFragment : Fragment() {
 
     private fun updateWebSearchButton(enabled: Boolean) {
         val accent = ButtonAccentManager.current
-        binding.btnWebSearch.background = if (enabled) {
-            GradientDrawable(
-                GradientDrawable.Orientation.LEFT_RIGHT,
-                accent.colors
-            ).apply { cornerRadius = 21f * resources.displayMetrics.density }
-        } else {
-            ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_pill)
-        }
-        binding.btnWebSearch.setTextColor(
-            if (enabled) accent.textColor else ThemeTokens.of(requireContext()).textPrimary
+        binding.btnWebSearch.background =
+            ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
+        binding.btnWebSearch.imageTintList = android.content.res.ColorStateList.valueOf(
+            if (enabled) accent.startColor else android.graphics.Color.WHITE
         )
         binding.btnWebSearch.contentDescription = getString(
             if (enabled) R.string.agent_web_on else R.string.agent_web_off
@@ -226,17 +220,10 @@ class AgentChatFragment : Fragment() {
             generating || binding.etInput.text?.toString()?.isNotBlank() == true
         binding.btnSend.alpha = if (binding.btnSend.isEnabled) 1f else 0.45f
         val accent = ButtonAccentManager.current
-        binding.btnSend.background = if (binding.btnSend.isEnabled) {
-            GradientDrawable(
-                GradientDrawable.Orientation.LEFT_RIGHT,
-                accent.colors
-            ).apply { cornerRadius = 21f * resources.displayMetrics.density }
-        } else {
-            ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_pill)
-        }
+        binding.btnSend.background =
+            ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
         binding.btnSend.setTextColor(
-            if (binding.btnSend.isEnabled) accent.textColor
-            else ThemeTokens.of(requireContext()).textPrimary
+            if (binding.btnSend.isEnabled) accent.startColor else android.graphics.Color.WHITE
         )
         binding.btnReasoning.isEnabled = !generating && !viewModel.forcedThinking.value
         binding.btnReasoning.alpha = if (binding.btnReasoning.isEnabled) 1f else 0.5f

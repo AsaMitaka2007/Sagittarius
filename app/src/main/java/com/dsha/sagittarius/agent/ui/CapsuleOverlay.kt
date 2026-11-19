@@ -81,6 +81,7 @@ class CapsuleOverlay(
             scaleX = 0.96f
             scaleY = 0.96f
         }
+        AgentTypography.apply(content)
         glass.addView(content, FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
@@ -147,8 +148,7 @@ class CapsuleOverlay(
         val scrimView = scrim
         animator?.cancel()
         dismissAnimator?.cancel()
-        glass.setExpanded(false)
-        glass.setCompact(true)
+        // 直接淡出已展开的卡片，不在大尺寸下切回 pill 圆角，避免瞬间变椭圆。
         dismissAnimator = ValueAnimator.ofFloat(1f, 0f).apply {
             duration = 170L
             addUpdateListener {

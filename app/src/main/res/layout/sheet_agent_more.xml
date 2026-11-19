@@ -84,10 +84,10 @@
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:layout_marginTop="10dp"
-            android:background="@drawable/bg_agent_pill"
+            android:background="@drawable/bg_agent_ink"
             android:gravity="center"
             android:text="@string/agent_save_persona"
-            android:textColor="?attr/blAccent"
+            android:textColor="#FFFFFF"
             android:textSize="13sp" />
     </LinearLayout>
 
@@ -117,10 +117,10 @@
             android:layout_width="match_parent"
             android:layout_height="44dp"
             android:layout_marginTop="8dp"
-            android:background="@drawable/bg_agent_pill"
+            android:background="@drawable/bg_agent_ink"
             android:gravity="center"
             android:text="@string/agent_save_permission"
-            android:textColor="?attr/blAccent"
+            android:textColor="#FFFFFF"
             android:textSize="13sp" />
     </LinearLayout>
 

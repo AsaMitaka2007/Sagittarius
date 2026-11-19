@@ -31,6 +31,9 @@ data class ButtonAccentStyle(
     val isLight: Boolean
         get() = (ColorUtils.calculateLuminance(startColor) + ColorUtils.calculateLuminance(endColor)) / 2.0 > 0.52
 
+    val isTransparent: Boolean
+        get() = Color.alpha(startColor) == 0 && Color.alpha(endColor) == 0
+
     val textColor: Int
         get() = if (isLight) Color.parseColor("#101828") else Color.WHITE
 }
@@ -46,7 +49,8 @@ object ButtonAccentManager {
         ButtonAccentStyle("aurora", "极光绿", Color.parseColor("#2ED9B0"), Color.parseColor("#0E2E6B")),
         ButtonAccentStyle("cyber", "赛博紫", Color.parseColor("#4B1D95"), Color.parseColor("#FF3FBF")),
         ButtonAccentStyle("sunset", "晚霞橙", Color.parseColor("#FF7A18"), Color.parseColor("#FFB347")),
-        ButtonAccentStyle("blue", "冰川蓝", Color.parseColor("#4DA8FF"), Color.parseColor("#7B61FF"))
+        ButtonAccentStyle("blue", "冰川蓝", Color.parseColor("#4DA8FF"), Color.parseColor("#7B61FF")),
+        ButtonAccentStyle("transparent", "透明", Color.TRANSPARENT, Color.TRANSPARENT)
     )
 
     private val _style = MutableStateFlow(presets[1])

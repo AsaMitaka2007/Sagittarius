@@ -572,3 +572,15 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 扩散时长放慢：有粒子 660ms → 980ms，减少动画模式 340ms → 520ms。
 - 铺满后延迟 60ms，页面与覆盖层同步 320ms 交叉淡入，避免先露出页面再消失的断层。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 20 类 / 53 用例 / 0 失败；APK 同上。
+
+
+## 1.3 按钮/字体/胶囊/单位（2026-11-19）
+
+- Agent 页按钮统一为黑色墨水圆角底、无流光/渐变描边；新增 `AgentTypography`，全页 TextView/EditText 统一 sans-serif 并收紧字距。Android 不内置 San Francisco，暂用系统 sans-serif 替代，若提供 SF Pro 字体文件可替换。
+- 联网搜索按钮改为地球矢量图，推理按钮增加星芒矢量图标；两者均为墨水底。
+- 修复胶囊收起变椭圆：`FloatingWindowService.collapse()` 先缩窗口，延迟 40ms 再切回 pill 圆角；`CapsuleOverlay.dismiss()` 不再在大尺寸下 `setExpanded(false)`，改为直接淡出展开卡片。
+- 全 App 按钮去流光：`GradientActionButton` 删除旋转 SweepGradient 边框、外发光与呼吸填充，改为静态渐变填充 + 纯色 accent 边框；`GlassChipView` 选中态改低透明度纯色填充 + 纯色边框；隐私设置卡片关闭 flow 动画。
+- 按钮颜色新增「透明」预设；透明时 `GradientActionButton`/`GlassChipView`/`GradientTabView` 回退到主题文字色，不绘制填充与边框。
+- AI 新增 `set_food_unit` 工具：为已有食材设置自定义单位换算（如 1 根香蕉 = 100g），已注册、写入系统提示词与工具目录，补 2 条单测。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 435 warning；APK `dist/sgr-debug-2.2-agent-ink.apk`（SHA256 `0B39E72D…7707`）。
+- 未完成：本机无设备/模拟器，墨水按钮、字体观感、胶囊收起与透明按钮未做真机验收；未 push。

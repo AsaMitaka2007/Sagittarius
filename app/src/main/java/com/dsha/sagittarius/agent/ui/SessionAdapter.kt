@@ -65,6 +65,7 @@ class SessionAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_agent_session, parent, false)
+        AgentTypography.apply(view)
         return Holder(view)
     }
 

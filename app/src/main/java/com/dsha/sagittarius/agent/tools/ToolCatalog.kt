@@ -20,6 +20,7 @@ object ToolCatalog {
         "manage_category" to Meta("管理分类", "记账", false),
         "add_diet" to Meta("记录饮食", "饮食", false),
         "add_food_to_library" to Meta("添加食材", "饮食", false),
+        "set_food_unit" to Meta("设置自定义单位", "饮食", false),
         "manage_food_category" to Meta("管理食材分类", "饮食", false),
         "search_food_cn_local" to Meta("搜索中国食物库", "饮食", true),
         "get_cn_food_nutrition" to Meta("查询食物营养", "饮食", true),

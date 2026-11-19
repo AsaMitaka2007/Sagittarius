@@ -32,6 +32,7 @@ class AgentSettingsSheet : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         SheetMotion.animateIn(view)
+        AgentTypography.apply(view)
         val app = requireActivity().application as SagittariusApp
         val prefs = app.sagittariusPrefs
         providers = ProviderRegistry.all.map { ProviderOption(it.id, it.displayName) } +
@@ -64,12 +65,9 @@ class AgentSettingsSheet : BottomSheetDialogFragment() {
             }
             override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
         })
-        val accent = com.dsha.sagittarius.ui.ButtonAccentManager.current
-        binding.btnSaveSettings.background = android.graphics.drawable.GradientDrawable(
-            android.graphics.drawable.GradientDrawable.Orientation.LEFT_RIGHT,
-            accent.colors
-        ).apply { cornerRadius = 16 * resources.displayMetrics.density }
-        binding.btnSaveSettings.setTextColor(accent.textColor)
+        binding.btnSaveSettings.background =
+            androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
+        binding.btnSaveSettings.setTextColor(android.graphics.Color.WHITE)
         binding.btnSaveSettings.setOnClickListener { save() }
     }
 

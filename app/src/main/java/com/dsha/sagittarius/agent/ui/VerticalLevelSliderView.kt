@@ -24,6 +24,8 @@ class VerticalLevelSliderView @JvmOverloads constructor(
     private val density = resources.displayMetrics.density
     private val tokens = ThemeTokens.of(context)
     private val accent = ButtonAccentManager.current
+    private val accentColor: Int
+        get() = if (accent.isTransparent) tokens.textPrimary else accent.startColor
     private val trackPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val knobPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -60,7 +62,7 @@ class VerticalLevelSliderView @JvmOverloads constructor(
 
         fillPaint.strokeWidth = trackWidth
         fillPaint.strokeCap = Paint.Cap.ROUND
-        fillPaint.color = accent.startColor
+        fillPaint.color = accentColor
         canvas.drawLine(cx, knobY, cx, bottom, fillPaint)
 
         // 4 个档位刻度
@@ -68,7 +70,7 @@ class VerticalLevelSliderView @JvmOverloads constructor(
         listOf(0f, 1f / 3f, 2f / 3f, 1f).forEach { fraction ->
             val y = bottom - (bottom - top) * fraction
             tickPaint.color = if (fraction <= progress + 0.01f) {
-                ColorUtils.setAlphaComponent(accent.startColor, 180)
+                ColorUtils.setAlphaComponent(accentColor, 180)
             } else {
                 ColorUtils.setAlphaComponent(tokens.textTertiary, 70)
             }
@@ -76,11 +78,11 @@ class VerticalLevelSliderView @JvmOverloads constructor(
         }
 
         // 光晕 + 旋钮
-        glowPaint.color = ColorUtils.setAlphaComponent(accent.startColor, 45)
+        glowPaint.color = ColorUtils.setAlphaComponent(accentColor, 45)
         canvas.drawCircle(cx, knobY, 15f * density, glowPaint)
-        glowPaint.color = ColorUtils.setAlphaComponent(accent.startColor, 24)
+        glowPaint.color = ColorUtils.setAlphaComponent(accentColor, 24)
         canvas.drawCircle(cx, knobY, 22f * density, glowPaint)
-        knobPaint.color = accent.startColor
+        knobPaint.color = accentColor
         canvas.drawCircle(cx, knobY, 7f * density, knobPaint)
         knobPaint.color = 0xFFFFFFFF.toInt()
         canvas.drawCircle(cx, knobY, 2.6f * density, knobPaint)

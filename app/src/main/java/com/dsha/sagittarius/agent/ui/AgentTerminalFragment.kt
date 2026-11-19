@@ -55,6 +55,7 @@ class AgentTerminalFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.btnExportLogs.setOnClickListener { requestLogExport() }
         binding.btnExportTools.setOnClickListener { requestToolExport() }
+        AgentTypography.apply(binding.root)
         observe()
     }
 
@@ -118,6 +119,7 @@ class AgentTerminalFragment : Fragment() {
             })
             container.addView(row)
         }
+        AgentTypography.apply(container)
     }
 
     private fun requestLogExport() {
