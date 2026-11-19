@@ -177,6 +177,10 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
                         background = GradientDrawable().apply {
                             cornerRadius = 12f * context.resources.displayMetrics.density
                             setColor(AgentInkColors.INK_SOFT)
+                            setStroke(
+                                (1f * context.resources.displayMetrics.density).toInt(),
+                                Color.parseColor("#66F3EBDD")
+                            )
                         }
                         val ph = (9 * context.resources.displayMetrics.density).toInt()
                         val pv = (5 * context.resources.displayMetrics.density).toInt()
@@ -268,6 +272,10 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
                     background = GradientDrawable().apply {
                         cornerRadius = 16f * resources.displayMetrics.density
                         setColor(AgentInkColors.INK_SOFT)
+                        setStroke(
+                            (1f * resources.displayMetrics.density).toInt(),
+                            Color.parseColor("#66F3EBDD")
+                        )
                     }
                     isEnabled = !answered
                     alpha = if (answered) 0.55f else 1f

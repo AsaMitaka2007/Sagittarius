@@ -27,6 +27,11 @@ class AgentEntryButton @JvmOverloads constructor(
         color = 0xE60B1220.toInt()
     }
     private val logoPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
+    private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+        style = Paint.Style.STROKE
+        strokeWidth = 1.2f * density
+        color = 0xCCF3EBDD.toInt()
+    }
 
     init {
         isClickable = true
@@ -48,6 +53,9 @@ class AgentEntryButton @JvmOverloads constructor(
         val left = rect.centerX() - target / 2f
         val top = rect.centerY() - target / 2f
         canvas.drawBitmap(logo, null, RectF(left, top, left + target, top + target), logoPaint)
+        // 米白液体感圆角边框，无光晕
+        val border = RectF(rect).apply { inset(0.6f, 0.6f) }
+        canvas.drawRoundRect(border, radius, radius, borderPaint)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {

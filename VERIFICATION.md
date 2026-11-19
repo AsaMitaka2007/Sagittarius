@@ -636,3 +636,13 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 胶囊展开/收起粒子与入口涟漪粒子统一为黑/白两色，删除青蓝与米白彩色粒子。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 441 warning；APK `dist/sgr-debug-2.7-ink-final.apk`（SHA256 `490EBE34…9313`，18MB）。
 - 未完成：本机无设备/模拟器，滑条吸附手感、星空视频帧与黑白粒子未真机验收；未 push。
+
+
+## 1.9 米白液体边框与毛玻璃修复（2026-11-19）
+
+- 黑色主题与 Agent 页按钮删除剩余高光/光感：`GradientActionButton` 在 ink 模式只画纯墨填充，不画顶部高光；Agent 入口按钮改为纯墨底 + 米白描边。
+- 新增 `bg_agent_ink_border`（墨底 + 1.2dp 米白描边 + 24dp 圆角），Agent 对话 dock、配置/终端按钮、chips、清空上下文按钮统一使用。
+- 黑色主题 chips、输入框、悬浮按钮描边改为米白色系；`GradientActionButton`/`GlassChipView` 在 ink 模式下边框为米白。
+- 毛玻璃主题修复：`values-v31` 不再使用 `windowIsTranslucent/windowShowWallpaper`，改为不透明玻璃背景；`ThemedActivity` 默认关闭 Glass 背景模糊，避免部分机型反复重绘/闪烁。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 442 warning；APK `dist/sgr-debug-2.8-cream-border.apk`（SHA256 `773F3ACA…ED14`）。
+- 未完成：本机无设备/模拟器，毛玻璃稳定性与米白边框观感未真机验收；未 push。

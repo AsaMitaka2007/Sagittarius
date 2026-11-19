@@ -146,7 +146,11 @@ class GlassChipView @JvmOverloads constructor(
             borderPaint.strokeWidth = 1.2f * density
             borderPaint.alpha = (255 * p).toInt()
             borderPaint.shader = null
-            borderPaint.color = if (accent.isTransparent) Color.TRANSPARENT else colors[0]
+            borderPaint.color = when {
+                accent.isTransparent -> Color.TRANSPARENT
+                accent.isInk -> Color.parseColor("#CCF3EBDD")
+                else -> colors[0]
+            }
             canvas.drawRoundRect(rect, radius, radius, borderPaint)
         }
         borderPaint.alpha = 255

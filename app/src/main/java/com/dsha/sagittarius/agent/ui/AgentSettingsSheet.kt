@@ -66,7 +66,7 @@ class AgentSettingsSheet : BottomSheetDialogFragment() {
             override fun onNothingSelected(parent: android.widget.AdapterView<*>?) = Unit
         })
         binding.btnSaveSettings.background =
-            androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
+            androidx.core.content.ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink_border)
         binding.btnSaveSettings.setTextColor(android.graphics.Color.WHITE)
         binding.btnSaveSettings.setOnClickListener { save() }
     }

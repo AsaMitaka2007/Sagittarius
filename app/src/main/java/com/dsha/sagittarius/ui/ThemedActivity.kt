@@ -41,7 +41,7 @@ abstract class ThemedActivity : AppCompatActivity() {
     /** Agent 页不随全局主题重建。 */
     protected open fun followsThemeChanges(): Boolean = true
 
-    protected open fun allowsGlassBlur(): Boolean = true
+    protected open fun allowsGlassBlur(): Boolean = false
 
     private fun applyGlassBlurIfNeeded() {
         if (!allowsGlassBlur()) return

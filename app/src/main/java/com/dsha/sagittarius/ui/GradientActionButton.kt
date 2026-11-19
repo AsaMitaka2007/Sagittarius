@@ -143,10 +143,10 @@ class GradientActionButton @JvmOverloads constructor(
                 canvas.restore()
             }
             borderPaint.shader = null
-            borderPaint.color = if (accent.isTransparent) {
-                Color.TRANSPARENT
-            } else {
-                ColorUtils.setAlphaComponent(accent.startColor, 210)
+            borderPaint.color = when {
+                accent.isTransparent -> Color.TRANSPARENT
+                accent.isInk -> Color.parseColor("#CCF3EBDD")
+                else -> ColorUtils.setAlphaComponent(accent.startColor, 210)
             }
             canvas.drawRoundRect(rect, radius, radius, borderPaint)
         } else {

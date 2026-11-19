@@ -263,7 +263,7 @@ class AgentConfigFragment : Fragment() {
                 view.background = GradientDrawable().apply {
                     cornerRadius = 16f * resources.displayMetrics.density
                     setColor(Color.parseColor("#E60B1220"))
-                    setStroke(0, Color.TRANSPARENT)
+                    setStroke((1.2f * resources.displayMetrics.density).toInt(), Color.parseColor("#CCF3EBDD"))
                 }
             }
         }
@@ -346,7 +346,7 @@ class AgentConfigFragment : Fragment() {
             background = GradientDrawable().apply {
                 cornerRadius = 18f * resources.displayMetrics.density
                 setColor(Color.parseColor("#E60B1220"))
-                setStroke(0, Color.TRANSPARENT)
+                setStroke((1.2f * resources.displayMetrics.density).toInt(), Color.parseColor("#CCF3EBDD"))
             }
             setOnClickListener { onClick() }
             layoutParams = LinearLayout.LayoutParams(
