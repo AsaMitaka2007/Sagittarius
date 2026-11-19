@@ -8,6 +8,7 @@ import com.dsha.sagittarius.R
 import com.dsha.sagittarius.SagittariusApp
 import com.dsha.sagittarius.agent.debug.LogcatDebugLogger
 import com.dsha.sagittarius.agent.debug.NoOpAgentDebugLogger
+import com.dsha.sagittarius.agent.debug.AgentRuntimeLog
 import com.dsha.sagittarius.agent.engine.AgentEngine
 import com.dsha.sagittarius.agent.engine.AgentEvent
 import com.dsha.sagittarius.agent.engine.SystemPromptProvider
@@ -22,12 +23,15 @@ import com.dsha.sagittarius.agent.engine.ChatMessage
 import com.dsha.sagittarius.agent.data.SagittariusPrefs
 import com.dsha.sagittarius.data.ChatHistoryEntity
 import com.dsha.sagittarius.data.ChatSessionEntity
+import com.dsha.sagittarius.data.AgentMemoryCategory
+import com.dsha.sagittarius.data.AgentMemoryEntity
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withTimeoutOrNull
 import com.dsha.sagittarius.agent.tools.ToolRegistryFactory
+import com.dsha.sagittarius.agent.tools.AgentTool
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -65,26 +69,18 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
     val modelId: StateFlow<String> = _modelId.asStateFlow()
     private val _effort = MutableStateFlow(prefs.thinking.value)
     val effort: StateFlow<String> = _effort.asStateFlow()
+    private val _liveliness = MutableStateFlow(prefs.liveliness.value)
+    val liveliness: StateFlow<String> = _liveliness.asStateFlow()
     private val _supportedEfforts = MutableStateFlow(listOf("off", "low", "high"))
     val supportedEfforts: StateFlow<List<String>> = _supportedEfforts.asStateFlow()
     private val _forcedThinking = MutableStateFlow(false)
     val forcedThinking: StateFlow<Boolean> = _forcedThinking.asStateFlow()
     private val _totalTokens = MutableStateFlow(prefs.totalTokens.value)
     val totalTokens: StateFlow<Long> = _totalTokens.asStateFlow()
-    private val _petVisible = MutableStateFlow(prefs.petVisible.value)
-    val petVisible: StateFlow<Boolean> = _petVisible.asStateFlow()
-    private val _petTextColor = MutableStateFlow(prefs.petTextColor.value)
-    val petTextColor: StateFlow<Int> = _petTextColor.asStateFlow()
-    private val _petScale = MutableStateFlow(prefs.petScale.value)
-    val petScale: StateFlow<Int> = _petScale.asStateFlow()
-    private val _petX = MutableStateFlow(prefs.petX.value)
-    val petX: StateFlow<Float> = _petX.asStateFlow()
-    private val _petY = MutableStateFlow(prefs.petY.value)
-    val petY: StateFlow<Float> = _petY.asStateFlow()
-    private val _petLocked = MutableStateFlow(prefs.petLocked.value)
-    val petLocked: StateFlow<Boolean> = _petLocked.asStateFlow()
-    private val _petPositionSet = MutableStateFlow(prefs.petPositionSet.value)
-    val petPositionSet: StateFlow<Boolean> = _petPositionSet.asStateFlow()
+    private val _memories = MutableStateFlow<List<AgentMemoryEntity>>(emptyList())
+    val memories: StateFlow<List<AgentMemoryEntity>> = _memories.asStateFlow()
+    private val _tools = MutableStateFlow<List<AgentTool>>(emptyList())
+    val tools: StateFlow<List<AgentTool>> = _tools.asStateFlow()
     private val _balanceText = MutableStateFlow<String?>(null)
     val balanceText: StateFlow<String?> = _balanceText.asStateFlow()
     private val _balanceSupported = MutableStateFlow(false)
@@ -110,14 +106,11 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
             )
         )
         viewModelScope.launch { prefs.webSearchEnabled.collect { _webSearchEnabled.value = it } }
-        viewModelScope.launch { prefs.petVisible.collect { _petVisible.value = it } }
+        viewModelScope.launch { prefs.liveliness.collect { _liveliness.value = it } }
+        viewModelScope.launch {
+            app.agentMemoryDao.observeAll().collect { _memories.value = it }
+        }
         viewModelScope.launch { prefs.totalTokens.collect { _totalTokens.value = it } }
-        viewModelScope.launch { prefs.petTextColor.collect { _petTextColor.value = it } }
-        viewModelScope.launch { prefs.petScale.collect { _petScale.value = it } }
-        viewModelScope.launch { prefs.petX.collect { _petX.value = it } }
-        viewModelScope.launch { prefs.petY.collect { _petY.value = it } }
-        viewModelScope.launch { prefs.petLocked.collect { _petLocked.value = it } }
-        viewModelScope.launch { prefs.petPositionSet.collect { _petPositionSet.value = it } }
         rebuildEngine()
         refreshBalance()
         loadModels()
@@ -198,11 +191,16 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         loadHistory(id)
     }
 
-    fun deleteSession(id: Long) {
+    fun deleteSession(id: Long) = deleteSessions(listOf(id))
+
+    fun deleteSessions(ids: List<Long>) {
+        val targets = ids.distinct()
+        if (targets.isEmpty()) return
+        stop()
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
-                app.chatHistoryDao.deleteForSession(id)
-                app.chatSessionDao.delete(id)
+                app.chatHistoryDao.deleteForSessions(targets)
+                app.chatSessionDao.deleteByIds(targets)
             }
             var all = runCatching { app.chatSessionDao.getAll() }.getOrDefault(emptyList())
             if (all.isEmpty()) {
@@ -211,7 +209,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
             }
             withContext(Dispatchers.Main) {
                 _sessions.value = all
-                if (_sessionId.value == id) {
+                if (_sessionId.value in targets) {
                     val next = all.first()
                     _sessionId.value = next.id
                     _messages.value = emptyList()
@@ -248,10 +246,10 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         }
     }
 
-    private fun saveHistory(role: String, content: String) {
+    private fun saveHistory(role: String, content: String, sessionId: Long = _sessionId.value) {
         val text = content.trim()
         if (text.isEmpty()) return
-        val session = _sessionId.value
+        val session = sessionId
         viewModelScope.launch(Dispatchers.IO) {
             runCatching {
                 app.chatHistoryDao.insert(
@@ -304,16 +302,20 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
             debugLogger,
             cfg
         )
+        val registry = ToolRegistryFactory.default(
+            app, app.repository, app.dietRepository,
+            logger = debugLogger,
+            bochaKeyProvider = { keyStore.load("bocha") },
+            memorySaver = { category, content -> rememberPreference(category, content) }
+        )
+        _tools.value = registry.all()
         engine = AgentEngine(
             llmClient!!,
-            ToolRegistryFactory.default(
-                app, app.repository, app.dietRepository,
-                logger = debugLogger,
-                bochaKeyProvider = { keyStore.load("bocha") }
-            ),
+            registry,
             SystemPromptProvider(
                 personaProvider = { prefs.personaDescription.value },
-                livelinessProvider = { prefs.liveliness.value }
+                livelinessProvider = { prefs.liveliness.value },
+                memoryProvider = { _memories.value }
             ),
             debugLogger,
             permissionGate = { name, args -> requestToolPermission(name, args) },
@@ -361,7 +363,12 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         hadToolInLastTurn = false
         if (_messages.value.none { it.role == ChatItem.Role.USER }) maybeNameSession(input)
         _messages.value = _messages.value + ChatItem(idGen.incrementAndGet(), ChatItem.Role.USER, input)
-        saveHistory("user", input)
+        val sessionSnapshot = _sessionId.value
+        saveHistory("user", input, sessionSnapshot)
+        AgentRuntimeLog.info(
+            "请求 provider=${_provider.value} model=${_modelId.value} " +
+                "effort=${_effort.value} web=${_webSearchEnabled.value} session=$sessionSnapshot"
+        )
         val assistantId = idGen.incrementAndGet()
         _messages.value = _messages.value + ChatItem(
             id = assistantId,
@@ -388,6 +395,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                         }
                         is AgentEvent.ToolStarted -> {
                             hadToolInLastTurn = true
+                            AgentRuntimeLog.tool("调用 ${event.name} ${event.args.take(300)}")
                             updateAssistant(assistantId) {
                                 it.copy(
                                     toolTraces = it.toolTraces + ToolTrace(
@@ -398,6 +406,12 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                             }
                         }
                         is AgentEvent.ToolFinished -> {
+                            AgentRuntimeLog.log(
+                                if (event.result.ok) AgentRuntimeLog.Level.TOOL
+                                else AgentRuntimeLog.Level.ERROR,
+                                "${event.name} -> ok=${event.result.ok} " +
+                                    event.result.contentForModel.take(300)
+                            )
                             updateAssistant(assistantId) {
                                 val traces = it.toolTraces.toMutableList()
                                 val index = traces.indexOfLast { trace -> trace.name == event.name && !trace.done }
@@ -421,6 +435,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                         is AgentEvent.Usage -> {
                             val prompt = event.promptTokens ?: 0
                             val completion = event.completionTokens ?: 0
+                            AgentRuntimeLog.info("tokens prompt=$prompt completion=$completion")
                             _tokenUsage.value = _tokenUsage.value + TokenUsage(prompt, completion)
                             val total = event.totalTokens ?: (prompt + completion)
                             if (total > 0) {
@@ -433,6 +448,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                         }
                         is AgentEvent.Failed -> {
                             val friendly = friendlyError(event.error)
+                            AgentRuntimeLog.error("请求失败 ${event.error.kind}: ${event.error.message}")
                             _lastError.value = friendly
                             updateAssistant(assistantId) {
                                 it.copy(streaming = false, error = friendly)
@@ -441,12 +457,13 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                     }
                 }
             } catch (_: CancellationException) {
+                AgentRuntimeLog.info("请求已停止")
                 updateAssistant(assistantId) { it.copy(streaming = false, stopped = true) }
             } finally {
                 _generating.value = false
                 updateAssistant(assistantId) { it.copy(streaming = false) }
                 val finalText = _messages.value.firstOrNull { it.id == assistantId }?.content.orEmpty()
-                saveHistory("assistant", finalText)
+                saveHistory("assistant", finalText, sessionSnapshot)
             }
         }
     }
@@ -508,9 +525,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         "update_theme",
         "update_date_card_color",
         "control_weather_debug",
-        "toggle_floating_window",
-        "toggle_pet",
-        "update_pet_config"
+        "toggle_floating_window"
     )
 
     data class TokenUsage(
@@ -583,6 +598,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
 
     fun selectModel(id: String) {
         if (id == _modelId.value) return
+        stop()
         engine?.clear()
         toolsDisabled = false
         _modelId.value = id
@@ -594,6 +610,63 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
     fun selectEffort(value: String) {
         _effort.value = value
         viewModelScope.launch { prefs.setThinking(_provider.value, value) }
+    }
+
+    fun selectLiveliness(value: String) {
+        _liveliness.value = value
+        viewModelScope.launch { prefs.setLiveliness(value) }
+    }
+
+    suspend fun rememberPreference(category: String, content: String): Boolean =
+        withContext(Dispatchers.IO) {
+            val text = content.trim()
+            if (text.isEmpty()) return@withContext false
+            runCatching {
+                app.agentMemoryDao.insert(
+                    AgentMemoryEntity(
+                        category = AgentMemoryCategory.normalize(category),
+                        content = text
+                    )
+                ) > 0
+            }.getOrDefault(false)
+        }
+
+    fun addMemory(category: String, content: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { rememberPreference(category, content) }
+        }
+    }
+
+    fun updateMemory(memory: AgentMemoryEntity, category: String, content: String) {
+        val text = content.trim()
+        if (text.isEmpty()) return
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                app.agentMemoryDao.update(
+                    memory.copy(
+                        category = AgentMemoryCategory.normalize(category),
+                        content = text,
+                        updatedAt = System.currentTimeMillis()
+                    )
+                )
+            }
+        }
+    }
+
+    fun setMemoryEnabled(memory: AgentMemoryEntity, enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching {
+                app.agentMemoryDao.update(
+                    memory.copy(enabled = enabled, updatedAt = System.currentTimeMillis())
+                )
+            }
+        }
+    }
+
+    fun deleteMemory(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            runCatching { app.agentMemoryDao.deleteById(id) }
+        }
     }
 
     fun toggleWebSearch() {
@@ -620,33 +693,6 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
             loadModels()
             refreshBalance()
         }
-    }
-
-    fun setPetVisible(visible: Boolean) {
-        _petVisible.value = visible
-        viewModelScope.launch(Dispatchers.IO) { prefs.setPetVisible(visible) }
-    }
-
-    fun setPetTextColor(color: Int) {
-        _petTextColor.value = color
-        viewModelScope.launch(Dispatchers.IO) { prefs.setPetTextColor(color) }
-    }
-
-    fun setPetScale(percent: Int) {
-        val safe = percent.coerceIn(50, 200)
-        _petScale.value = safe
-        viewModelScope.launch(Dispatchers.IO) { prefs.setPetScale(safe) }
-    }
-
-    fun setPetPosition(x: Float, y: Float) {
-        _petX.value = x
-        _petY.value = y
-        viewModelScope.launch(Dispatchers.IO) { prefs.setPetPosition(x, y) }
-    }
-
-    fun setPetLocked(locked: Boolean) {
-        _petLocked.value = locked
-        viewModelScope.launch(Dispatchers.IO) { prefs.setPetLocked(locked) }
     }
 
     fun refreshBalance() {

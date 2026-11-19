@@ -111,19 +111,12 @@
     </LinearLayout>
     </LinearLayout>
 
-    <ImageButton
+    <com.dsha.sagittarius.ui.AgentEntryButton
         android:id="@+id/fabAgent"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="84dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/agent_fab_description"
-        android:elevation="0dp"
-        android:padding="0dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/sgr"
-        android:stateListAnimator="@null"
-        app:tint="@null" />
+        android:layout_marginBottom="88dp"
+        android:contentDescription="@string/agent_fab_description" />
 </FrameLayout>

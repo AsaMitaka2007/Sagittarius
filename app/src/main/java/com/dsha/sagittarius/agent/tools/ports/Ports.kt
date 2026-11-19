@@ -62,10 +62,6 @@ interface SystemPort {
     suspend fun toggleFloatingWindow(enabled: Boolean): Boolean
     suspend fun navigateToTab(tab: String): String
     suspend fun controlWeather(type: String): String
-    suspend fun setPetVisible(visible: Boolean)
-    suspend fun setPetTextColor(color: Int)
-    suspend fun setPetScale(percent: Int)
-    suspend fun setPetLocked(locked: Boolean)
 }
 
 interface QueryPort {

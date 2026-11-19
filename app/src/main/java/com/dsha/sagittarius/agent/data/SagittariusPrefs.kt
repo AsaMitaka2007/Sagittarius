@@ -2,9 +2,7 @@ package com.dsha.sagittarius.agent.data
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -29,14 +27,7 @@ object AgentPrefsKeys {
     val PERSONA_GREETING = stringPreferencesKey("persona_greeting")
     val TOOL_PERMISSION = stringPreferencesKey("tool_permission")
     val LIVELINESS = stringPreferencesKey("ai_liveliness")
-    val PET_VISIBLE = booleanPreferencesKey("pet_visible")
     val TOTAL_TOKENS = longPreferencesKey("total_tokens")
-    val PET_TEXT_COLOR = intPreferencesKey("pet_text_color")
-    val PET_SCALE = intPreferencesKey("pet_scale_percent")
-    val PET_X = floatPreferencesKey("pet_x")
-    val PET_Y = floatPreferencesKey("pet_y")
-    val PET_LOCKED = booleanPreferencesKey("pet_locked")
-    val PET_POSITION_SET = booleanPreferencesKey("pet_position_set")
     fun model(provider: String) = stringPreferencesKey("model_id_$provider")
     fun thinking(provider: String) = stringPreferencesKey("thinking_$provider")
 }
@@ -51,14 +42,7 @@ class SagittariusPrefs(private val context: Context) {
     private val _personaGreeting = MutableStateFlow("")
     private val _toolPermission = MutableStateFlow(ToolPermissionMode.ASK)
     private val _liveliness = MutableStateFlow("high")
-    private val _petVisible = MutableStateFlow(true)
     private val _totalTokens = MutableStateFlow(0L)
-    private val _petTextColor = MutableStateFlow(0)
-    private val _petScale = MutableStateFlow(100)
-    private val _petX = MutableStateFlow(0f)
-    private val _petY = MutableStateFlow(0f)
-    private val _petLocked = MutableStateFlow(false)
-    private val _petPositionSet = MutableStateFlow(false)
 
     val provider: StateFlow<String> = _provider
     val model: StateFlow<String> = _model
@@ -69,14 +53,7 @@ class SagittariusPrefs(private val context: Context) {
     val personaGreeting: StateFlow<String> = _personaGreeting
     val toolPermission: StateFlow<ToolPermissionMode> = _toolPermission
     val liveliness: StateFlow<String> = _liveliness
-    val petVisible: StateFlow<Boolean> = _petVisible
     val totalTokens: StateFlow<Long> = _totalTokens
-    val petTextColor: StateFlow<Int> = _petTextColor
-    val petScale: StateFlow<Int> = _petScale
-    val petX: StateFlow<Float> = _petX
-    val petY: StateFlow<Float> = _petY
-    val petLocked: StateFlow<Boolean> = _petLocked
-    val petPositionSet: StateFlow<Boolean> = _petPositionSet
 
     init {
         runBlocking(Dispatchers.IO) {
@@ -102,14 +79,7 @@ class SagittariusPrefs(private val context: Context) {
             )
             _liveliness.value = prefs?.get(AgentPrefsKeys.LIVELINESS)
                 ?.takeIf { it in setOf("off", "low", "high", "ultra") } ?: "high"
-            _petVisible.value = prefs?.get(AgentPrefsKeys.PET_VISIBLE) ?: true
             _totalTokens.value = prefs?.get(AgentPrefsKeys.TOTAL_TOKENS) ?: 0L
-            _petTextColor.value = prefs?.get(AgentPrefsKeys.PET_TEXT_COLOR) ?: 0
-            _petScale.value = (prefs?.get(AgentPrefsKeys.PET_SCALE) ?: 100).coerceIn(50, 200)
-            _petX.value = prefs?.get(AgentPrefsKeys.PET_X) ?: 0f
-            _petY.value = prefs?.get(AgentPrefsKeys.PET_Y) ?: 0f
-            _petLocked.value = prefs?.get(AgentPrefsKeys.PET_LOCKED) ?: false
-            _petPositionSet.value = prefs?.get(AgentPrefsKeys.PET_POSITION_SET) ?: false
             runCatching {
                 context.sagittariusDataStore.edit { mutable ->
                     listOf(
@@ -154,38 +124,6 @@ class SagittariusPrefs(private val context: Context) {
         val safe = value.takeIf { it in setOf("off", "low", "high", "ultra") } ?: "high"
         _liveliness.value = safe
         context.sagittariusDataStore.edit { it[AgentPrefsKeys.LIVELINESS] = safe }
-    }
-
-    suspend fun setPetVisible(visible: Boolean) {
-        _petVisible.value = visible
-        context.sagittariusDataStore.edit { it[AgentPrefsKeys.PET_VISIBLE] = visible }
-    }
-
-    suspend fun setPetTextColor(color: Int) {
-        _petTextColor.value = color
-        context.sagittariusDataStore.edit { it[AgentPrefsKeys.PET_TEXT_COLOR] = color }
-    }
-
-    suspend fun setPetScale(percent: Int) {
-        val safe = percent.coerceIn(50, 200)
-        _petScale.value = safe
-        context.sagittariusDataStore.edit { it[AgentPrefsKeys.PET_SCALE] = safe }
-    }
-
-    suspend fun setPetLocked(locked: Boolean) {
-        _petLocked.value = locked
-        context.sagittariusDataStore.edit { it[AgentPrefsKeys.PET_LOCKED] = locked }
-    }
-
-    suspend fun setPetPosition(x: Float, y: Float) {
-        _petX.value = x
-        _petY.value = y
-        _petPositionSet.value = true
-        context.sagittariusDataStore.edit {
-            it[AgentPrefsKeys.PET_X] = x
-            it[AgentPrefsKeys.PET_Y] = y
-            it[AgentPrefsKeys.PET_POSITION_SET] = true
-        }
     }
 
     suspend fun addTokens(delta: Long) {

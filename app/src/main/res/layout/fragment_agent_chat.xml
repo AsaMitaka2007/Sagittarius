@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chatRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="6dp">
+
+            <TextView
+                android:id="@+id/tvProvider"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:background="@drawable/bg_agent_pill"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxWidth="150dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:singleLine="true"
+                android:textColor="?attr/blTextSecondary"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tvModel"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_agent_pill"
+                android:ellipsize="end"
+                android:gravity="center"
+                android:maxWidth="170dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:singleLine="true"
+                android:textColor="?attr/blTextSecondary"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/tvReasoningState"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:singleLine="true"
+                android:textColor="?attr/blTextTertiary"
+                android:textSize="10sp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerChat"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingStart="12dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="8dp" />
+
+            <LinearLayout
+                android:id="@+id/emptyPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/agent_empty_title"
+                    android:textColor="?attr/blTextPrimary"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/chipExpense"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:background="?attr/blIconCircleBackground"
+                    android:padding="14dp"
+                    android:text="@string/agent_example_expense"
+                    android:textColor="?attr/blTextPrimary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/chipDiet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="?attr/blIconCircleBackground"
+                    android:padding="14dp"
+                    android:text="@string/agent_example_diet"
+                    android:textColor="?attr/blTextPrimary"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/chipTaxi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:background="?attr/blIconCircleBackground"
+                    android:padding="14dp"
+                    android:text="@string/agent_example_taxi"
+                    android:textColor="?attr/blTextPrimary"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnScrollBottom"
+                android:layout_width="wrap_content"
+                android:layout_height="38dp"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="6dp"
+                android:background="?attr/blIconCircleBackground"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:gravity="center"
+                android:text="↓"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="34dp"
+                android:layout_gravity="bottom|center_horizontal"
+                android:layout_marginBottom="52dp"
+                android:background="?attr/blIconCircleBackground"
+                android:gravity="center"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
+                android:text="@string/agent_retry"
+                android:textColor="?attr/blAccent"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:id="@+id/dock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:paddingStart="10dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="8dp">
+
+            <ImageView
+                android:id="@+id/btnSessions"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_agent_pill"
+                android:contentDescription="@string/agent_sessions"
+                android:padding="11dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_sessions_silhouette" />
+
+            <TextView
+                android:id="@+id/btnWebSearch"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_agent_pill"
+                android:contentDescription="@string/agent_web_search"
+                android:gravity="center"
+                android:text="网"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="13sp" />
+
+            <EditText
+                android:id="@+id/etInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/bg_input"
+                android:gravity="top|start"
+                android:hint="@string/agent_input_hint"
+                android:imeOptions="actionNone"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="4"
+                android:minHeight="42dp"
+                android:paddingStart="13dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="13dp"
+                android:paddingBottom="10dp"
+                android:textColor="?attr/blTextPrimary"
+                android:textColorHint="?attr/blTextTertiary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/btnReasoning"
+                android:layout_width="wrap_content"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_agent_pill"
+                android:gravity="center"
+                android:minWidth="58dp"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:singleLine="true"
+                android:text="@string/agent_reasoning_short"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="11sp" />
+
+            <TextView
+                android:id="@+id/btnSend"
+                android:layout_width="48dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="6dp"
+                android:background="@drawable/bg_agent_pill"
+                android:contentDescription="@string/agent_send"
+                android:gravity="center"
+                android:text="↑"
+                android:textColor="?attr/blTextPrimary"
+                android:textSize="18sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/capsuleHost"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipChildren="false"
+        android:visibility="gone" />
+</FrameLayout>

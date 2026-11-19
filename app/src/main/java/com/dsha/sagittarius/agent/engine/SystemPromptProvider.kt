@@ -1,5 +1,6 @@
 package com.dsha.sagittarius.agent.engine
 
+import com.dsha.sagittarius.data.AgentMemoryEntity
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -8,7 +9,8 @@ import java.util.Locale
 class SystemPromptProvider(
     private val clock: Clock = Clock.systemDefaultZone(),
     private val personaProvider: () -> String = { "" },
-    private val livelinessProvider: () -> String = { "high" }
+    private val livelinessProvider: () -> String = { "high" },
+    private val memoryProvider: () -> List<AgentMemoryEntity> = { emptyList() }
 ) {
     fun build(webSearchEnabled: Boolean = false, categories: List<String> = emptyList()): String {
         val now = LocalDateTime.now(clock)
@@ -19,9 +21,22 @@ class SystemPromptProvider(
             "ultra" -> "尽情使用颜色、大小、抖动、旋转等标签，让画面炫酷。"
             else -> "可用 2-3 个特效标签强调情绪。"
         }
+        val memories = buildString {
+            var budget = 1800
+            memoryProvider()
+                .filter { it.enabled && it.content.isNotBlank() }
+                .take(50)
+                .forEach { memory ->
+                    val line = "- [${memory.category}] ${memory.content.trim().take(160)}"
+                    if (line.length > budget) return@forEach
+                    appendLine(line)
+                    budget -= line.length
+                }
+        }.trim()
         return """
             你是「Sagittarius」的私人管家，活泼、略毒舌，关心主人的健康与钱包。
             ${personaProvider().trim().takeIf { it.isNotEmpty() }?.let { "用户人设：$it" } ?: ""}
+            ${if (memories.isNotEmpty()) "长期记忆（用户要求记住的偏好，按类别参考，不要逐条复述）：\n$memories" else ""}
             当前时间：${now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}，星期$weekday，货币人民币。
             日期参数必须为 YYYY-MM-DD。当前日期：${now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))}。
 
@@ -43,12 +58,13 @@ class SystemPromptProvider(
               仍失败才用自身知识估算；用户明确要求时才 add_food_to_library / add_diet。
             - 查询：query_data（expense/budget/diet/nutrition）
             - 系统：navigate_to_tab、update_theme、update_date_card_color、toggle_floating_window、
-              control_weather_debug、toggle_pet、update_pet_config、toggle_network_search
+              control_weather_debug、toggle_network_search、remember_preference
             当前已有分类：[${categories.joinToString(", ")}]。
             当前联网开关：${if (webSearchEnabled) "开启" else "关闭"}。
 
+            用户说“记住/以后…”时，调用 remember_preference 保存长期偏好；
+            类别只能是 人设 / 饮食习惯 / 记账偏好 / 其他，内容要具体可执行。
             餐次按时间推断：05-10 早餐，10-15 午餐，15-17 加餐，17-22 晚餐，其余按上下文。
-            桌宠：用户说“出来/藏起来”调用 toggle_pet；改文字色或大小调用 update_pet_config。
 
             需要用户二选一/确认时，先不要执行工具，也不要输出 [DETAILS]；
             在回复末尾输出 2-4 个可点击选项：

@@ -539,3 +539,16 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 删除 `NutrientRingView` 与独立小环布局；图例高度 82dp → 112dp。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 18 个测试类 / 47 用例 / 0 失败；`lintDebug` 0 error / 401 warning。
 - 未完成：本机无设备/模拟器，8 圈间距与触摸命中区域未做真机验收。
+
+
+## 1.2 AI Agent UI 重写（2026-11-19）
+
+- 删除桌宠：移除 AI 页 `petContainer`、`PetConfigSheet`、`TogglePetTool`、`UpdatePetConfigTool`、pet 资源与 DataStore key；预算悬浮胶囊、前台服务、通知与设置页开关保持不变。
+- 入口改为 64×64dp 圆角星图按钮；用户素材经裁切、抠黑底、提亮、192×192 导出；点击后以按钮为原点做圆形扩散 + 边缘引力场粒子转场。
+- AI 页重写为「对话 / 配置 / 终端」三选项卡；Host 持有共享 `SagittariusViewModel`，生成与审批不随 Tab 切换中断。
+- 对话页：单行底部 dock（会话、联网、输入、推理、发送/停止）；会话胶囊从按钮弹性展开为卡片，支持切换、新建、长按多选、全选、批量删除；推理胶囊向上展开，内含推理强度与生动度两个竖向 4 档滑条。
+- 配置页：服务商/模型 chips、Key 管理入口、分类记忆（人设/饮食习惯/记账偏好/其他）增删改与启停、人设/权限/上下文入口、主题与背景预留区。
+- 记忆：Room v11 新增 `agent_memories`；系统提示词注入启用记忆（最多 50 条/1800 字）；新增 `remember_preference` 工具，用户说“记住…”时 AI 可写入。
+- 终端页：常驻内存日志（环形 500 条、自动脱敏 Key）、工具目录（工具名/中文名/分类/说明）；两个卡片均可展开查看并导出 TXT / CSV。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 20 个测试类 / 53 用例 / 0 失败；`lintDebug` 0 error / 421 warning；Python 回放 10→11 迁移通过；APK `dist/sgr-debug-2.0-agent-ui.apk`（SHA256 `9C5D4EB6…0013`）。
+- 未完成：本机无设备/模拟器，入口扩散、胶囊形变、竖向滑条与三 Tab 布局未做真机验收；未 push。

@@ -44,6 +44,9 @@ class SagittariusApp : Application() {
     lateinit var chatSessionDao: com.dsha.sagittarius.data.ChatSessionDao
         private set
 
+    lateinit var agentMemoryDao: com.dsha.sagittarius.data.AgentMemoryDao
+        private set
+
     lateinit var cnFoodRepository: com.dsha.sagittarius.data.CnFoodRepository
         private set
 
@@ -66,6 +69,7 @@ class SagittariusApp : Application() {
         chatHistoryDao = com.dsha.sagittarius.data.AppDatabase.get(this).chatHistoryDao()
         chatHistoryDeleteDao = com.dsha.sagittarius.data.AppDatabase.get(this).chatHistoryDeleteDao()
         chatSessionDao = com.dsha.sagittarius.data.AppDatabase.get(this).chatSessionDao()
+        agentMemoryDao = com.dsha.sagittarius.data.AppDatabase.get(this).agentMemoryDao()
         cnFoodRepository = com.dsha.sagittarius.data.CnFoodRepository.get(this)
 
         appScope.launch {

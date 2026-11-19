@@ -84,7 +84,7 @@
 <string name="agent_live_low">低</string>
 <string name="agent_live_off">关</string>
 <string name="agent_live_ultra">超绝</string>
-<string name="agent_liveliness">AI 生动性</string>
+<string name="agent_liveliness">生动度</string>
 <string name="agent_loading">校验中…</string>
 <string name="agent_message_actions">消息操作</string>
 <string name="agent_model">模型</string>
@@ -386,7 +386,7 @@
 <string name="privacy_network_title">网络说明</string>
 <string name="privacy_permission_body">联网权限用于 AI 与可选网络服务；悬浮窗权限用于桌面记账胶囊；通知权限用于前台服务通知；位置权限仅在天气模块使用，可拒绝或不授权。所有权限均可在系统设置中撤回，撤回不会删除已保存数据。</string>
 <string name="privacy_permission_title">权限用途</string>
-<string name="privacy_storage_body">预算、账单、饮食、食材、聊天记录、桌宠位置与外观、累计 Tokens 等保存在本机 Room / DataStore。API Key 使用 Android Keystore 加密保存，不写入日志，也不会随导出文件发送。卸载应用通常会删除本机数据，请在卸载前自行备份。</string>
+<string name="privacy_storage_body">预算、账单、饮食、食材、聊天记录、累计 Tokens 等保存在本机 Room / DataStore。API Key 使用 Android Keystore 加密保存，不写入日志，也不会随导出文件发送。卸载应用通常会删除本机数据，请在卸载前自行备份。</string>
 <string name="privacy_storage_title">数据存储</string>
 <string name="privacy_subtitle">使用 Sagittarius 前，请阅读数据、AI 服务与责任边界。</string>
 <string name="privacy_ai_title">AI 服务与生成内容</string>
@@ -394,7 +394,7 @@
 <string name="privacy_terms_title">用户协议与免责声明</string>
 <string name="privacy_terms_body">你应合法使用本应用，不得利用 AI 或工具从事违法、侵权、欺诈或危害他人的活动。应用按现状提供，作者不对数据丢失、AI 误操作、第三方服务中断或费用承担责任。请定期备份重要数据，并在执行删除、预算修改等操作前确认。继续安装或使用即表示你已阅读并同意本协议。</string>
 <string name="privacy_title">隐私与用户协议</string>
-<string name="privacy_uninstall_body">卸载应用通常会删除本机数据库、聊天记录、桌宠配置与加密 Key。请在卸载前从历史记账页导出 CSV；已导出的文件由你自行保管。</string>
+<string name="privacy_uninstall_body">卸载应用通常会删除本机数据库、聊天记录与加密 Key。请在卸载前从历史记账页导出 CSV；已导出的文件由你自行保管。</string>
 <string name="privacy_uninstall_title">卸载说明</string>
 <string name="privacy_updated">版本 1.0 · 生效日期：2026-11-06</string>
 <string name="privacy_version_body">协议版本：1.0
@@ -539,28 +539,47 @@
 <string name="widget_remaining">剩余 %1$s</string>
 <string name="widget_tap_hint">点击打开并显示悬浮窗</string>
 <string name="widget_used">已用 %1$d%%</string>
-    <string name="agent_pet_toggle">桌宠</string>
-    <string name="agent_pet_config">桌宠设置</string>
-    <string name="agent_pet_evict">驱逐</string>
-    <string name="agent_pet_lock">锁定桌宠位置</string>
-    <string name="agent_pet_locked_on">桌宠位置已锁定</string>
-    <string name="agent_pet_locked_off">桌宠位置已解锁</string>
-    <string name="agent_pet_text_color">头顶文字颜色</string>
-    <string name="agent_pet_size">桌宠大小</string>
-    <string name="agent_pet_color_theme">跟随主题</string>
-    <string name="agent_pet_color_pink">粉色</string>
-    <string name="agent_pet_color_cyan">青色</string>
-    <string name="agent_pet_color_yellow">黄色</string>
-    <string name="agent_pet_color_white">白色</string>
-    <string name="agent_pet_balance_placeholder">余额: --</string>
-    <string name="agent_pet_tokens_placeholder">Tokens: 0</string>
-    <string name="agent_pet_balance">余额: %1$s</string>
-    <string name="agent_pet_tokens">Tokens: %1$s</string>
-    <string-array name="agent_pet_lines">
-        <item>不要乱戳啦！</item>
-        <item>再戳我就要收费了。</item>
-        <item>今天也要好好记账哦。</item>
-        <item>你戳得我有点晕…</item>
-    </string-array>
+<string name="agent_tab_chat">对话</string>
+<string name="agent_tab_config">配置</string>
+<string name="agent_tab_terminal">终端</string>
+<string name="agent_reasoning_short">推理</string>
+<string name="agent_config_service_title">服务商与模型</string>
+<string name="agent_config_edit_service">管理服务商与模型</string>
+<string name="agent_config_memory_title">记忆</string>
+<string name="agent_config_memory_desc">按人设、饮食习惯、记账偏好分类记录长期偏好，后续对话会自动参考。</string>
+<string name="agent_config_advanced">高级设置（人设 / 权限 / 上下文）</string>
+<string name="agent_config_appearance_title">主题与背景</string>
+<string name="agent_config_appearance_desc">预留区域：后续在这里切换主题、背景与推理进度条视觉。</string>
+<string name="agent_terminal_logs_title">运行日志</string>
+<string name="agent_terminal_logs_empty">暂无运行日志</string>
+<string name="agent_terminal_tools_title">工具清单</string>
+<string name="agent_terminal_export">导出</string>
+<string name="agent_reasoning_dialog_title">推理与生动度</string>
+<string name="agent_reasoning_effort">推理强度</string>
+<string name="agent_session_current">当前</string>
+<string name="agent_session_new">新建</string>
+<string name="agent_session_select">多选</string>
+<string name="agent_session_done">完成</string>
+<string name="agent_session_select_all">全选</string>
+<string name="agent_session_delete_n">删除 (%1$d)</string>
+<string name="agent_session_delete_confirm">删除选中的 %1$d 个对话？聊天记录将一并删除。</string>
+<string name="agent_config_memory_add">＋ 添加记忆</string>
+<string name="agent_config_memory_empty">还没有记忆，添加一条试试</string>
+<string name="agent_config_memory_hint">例如：以后记录蛋白粉自动加 500ml 水</string>
+<string name="agent_config_memory_toggle_on">停用</string>
+<string name="agent_config_memory_toggle_off">启用</string>
+<string name="agent_config_memory_delete">删除</string>
+<string name="agent_config_memory_delete_confirm">删除这条记忆？</string>
+<string name="agent_config_memory_add_title">添加记忆</string>
+<string name="agent_config_memory_edit_title">编辑记忆</string>
+<string name="agent_config_memory_saved">记忆已保存</string>
+<string name="agent_config_category_all">全部</string>
+<string name="agent_terminal_export_logs_title">导出运行日志</string>
+<string name="agent_terminal_export_tools_title">导出工具清单</string>
+<string name="agent_terminal_export_done">已导出</string>
+<string name="agent_terminal_export_failed">导出失败，请检查存储权限或空间</string>
+<string name="agent_terminal_clear">清空</string>
+<string name="agent_terminal_close">关闭</string>
+<string name="agent_terminal_tools_unit">个工具</string>
 
 </resources>

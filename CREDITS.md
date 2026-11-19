@@ -45,3 +45,9 @@
 
 图片通过 Pexels 图片 CDN 下载并裁切为 480×480，用于列表与轮盘展示。
 完整授权说明见 <https://www.pexels.com/license/>。
+
+## 入口 Logo
+
+`app/src/main/res/drawable-nodpi/agent_entry_logo.png` 由用户提供的
+`E:\AGI-sagittarius\素材\sag入口.png` 裁切、抠黑底、提亮并缩放到 192×192 生成，
+仅用于应用内 AI 入口按钮。

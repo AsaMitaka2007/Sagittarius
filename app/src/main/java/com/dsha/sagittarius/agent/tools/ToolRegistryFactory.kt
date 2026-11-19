@@ -19,7 +19,8 @@ object ToolRegistryFactory {
         dietRepository: DietRepository,
         clock: Clock = Clock.systemDefaultZone(),
         logger: AgentDebugLogger = NoOpAgentDebugLogger,
-        bochaKeyProvider: suspend () -> String? = { null }
+        bochaKeyProvider: suspend () -> String? = { null },
+        memorySaver: suspend (category: String, content: String) -> Boolean = { _, _ -> false }
     ): ToolRegistry {
         val expense = BudgetRepositoryExpensePort(budgetRepository)
         val diet = DietRepositoryDietPort(dietRepository)
@@ -55,8 +56,7 @@ object ToolRegistryFactory {
             register(ToggleFloatingWindowTool(systemPort))
             register(NavigateToTabTool(systemPort))
             register(ControlWeatherDebugTool(systemPort))
-            register(TogglePetTool(systemPort))
-            register(UpdatePetConfigTool(systemPort))
+            register(RememberPreferenceTool(memorySaver))
             // register(WebSearchTool(...))
         }
     }

@@ -74,7 +74,6 @@ class MainActivity : ThemedActivity() {
         observeServiceState()
         lifecycleScope.launch { repository.ensureInitialState() }
         handleIntent(intent)
-        com.dsha.sagittarius.ui.ButtonMotion.attachFab(binding.fabAgent)
         binding.fabAgent.setOnClickListener { openAgent() }
         binding.fabAgent.setOnLongClickListener {
             binding.fabAgent.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
@@ -307,14 +306,25 @@ class MainActivity : ThemedActivity() {
             val key = withContext(Dispatchers.IO) {
                 app.apiKeyStore.load(app.sagittariusPrefs.provider.value)
             }
-            if (key.isNullOrBlank()) {
-                AgentSettingsSheet().show(supportFragmentManager, "agent_settings")
-            } else {
-                startActivity(
-                    Intent(this@MainActivity, SagittariusActivity::class.java)
-                        .putExtra(SagittariusActivity.EXTRA_VOICE, voice)
+            val origin = IntArray(2)
+            binding.fabAgent.getLocationOnScreen(origin)
+            val intent = Intent(this@MainActivity, SagittariusActivity::class.java).apply {
+                putExtra(SagittariusActivity.EXTRA_VOICE, voice)
+                putExtra(SagittariusActivity.EXTRA_START_TAB, if (key.isNullOrBlank()) 1 else 0)
+                putExtra(
+                    SagittariusActivity.EXTRA_REVEAL_X,
+                    origin[0] + binding.fabAgent.width / 2f
+                )
+                putExtra(
+                    SagittariusActivity.EXTRA_REVEAL_Y,
+                    origin[1] + binding.fabAgent.height / 2f
+                )
+                putExtra(
+                    SagittariusActivity.EXTRA_REVEAL_RADIUS,
+                    binding.fabAgent.width / 2f
                 )
             }
+            startActivity(intent)
         }
     }
 

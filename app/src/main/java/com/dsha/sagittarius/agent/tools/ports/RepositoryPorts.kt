@@ -175,14 +175,6 @@ class AndroidSystemPort(
         return tab
     }
 
-    override suspend fun setPetVisible(visible: Boolean) {
-        prefs.setPetVisible(visible)
-    }
-
-    override suspend fun setPetTextColor(color: Int) = prefs.setPetTextColor(color)
-    override suspend fun setPetScale(percent: Int) = prefs.setPetScale(percent)
-    override suspend fun setPetLocked(locked: Boolean) = prefs.setPetLocked(locked)
-
     override suspend fun controlWeather(type: String): String {
         val weather = when (type.trim().lowercase()) {
             "real", "真实" -> null

@@ -162,6 +162,9 @@ interface ChatHistoryDao {
     @Query("DELETE FROM chat_history WHERE sessionId = :sessionId")
     suspend fun deleteForSession(sessionId: Long)
 
+    @Query("DELETE FROM chat_history WHERE sessionId IN (:sessionIds)")
+    suspend fun deleteForSessions(sessionIds: List<Long>)
+
     @Insert
     suspend fun insert(item: ChatHistoryEntity): Long
 
@@ -218,4 +221,7 @@ interface ChatSessionDao {
 
     @Query("DELETE FROM chat_sessions WHERE id = :id")
     suspend fun delete(id: Long)
+
+    @Query("DELETE FROM chat_sessions WHERE id IN (:ids)")
+    suspend fun deleteByIds(ids: List<Long>)
 }
