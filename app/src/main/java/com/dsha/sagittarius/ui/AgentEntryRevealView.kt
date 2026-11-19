@@ -29,7 +29,6 @@ class AgentEntryRevealView @JvmOverloads constructor(
     private val density = resources.displayMetrics.density
     private val accent = ButtonAccentManager.current
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val ringPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.STROKE }
     private val particlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val trailPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -79,8 +78,8 @@ class AgentEntryRevealView @JvmOverloads constructor(
         visibility = VISIBLE
         animator?.cancel()
         animator = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = if (particles.isEmpty()) 340L else 660L
-            interpolator = DecelerateInterpolator(1.15f)
+            duration = if (particles.isEmpty()) 520L else 980L
+            interpolator = DecelerateInterpolator(0.92f)
             addUpdateListener {
                 progress = it.animatedValue as Float
                 if (progress >= 0.995f && !filledNotified) {
@@ -105,7 +104,9 @@ class AgentEntryRevealView @JvmOverloads constructor(
     private fun fadeOut() {
         fadeAnimator?.cancel()
         fadeAnimator = ValueAnimator.ofFloat(1f, 0f).apply {
-            duration = 240L
+            startDelay = 60L
+            duration = 320L
+            interpolator = DecelerateInterpolator(0.9f)
             addUpdateListener {
                 alpha = it.animatedValue as Float
             }
@@ -124,33 +125,21 @@ class AgentEntryRevealView @JvmOverloads constructor(
         if (!running) return
         val eased = 1f - (1f - progress) * (1f - progress)
         val radius = startRadius + (maxRadius - startRadius) * eased
-        // 统一使用深色墨迹覆盖，浅色主题下也能看到明确的“铺满”过程
-        val baseColor = 0xFF0B1220.toInt()
+        // 深色墨迹由中心向外铺满；不画外圈边框，边缘只保留粒子
         fillPaint.shader = RadialGradient(
             originX, originY, radius.coerceAtLeast(1f),
             intArrayOf(
-                baseColor,
-                baseColor,
-                ColorUtils.setAlphaComponent(accent.startColor, 40),
-                ColorUtils.setAlphaComponent(accent.endColor, 90)
+                0xFF17243C.toInt(),
+                0xFF0E1626.toInt(),
+                0xFF0B1220.toInt(),
+                0xFF0B1220.toInt()
             ),
-            floatArrayOf(0f, 0.78f, 0.94f, 1f),
+            floatArrayOf(0f, 0.55f, 0.94f, 1f),
             Shader.TileMode.CLAMP
         )
         canvas.drawCircle(originX, originY, radius, fillPaint)
         fillPaint.shader = null
-        drawEdge(canvas, radius)
         drawParticles(canvas, radius)
-    }
-
-    private fun drawEdge(canvas: Canvas, radius: Float) {
-        val fade = sin(progress * Math.PI).toFloat().coerceIn(0f, 1f)
-        ringPaint.strokeWidth = 2.4f * density
-        ringPaint.color = ColorUtils.setAlphaComponent(colors[2], (130 * fade).toInt())
-        canvas.drawCircle(originX, originY, radius, ringPaint)
-        ringPaint.strokeWidth = 9f * density
-        ringPaint.color = ColorUtils.setAlphaComponent(colors[0], (38 * fade).toInt())
-        canvas.drawCircle(originX, originY, radius - 4f * density, ringPaint)
     }
 
     private fun drawParticles(canvas: Canvas, radius: Float) {

@@ -2,6 +2,7 @@ package com.dsha.sagittarius.agent.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.animation.DecelerateInterpolator
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
@@ -112,7 +113,9 @@ class SagittariusActivity : ThemedActivity() {
                 onFilled = {
                     binding.contentRoot.animate()
                         .alpha(1f)
-                        .setDuration(260L)
+                        .setStartDelay(60L)
+                        .setDuration(320L)
+                        .setInterpolator(DecelerateInterpolator(0.9f))
                         .start()
                 }
             )
