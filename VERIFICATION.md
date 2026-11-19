@@ -657,3 +657,13 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 毛玻璃主题：删除 `drawable-v31/bg_screen_glass.xml`（半透明底色），v31 统一回落到不透明 `bg_screen_glass`；`windowIsTranslucent/windowShowWallpaper/backgroundDimEnabled=false` 下沉到 `Glass.Base`，导航栏改不透明 `#0A0F1D`。此前不透明窗口里绘制半透明底色，会在 HyperOS 上反复重绘，是闪烁的根因。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-2.9-ai-polish.apk`（SHA256 `42660944…46BD`，17MB）。
 - 未完成：本机无设备/模拟器，气泡描边、入口渐变与 Redmi K80 上的毛玻璃稳定性未真机验收；未 push。
+
+
+## 2.1 真磨砂、星芒滑条与奶油主题（2026-11-19）
+
+- 磨砂主题：改为半透明窗口 + `windowShowWallpaper`，Activity 侧对 Android 12+ 设置 `FLAG_BLUR_BEHIND` 与 42dp 背景模糊，窗口底色仅留 `#590A0F1D` 薄雾，真正透出桌面；主题名「毛玻璃」改为「磨砂」。桌面壁纸不上传、不读取（Android 13+ 第三方应用已无法读取壁纸位图），由系统直接绘制并模糊。API 26–30 无系统背景模糊，仍为透明薄雾玻璃。
+- 联网按钮：开启时米白半透明填充 + 米白描边 + 右上角状态点 + 图标米白 + 180ms 回弹；关闭时墨底细描边、图标灰色、整体 82% 透明度。
+- 推理/生动度滑条最高档重绘：26 颗白色四角星芒粒子，持续缓慢平移与旋转，按正弦呼吸淡入淡出，叠加两层白色柔光与放大星芒，形成荧光感；动画周期 9s，减少动画模式自动停止。
+- 新增奶油主题（`Theme.Sagittarius.Ins`）：奶油底 + 网上抓取的暖色渐变薄雾（Pexels #7630065，Eva Bronzini，已裁切/模糊/混色，署名见 `CREDITS.md`），焦糖强调色、半透明白卡、暖色细描边、奶油/玫瑰/雾紫按钮渐变；`ThemeMode` 新增 `INS`，设置页、AI `update_theme` 工具与错误文案同步支持 `ins`。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-3.0-themes.apk`（SHA256 `12D7A457…0E55`，17MB）。
+- 未完成：本机无设备/模拟器，真磨砂在 Redmi K80/HyperOS 上是否仍抽搐、奶油主题观感与星芒滑条均未真机验收；未 push。

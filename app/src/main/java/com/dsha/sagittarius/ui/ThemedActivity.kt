@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 /**
  * 所有界面 Activity 的基类：启动前套用 DataStore 主题，主题切换时立即 recreate。
- * Android 12+ 毛玻璃主题额外给窗口开启背景模糊。
+ * 磨砂主题使用半透明窗口 + 系统壁纸 + 背景模糊，真正透出桌面。
  */
 abstract class ThemedActivity : AppCompatActivity() {
 
@@ -41,7 +41,8 @@ abstract class ThemedActivity : AppCompatActivity() {
     /** Agent 页不随全局主题重建。 */
     protected open fun followsThemeChanges(): Boolean = true
 
-    protected open fun allowsGlassBlur(): Boolean = false
+    /** 磨砂主题默认开启系统背景模糊；Agent 页覆盖为 false。 */
+    protected open fun allowsGlassBlur(): Boolean = true
 
     private fun applyGlassBlurIfNeeded() {
         if (!allowsGlassBlur()) return

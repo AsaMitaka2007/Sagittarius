@@ -23,6 +23,7 @@ import androidx.core.graphics.ColorUtils
 import com.dsha.sagittarius.ui.MotionUtils
 import com.dsha.sagittarius.ui.ThemeTokens
 import kotlin.math.abs
+import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
 
@@ -45,9 +46,11 @@ class VerticalLevelSliderView @JvmOverloads constructor(
     private val knobPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val starPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
     private val twinklePaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val sparklePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val trackRect = RectF()
     private val fillRect = RectF()
     private val clipPath = Path()
+    private val sparklePath = Path()
     private val starMatrix = Matrix()
     private val starfield = ArrayList<StarDot>()
     private var progress = 0f
@@ -64,14 +67,26 @@ class VerticalLevelSliderView @JvmOverloads constructor(
     init {
         isClickable = true
         contentDescription = "竖向档位滑条"
+        // 四角星芒：中心到四角，腰部收窄
+        sparklePath.moveTo(0f, -1f)
+        sparklePath.quadTo(0.18f, -0.18f, 1f, 0f)
+        sparklePath.quadTo(0.18f, 0.18f, 0f, 1f)
+        sparklePath.quadTo(-0.18f, 0.18f, -1f, 0f)
+        sparklePath.quadTo(-0.18f, -0.18f, 0f, -1f)
+        sparklePath.close()
         val random = Random(7)
-        repeat(18) {
+        repeat(26) {
             starfield += StarDot(
-                x = random.nextFloat(),
-                y = random.nextFloat(),
-                radius = 0.7f + random.nextFloat() * 1.6f,
+                x = 0.06f + random.nextFloat() * 0.88f,
+                y = 0.05f + random.nextFloat() * 0.90f,
+                size = 1.1f + random.nextFloat() * 1.8f,
                 phase = random.nextFloat() * 6.28f,
-                speed = 0.6f + random.nextFloat() * 1.4f
+                twinkleSpeed = 0.55f + random.nextFloat() * 0.85f,
+                driftSpeedX = 0.35f + random.nextFloat() * 0.45f,
+                driftSpeedY = 0.28f + random.nextFloat() * 0.38f,
+                driftX = 0.015f + random.nextFloat() * 0.035f,
+                driftY = 0.02f + random.nextFloat() * 0.05f,
+                rotationSpeed = 0.32f + random.nextFloat() * 0.55f
             )
         }
     }
@@ -196,16 +211,44 @@ class VerticalLevelSliderView @JvmOverloads constructor(
             starPaint.shader = null
             starPaint.colorFilter = null
         }
-        // 动态闪烁星点；没有解码到视频帧时也能呈现星空
+        // 十字星芒粒子：缓慢平移、旋转、呼吸淡入淡出，并带白色荧光
+        val t = phase
         starfield.forEach { star ->
-            val x = rect.left + rect.width() * star.x
-            val y = rect.top + rect.height() * star.y
-            val alpha = (90 + 150 * (sin(phase * star.speed + star.phase) * 0.5 + 0.5)).toInt()
-            // 只保留白色发光星点，先画外圈柔光再画亮核
-            twinklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha / 4)
-            canvas.drawCircle(x, y, star.radius * 2.6f * density, twinklePaint)
-            twinklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha)
-            canvas.drawCircle(x, y, star.radius * density, twinklePaint)
+            val x = rect.left + rect.width() * (
+                star.x + sin(t * star.driftSpeedX + star.phase) * star.driftX
+            )
+            val y = rect.top + rect.height() * (
+                star.y + cos(t * star.driftSpeedY + star.phase * 1.7f) * star.driftY
+            )
+            val wave = sin(t * star.twinkleSpeed + star.phase) * 0.5f + 0.5f
+            val intensity = 0.12f + 0.88f * wave * wave
+            val alpha = (255 * intensity).toInt().coerceIn(0, 255)
+            val radius = star.size * density
+            val rotation = (t * star.rotationSpeed + star.phase) * 57.2958f
+            // 荧光：两层低透明度光晕 + 放大星芒
+            twinklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha / 9)
+            canvas.drawCircle(x, y, radius * 9f, twinklePaint)
+            twinklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha / 5)
+            canvas.drawCircle(x, y, radius * 5.4f, twinklePaint)
+            canvas.save()
+            canvas.translate(x, y)
+            canvas.rotate(rotation)
+            canvas.scale(radius * 2.7f, radius * 2.7f)
+            sparklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha / 6)
+            canvas.drawPath(sparklePath, sparklePaint)
+            canvas.restore()
+
+            canvas.save()
+            canvas.translate(x, y)
+            canvas.rotate(rotation)
+            canvas.scale(radius, radius)
+            sparklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha)
+            canvas.drawPath(sparklePath, sparklePaint)
+            // 中心亮核，增强“星芒”质感
+            sparklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, (alpha * 0.85f).toInt())
+            twinklePaint.color = sparklePaint.color
+            canvas.drawCircle(0f, 0f, 0.34f, twinklePaint)
+            canvas.restore()
         }
         canvas.restoreToCount(layer)
     }
@@ -227,7 +270,7 @@ class VerticalLevelSliderView @JvmOverloads constructor(
     private fun startStarAnimator() {
         if (starAnimator?.isStarted == true) return
         starAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 7000L
+            duration = 9000L
             repeatCount = ValueAnimator.INFINITE
             repeatMode = ValueAnimator.RESTART
             interpolator = android.view.animation.LinearInterpolator()
@@ -330,8 +373,13 @@ class VerticalLevelSliderView @JvmOverloads constructor(
     private data class StarDot(
         val x: Float,
         val y: Float,
-        val radius: Float,
+        val size: Float,
         val phase: Float,
-        val speed: Float
+        val twinkleSpeed: Float,
+        val driftSpeedX: Float,
+        val driftSpeedY: Float,
+        val driftX: Float,
+        val driftY: Float,
+        val rotationSpeed: Float
     )
 }

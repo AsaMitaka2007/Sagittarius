@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 奶油主题：柔和奶油底 + 网上抓取的暖色渐变薄雾 + 细纸纹 -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#F7F1E8" />
+        </shape>
+    </item>
+    <item>
+        <bitmap
+            android:gravity="fill"
+            android:src="@drawable/bg_ins_wash" />
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:centerColor="#00FFFFFF"
+                android:endColor="#4DF7F1E8"
+                android:startColor="#66F7F1E8" />
+        </shape>
+    </item>
+    <item>
+        <bitmap
+            android:gravity="fill"
+            android:src="@drawable/noise_tile"
+            android:tileMode="repeat" />
+    </item>
+</layer-list>

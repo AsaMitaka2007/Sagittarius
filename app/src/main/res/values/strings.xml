@@ -467,7 +467,8 @@
 <string name="tab_stats_desc">消费图表与分类统计</string>
 <string name="tab_weather">天气</string>
 <string name="theme_black">黑色</string>
-<string name="theme_glass">毛玻璃</string>
+<string name="theme_glass">磨砂</string>
+<string name="theme_ins">奶油</string>
 <string name="theme_light">浅色</string>
 <string name="theme_switch_hint">主题切换立即生效，并由 DataStore 保存。</string>
 <string name="today">今天</string>

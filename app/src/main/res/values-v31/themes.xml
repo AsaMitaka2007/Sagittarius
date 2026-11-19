@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Sagittarius.Glass" parent="Theme.Sagittarius.Glass.Base">
-        <!-- 不透明窗口 + 不透明背景；v31 不再使用半透明/壁纸/模糊 -->
-        <item name="android:windowIsTranslucent">false</item>
-        <item name="android:windowShowWallpaper">false</item>
+        <!-- 真磨砂：半透明窗口 + 系统壁纸 + Activity 侧背景模糊 -->
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowShowWallpaper">true</item>
         <item name="android:backgroundDimEnabled">false</item>
+        <!-- 避免用黑色启动预览窗盖住桌面壁纸 -->
+        <item name="android:windowDisablePreview">true</item>
     </style>
 </resources>

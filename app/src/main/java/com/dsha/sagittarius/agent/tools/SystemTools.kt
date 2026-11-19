@@ -38,7 +38,7 @@ class UpdateThemeTool(private val system: SystemPort) : AgentTool {
     override val description = "切换 App 主题"
     override val parametersSchema: JsonObject = buildJsonObject {
         put("type", "object")
-        put("properties", buildJsonObject { put("theme", buildJsonObject { put("type", "string"); put("enum", buildJsonArray { listOf("light", "dark", "glass").forEach { add(JsonPrimitive(it)) } }) }) })
+        put("properties", buildJsonObject { put("theme", buildJsonObject { put("type", "string"); put("enum", buildJsonArray { listOf("light", "dark", "glass", "ins").forEach { add(JsonPrimitive(it)) } }) }) })
         put("required", buildJsonArray { add(JsonPrimitive("theme")) })
     }
 

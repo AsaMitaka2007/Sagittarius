@@ -51,3 +51,9 @@
 `app/src/main/res/drawable-nodpi/agent_entry_logo.png` 由用户提供的
 `E:\AGI-sagittarius\素材\sag入口.png` 裁切、抠黑底、提亮并缩放到 192×192 生成，
 仅用于应用内 AI 入口按钮。
+
+# 主题背景素材
+
+`app/src/main/res/drawable-nodpi/bg_ins_wash.jpg`（奶油主题背景）基于 Pexels 图片
+[#7630065](https://www.pexels.com/es-es/foto/arte-textura-abstracto-resumen-7630065/)，
+作者 Eva Bronzini，Pexels License。已做裁切、模糊、与奶油底色混合处理。

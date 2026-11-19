@@ -275,7 +275,7 @@ class FloatingWindowService : Service() {
 
     private fun setupInteractions(binding: ViewFloatingWindowBinding) {
         binding.glass.onPaletteChanged = { palette -> applyPalette(palette) }
-        applyPalette(BudgetPalette.forRatio(currentSnapshot?.let(BudgetMath::remainingRatio), currentThemeMode == ThemeMode.LIGHT))
+        applyPalette(BudgetPalette.forRatio(currentSnapshot?.let(BudgetMath::remainingRatio), ThemeManager.isLight))
 
         binding.btnCollapse.setOnClickListener { collapse() }
         binding.btnCloseFloating.setOnClickListener { closeFloatingWindow() }

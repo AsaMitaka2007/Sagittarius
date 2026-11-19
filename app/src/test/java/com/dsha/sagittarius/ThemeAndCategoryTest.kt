@@ -15,6 +15,7 @@ class ThemeAndCategoryTest {
         assertEquals(ThemeMode.LIGHT, ThemeMode.fromStorage("light"))
         assertEquals(ThemeMode.BLACK, ThemeMode.fromStorage("black"))
         assertEquals(ThemeMode.GLASS, ThemeMode.fromStorage("glass"))
+        assertEquals(ThemeMode.INS, ThemeMode.fromStorage("ins"))
     }
 
     @Test

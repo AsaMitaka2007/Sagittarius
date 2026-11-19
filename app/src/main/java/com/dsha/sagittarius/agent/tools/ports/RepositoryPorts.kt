@@ -85,7 +85,8 @@ class AppSettingsPort(
             "dark", "black" -> ThemeMode.BLACK
             "light" -> ThemeMode.LIGHT
             "glass" -> ThemeMode.GLASS
-            else -> throw IllegalArgumentException("主题只能是 dark/light/glass")
+            "ins", "cream" -> ThemeMode.INS
+            else -> throw IllegalArgumentException("主题只能是 dark/light/glass/ins")
         }
         ThemeManager.setMode(context, mode)
         return mode.storageValue
@@ -125,7 +126,8 @@ class AndroidSystemPort(
             "light" -> ThemeMode.LIGHT
             "dark", "black" -> ThemeMode.BLACK
             "glass" -> ThemeMode.GLASS
-            else -> throw IllegalArgumentException("主题只能是 light/dark/glass")
+            "ins", "cream" -> ThemeMode.INS
+            else -> throw IllegalArgumentException("主题只能是 light/dark/glass/ins")
         }
         ThemeManager.setMode(context, mode)
         return mode.storageValue

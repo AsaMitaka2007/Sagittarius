@@ -200,14 +200,27 @@ class AgentChatFragment : Fragment() {
     }
 
     private fun updateWebSearchButton(enabled: Boolean) {
-        binding.btnWebSearch.background =
-            ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
-        binding.btnWebSearch.imageTintList = android.content.res.ColorStateList.valueOf(
-            if (enabled) AgentInkColors.CREAM else android.graphics.Color.WHITE
+        binding.btnWebSearch.background = ContextCompat.getDrawable(
+            requireContext(),
+            if (enabled) R.drawable.bg_agent_web_on else R.drawable.bg_agent_ink_border
         )
+        binding.btnWebSearch.imageTintList = android.content.res.ColorStateList.valueOf(
+            if (enabled) AgentInkColors.CREAM else AgentInkColors.TEXT_TERTIARY
+        )
+        binding.btnWebSearch.alpha = if (enabled) 1f else 0.82f
         binding.btnWebSearch.contentDescription = getString(
             if (enabled) R.string.agent_web_on else R.string.agent_web_off
         )
+        // 开启时轻微弹一下，强化状态变化
+        binding.btnWebSearch.animate().cancel()
+        if (enabled) {
+            binding.btnWebSearch.scaleX = 0.9f
+            binding.btnWebSearch.scaleY = 0.9f
+            binding.btnWebSearch.animate().scaleX(1f).scaleY(1f).setDuration(180L).start()
+        } else {
+            binding.btnWebSearch.scaleX = 1f
+            binding.btnWebSearch.scaleY = 1f
+        }
     }
 
     private fun updateSendButton() {

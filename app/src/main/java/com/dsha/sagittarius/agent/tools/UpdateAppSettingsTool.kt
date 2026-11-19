@@ -27,7 +27,7 @@ class UpdateAppSettingsTool(
             })
             put("value", buildJsonObject {
                 put("type", "string")
-                put("description", "theme: dark/light/glass；daily_budget: 元；nutrition_goal: 数字，如 150g 或 2000")
+                put("description", "theme: dark/light/glass/ins；daily_budget: 元；nutrition_goal: 数字，如 150g 或 2000")
             })
         })
         put("required", buildJsonArray { add(JsonPrimitive("setting_key")); add(JsonPrimitive("value")) })

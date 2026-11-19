@@ -59,6 +59,7 @@ object ButtonAccentManager {
         ButtonAccentStyle("cyber", "赛博紫", Color.parseColor("#4B1D95"), Color.parseColor("#FF3FBF")),
         ButtonAccentStyle("sunset", "晚霞橙", Color.parseColor("#FF7A18"), Color.parseColor("#FFB347")),
         ButtonAccentStyle("blue", "冰川蓝", Color.parseColor("#4DA8FF"), Color.parseColor("#7B61FF")),
+        ButtonAccentStyle("caramel", "焦糖", Color.parseColor("#C58A66"), Color.parseColor("#B87A8E")),
         ButtonAccentStyle("transparent", "透明", Color.TRANSPARENT, Color.TRANSPARENT)
     )
 
@@ -67,8 +68,16 @@ object ButtonAccentManager {
     private val inkStyle = ButtonAccentStyle(
         "ink", "墨水黑", Color.parseColor("#0B1220"), Color.parseColor("#0B1220")
     )
+    /** 奶油主题的默认焦糖强调色；用户主动选过其他颜色时仍尊重用户选择。 */
+    private val insStyle = ButtonAccentStyle(
+        "caramel", "焦糖", Color.parseColor("#C58A66"), Color.parseColor("#B87A8E")
+    )
     val current: ButtonAccentStyle
-        get() = if (ThemeManager.current == ThemeMode.BLACK) inkStyle else _style.value
+        get() = when {
+            ThemeManager.current == ThemeMode.BLACK -> inkStyle
+            ThemeManager.current == ThemeMode.INS && _style.value.id == "aurora" -> insStyle
+            else -> _style.value
+        }
 
     @Volatile
     private var initialized = false

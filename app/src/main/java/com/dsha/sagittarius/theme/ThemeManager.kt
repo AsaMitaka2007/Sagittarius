@@ -26,7 +26,8 @@ enum class ThemeMode(
 ) {
     LIGHT("light", R.style.Theme_Sagittarius_Light),
     BLACK("black", R.style.Theme_Sagittarius_Black),
-    GLASS("glass", R.style.Theme_Sagittarius_Glass);
+    GLASS("glass", R.style.Theme_Sagittarius_Glass),
+    INS("ins", R.style.Theme_Sagittarius_Ins);
 
     companion object {
         fun fromStorage(value: String?): ThemeMode =
@@ -52,7 +53,7 @@ object ThemeManager {
     private var initialized = false
 
     val current: ThemeMode get() = _mode.value
-    val isLight: Boolean get() = current == ThemeMode.LIGHT
+    val isLight: Boolean get() = current == ThemeMode.LIGHT || current == ThemeMode.INS
     val isGlass: Boolean get() = current == ThemeMode.GLASS
 
     /**

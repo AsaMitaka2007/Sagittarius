@@ -134,7 +134,8 @@ class SettingsFragment : Fragment() {
         val labels = mapOf(
             ThemeMode.LIGHT to R.string.theme_light,
             ThemeMode.BLACK to R.string.theme_black,
-            ThemeMode.GLASS to R.string.theme_glass
+            ThemeMode.GLASS to R.string.theme_glass,
+            ThemeMode.INS to R.string.theme_ins
         )
         ThemeMode.entries.forEach { mode ->
             val chip = GlassChipView(requireContext()).apply {
