@@ -121,6 +121,11 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
                         intArrayOf(AgentInkColors.INK, AgentInkColors.INK)
                     }
                 )
+                // 米白液体感描边：用户气泡略淡，管家气泡更清晰
+                setStroke(
+                    (1.2f * context.resources.displayMetrics.density).toInt().coerceAtLeast(1),
+                    if (isUser) Color.parseColor("#99F3EBDD") else Color.parseColor("#CCF3EBDD")
+                )
             }
             val pad = (12 * context.resources.displayMetrics.density).toInt()
             bubble.setPadding(pad, pad, pad, pad)

@@ -28,9 +28,15 @@ data class RichText(val text: SpannableString, val animators: List<AnimatableRic
  * 未闭合标签会等待下一次流式更新，不会崩溃或提前应用。
  */
 object RichTextParser {
-    private data class OpenTag(val name: String, val value: String, val start: Int)
+    private data class OpenTag(
+        val name: String,
+        val value: String,
+        val start: Int,
+        val origin: String = name
+    )
 
     private val recognized = setOf("color", "size", "glow", "blink", "spin", "shake")
+    private val colorPattern = Regex("color\\s*[:=]\\s*([^;\"']+)", RegexOption.IGNORE_CASE)
 
     fun parse(source: String, invalidate: () -> Unit, animate: Boolean = true): RichText {
         val out = SpannableStringBuilder()
@@ -48,20 +54,35 @@ object RichTextParser {
             val raw = source.substring(i + 1, end).trim()
             val closing = raw.startsWith("/")
             val body = if (closing) raw.substring(1) else raw
-            val eq = body.indexOf('=')
-            val name = (if (eq >= 0) body.substring(0, eq) else body).trim().lowercase()
-            val value = if (eq >= 0) body.substring(eq + 1).trim().lowercase() else ""
+            // 标签名到第一个空白或等号为止，兼容 <color=red> 与 <span style="color:red">
+            val nameEnd = body.indexOfFirst { it == '=' || it.isWhitespace() }
+                .let { if (it < 0) body.length else it }
+            val origin = body.substring(0, nameEnd).trim().lowercase()
+            val attrs = body.substring(nameEnd).trim()
+            val name = when (origin) {
+                "span", "font" -> "color"
+                else -> origin
+            }
+            val value = when (origin) {
+                "span", "font" -> htmlColor(attrs)
+                else -> attrs.removePrefix("=").trim().lowercase()
+            }
             if (name !in recognized) {
                 out.append(source, i, end + 1)
                 i = end + 1
                 continue
             }
             if (!closing) {
-                open.addLast(OpenTag(name, value, out.length))
+                // 没有颜色的 span/font 直接丢弃标签，避免源码泄漏到气泡里
+                if (origin != "color" && value.isBlank()) {
+                    i = end + 1
+                    continue
+                }
+                open.addLast(OpenTag(name, value, out.length, origin))
                 i = end + 1
                 continue
             }
-            val index = open.indexOfLast { it.name == name }
+            val index = open.indexOfLast { it.origin == origin }
             if (index >= 0) {
                 val tag = open.removeAt(index)
                 if (out.length > tag.start) {
@@ -72,6 +93,10 @@ object RichTextParser {
         }
         return RichText(SpannableString(out), animators)
     }
+
+    /** 从 span/font 的属性里取颜色：支持 style="color:cyan"、color="#FF0000"。 */
+    private fun htmlColor(attrs: String): String =
+        colorPattern.find(attrs)?.groupValues?.get(1)?.trim().orEmpty()
 
     private fun applySpan(
         out: SpannableStringBuilder,
@@ -128,16 +153,42 @@ object RichTextParser {
         return if (colorTag.value == "rainbow") null else colorFor(colorTag.value)
     }
 
-    private fun colorFor(value: String): Int = when (value) {
-        "red" -> Color.parseColor("#FF5252")
-        "orange" -> Color.parseColor("#FF9800")
-        "yellow" -> Color.parseColor("#FFD600")
-        "green" -> Color.parseColor("#4CAF50")
-        "cyan" -> Color.parseColor("#00BCD4")
-        "blue" -> Color.parseColor("#448AFF")
-        "purple" -> Color.parseColor("#AB47BC")
-        "gold" -> Color.parseColor("#FFD700")
-        else -> Color.parseColor("#FFB74D")
+    private fun colorFor(value: String): Int {
+        val raw = value.trim().trim('"', '\'', ';', '，', ',').lowercase()
+        val fallback = Color.parseColor("#FFB74D")
+        return when (raw) {
+            "red" -> Color.parseColor("#FF5252")
+            "orange" -> Color.parseColor("#FF9800")
+            "yellow" -> Color.parseColor("#FFD600")
+            "green" -> Color.parseColor("#4CAF50")
+            "cyan" -> Color.parseColor("#00BCD4")
+            "blue" -> Color.parseColor("#448AFF")
+            "purple" -> Color.parseColor("#AB47BC")
+            "gold" -> Color.parseColor("#FFD700")
+            "white" -> Color.WHITE
+            "black" -> Color.BLACK
+            "gray", "grey" -> Color.parseColor("#9E9E9E")
+            "pink" -> Color.parseColor("#F06292")
+            "teal" -> Color.parseColor("#26A69A")
+            "lime" -> Color.parseColor("#C6FF00")
+            "magenta" -> Color.parseColor("#E040FB")
+            "silver" -> Color.parseColor("#CFD8DC")
+            "brown" -> Color.parseColor("#8D6E63")
+            "navy" -> Color.parseColor("#3F51B5")
+            else -> when {
+                raw.startsWith("#") -> runCatching { Color.parseColor(raw) }.getOrDefault(fallback)
+                raw.startsWith("rgb(") -> {
+                    val parts = raw.removePrefix("rgb(").removeSuffix(")")
+                        .split(',').mapNotNull { it.trim().toIntOrNull() }
+                    if (parts.size >= 3) Color.rgb(
+                        parts[0].coerceIn(0, 255),
+                        parts[1].coerceIn(0, 255),
+                        parts[2].coerceIn(0, 255)
+                    ) else fallback
+                }
+                else -> fallback
+            }
+        }
     }
 }
 

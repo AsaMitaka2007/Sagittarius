@@ -37,6 +37,7 @@ class AgentEntryRevealView @JvmOverloads constructor(
         Color.WHITE,
         Color.BLACK
     )
+    private val ink = 0xFF0B1220.toInt()
     private val random = Random(System.nanoTime())
     private val particles = ArrayList<Particle>()
     private var originX = 0f
@@ -65,7 +66,7 @@ class AgentEntryRevealView @JvmOverloads constructor(
         maxRadius = hypot(
             max(originX, width - originX).toDouble(),
             max(originY, height - originY).toDouble()
-        ).toFloat() + dp(32f)
+        ).toFloat() + dp(96f)
         particles.clear()
         if (MotionUtils.ambientAllowed(context)) {
             repeat(110) { particles += spawnParticle() }
@@ -122,21 +123,34 @@ class AgentEntryRevealView @JvmOverloads constructor(
         if (!running) return
         val eased = 1f - (1f - progress) * (1f - progress)
         val radius = startRadius + (maxRadius - startRadius) * eased
-        // 深色墨迹由中心向外铺满；不画外圈边框，边缘只保留粒子
+        // 可见的深蓝墨渐变：由中心亮蓝逐渐收束到页面墨黑，外缘柔和透明。
+        // 之前四档全是近似墨色，叠在黑色窗口上看起来就是“直接黑屏”。
+        val settle = eased.coerceIn(0f, 1f)
         fillPaint.shader = RadialGradient(
             originX, originY, radius.coerceAtLeast(1f),
             intArrayOf(
-                0xFF17243C.toInt(),
-                0xFF0E1626.toInt(),
-                0xFF0B1220.toInt(),
-                0xFF0B1220.toInt()
+                blend(0xFF33507E.toInt(), ink, settle),
+                blend(0xFF1B2C4C.toInt(), ink, settle),
+                blend(0xFF0D1829.toInt(), ink, settle),
+                Color.TRANSPARENT
             ),
-            floatArrayOf(0f, 0.55f, 0.94f, 1f),
+            floatArrayOf(0f, 0.58f, 0.95f, 1f),
             Shader.TileMode.CLAMP
         )
         canvas.drawCircle(originX, originY, radius, fillPaint)
         fillPaint.shader = null
         drawParticles(canvas, radius)
+    }
+
+    private fun blend(from: Int, to: Int, t: Float): Int {
+        val f = t.coerceIn(0f, 1f)
+        fun mix(a: Int, b: Int) = (a + (b - a) * f).toInt().coerceIn(0, 255)
+        return Color.argb(
+            mix(Color.alpha(from), Color.alpha(to)),
+            mix(Color.red(from), Color.red(to)),
+            mix(Color.green(from), Color.green(to)),
+            mix(Color.blue(from), Color.blue(to))
+        )
     }
 
     private fun drawParticles(canvas: Canvas, radius: Float) {

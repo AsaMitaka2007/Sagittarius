@@ -325,6 +325,8 @@ class MainActivity : ThemedActivity() {
                 )
             }
             startActivity(intent)
+            @Suppress("DEPRECATION")
+            overridePendingTransition(R.anim.agent_fade_in, R.anim.agent_fade_hold)
         }
     }
 

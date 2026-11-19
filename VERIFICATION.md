@@ -646,3 +646,14 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 毛玻璃主题修复：`values-v31` 不再使用 `windowIsTranslucent/windowShowWallpaper`，改为不透明玻璃背景；`ThemedActivity` 默认关闭 Glass 背景模糊，避免部分机型反复重绘/闪烁。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 442 warning；APK `dist/sgr-debug-2.8-cream-border.apk`（SHA256 `773F3ACA…ED14`）。
 - 未完成：本机无设备/模拟器，毛玻璃稳定性与米白边框观感未真机验收；未 push。
+
+
+## 2.0 气泡描边、入口渐变与 span 颜色（2026-11-19）
+
+- 聊天气泡新增米白描边：用户气泡 `#99F3EBDD`、管家气泡 `#CCF3EBDD`，1.2dp，与 Agent 按钮的液体边框一致。
+- 入口转场恢复可见渐变：扩散圆由中心亮蓝 `#33507E` → `#1B2C4C` → 墨黑收束，外缘柔和透明，不再是一块近似纯黑；同时首页启动 Agent 时窗口 220ms 淡入，消除点击后瞬间黑屏。
+- 黑色主题（及深色墨水按钮）下，饮食球 `DietBubbleView` 与记账球 `BubbleAmountView` 改为米白 `#CCF3EBDD` 描边，删除外发光、白色高光与顶部高光弧线；浅色主题仍沿用按钮强调色。
+- `RichTextParser` 新增 HTML 写法支持：`<span style="color:cyan">…</span>`、`<font color="#FF0000">…</font>`，颜色支持命名色、`#RGB/#RRGGBB/#AARRGGBB` 与 `rgb(r,g,b)`；无颜色的 span 标签直接丢弃，不再把源码显示在气泡里。
+- 毛玻璃主题：删除 `drawable-v31/bg_screen_glass.xml`（半透明底色），v31 统一回落到不透明 `bg_screen_glass`；`windowIsTranslucent/windowShowWallpaper/backgroundDimEnabled=false` 下沉到 `Glass.Base`，导航栏改不透明 `#0A0F1D`。此前不透明窗口里绘制半透明底色，会在 HyperOS 上反复重绘，是闪烁的根因。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-2.9-ai-polish.apk`（SHA256 `42660944…46BD`，17MB）。
+- 未完成：本机无设备/模拟器，气泡描边、入口渐变与 Redmi K80 上的毛玻璃稳定性未真机验收；未 push。

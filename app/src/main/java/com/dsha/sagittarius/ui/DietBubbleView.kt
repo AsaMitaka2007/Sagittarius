@@ -11,6 +11,7 @@ import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.graphics.ColorUtils
+import com.dsha.sagittarius.theme.ThemeManager
 import com.dsha.sagittarius.ui.ButtonAccentManager
 import java.util.Locale
 import kotlin.math.min
@@ -24,6 +25,7 @@ class DietBubbleView @JvmOverloads constructor(
     private val density = resources.displayMetrics.density
     private val tokens = ThemeTokens.of(context)
     private val accent = ButtonAccentManager.current
+    private val inkSurface = accent.isInk && !ThemeManager.isLight
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -57,21 +59,37 @@ class DietBubbleView @JvmOverloads constructor(
         val radius = diameter / 2f
         rect.set(cx - radius, cy - radius, cx + radius, cy + radius)
 
-        fillPaint.shader = RadialGradient(
-            cx - radius * 0.32f,
-            cy - radius * 0.38f,
-            radius * 1.35f,
-            intArrayOf(
-                ColorUtils.setAlphaComponent(Color.WHITE, 70),
-                tokens.cardFillTop,
-                tokens.cardFillBottom
-            ),
-            null,
-            Shader.TileMode.CLAMP
-        )
+        if (inkSurface) {
+            // 墨水黑主题：纯墨底、无白色高光，米白圆润描边
+            fillPaint.shader = RadialGradient(
+                cx - radius * 0.32f,
+                cy - radius * 0.38f,
+                radius * 1.35f,
+                intArrayOf(0xFF17243A.toInt(), 0xFF0B1220.toInt(), 0xFF080F1B.toInt()),
+                null,
+                Shader.TileMode.CLAMP
+            )
+        } else {
+            fillPaint.shader = RadialGradient(
+                cx - radius * 0.32f,
+                cy - radius * 0.38f,
+                radius * 1.35f,
+                intArrayOf(
+                    ColorUtils.setAlphaComponent(Color.WHITE, 70),
+                    tokens.cardFillTop,
+                    tokens.cardFillBottom
+                ),
+                null,
+                Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawCircle(cx, cy, radius, fillPaint)
         fillPaint.shader = null
-        borderPaint.color = if (error) Color.parseColor("#E35D5D") else accent.startColor
+        borderPaint.color = when {
+            error -> Color.parseColor("#E35D5D")
+            inkSurface -> 0xCCF3EBDD.toInt()
+            else -> accent.startColor
+        }
         borderPaint.strokeWidth = if (error) 2.5f * density else 1.3f * density
         canvas.drawCircle(cx, cy, radius, borderPaint)
         borderPaint.strokeWidth = 1.3f * density

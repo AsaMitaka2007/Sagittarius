@@ -25,6 +25,7 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
+import com.dsha.sagittarius.theme.ThemeManager
 import com.dsha.sagittarius.ui.ButtonAccentManager
 import com.dsha.sagittarius.util.Money
 import kotlin.math.min
@@ -48,6 +49,7 @@ class BubbleAmountView @JvmOverloads constructor(
     private val density = resources.displayMetrics.density
     private val tokens = ThemeTokens.of(context)
     private val accent = ButtonAccentManager.current
+    private val inkSurface = accent.isInk && !ThemeManager.isLight
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val glowPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val highlightPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -204,49 +206,71 @@ class BubbleAmountView @JvmOverloads constructor(
         val radius = diameter / 2f
         circle.set(cx - radius, cy - radius, cx + radius, cy + radius)
 
-        glowPaint.style = Paint.Style.STROKE
-        glowPaint.strokeWidth = 1.2f * density
-        for (i in 5 downTo 1) {
-            glowPaint.color = ColorUtils.setAlphaComponent(accent.startColor, 4 + (5 - i) * 4)
-            canvas.drawCircle(cx, cy, radius + i * dp(2.2f), glowPaint)
+        if (!inkSurface) {
+            glowPaint.style = Paint.Style.STROKE
+            glowPaint.strokeWidth = 1.2f * density
+            for (i in 5 downTo 1) {
+                glowPaint.color = ColorUtils.setAlphaComponent(accent.startColor, 4 + (5 - i) * 4)
+                canvas.drawCircle(cx, cy, radius + i * dp(2.2f), glowPaint)
+            }
         }
 
-        fillPaint.shader = RadialGradient(
-            cx - radius * 0.34f,
-            cy - radius * 0.4f,
-            radius * 1.45f,
-            intArrayOf(
-                ColorUtils.setAlphaComponent(Color.WHITE, 42),
-                tokens.cardFillTop,
-                tokens.cardFillBottom
-            ),
-            null,
-            Shader.TileMode.CLAMP
-        )
+        if (inkSurface) {
+            // 墨水黑主题：纯墨底、无外发光/高光
+            fillPaint.shader = RadialGradient(
+                cx - radius * 0.34f,
+                cy - radius * 0.4f,
+                radius * 1.45f,
+                intArrayOf(0xFF17243A.toInt(), 0xFF0B1220.toInt(), 0xFF080F1B.toInt()),
+                null,
+                Shader.TileMode.CLAMP
+            )
+        } else {
+            fillPaint.shader = RadialGradient(
+                cx - radius * 0.34f,
+                cy - radius * 0.4f,
+                radius * 1.45f,
+                intArrayOf(
+                    ColorUtils.setAlphaComponent(Color.WHITE, 42),
+                    tokens.cardFillTop,
+                    tokens.cardFillBottom
+                ),
+                null,
+                Shader.TileMode.CLAMP
+            )
+        }
         canvas.drawCircle(cx, cy, radius, fillPaint)
         fillPaint.shader = null
 
-        highlightPaint.shader = RadialGradient(
-            cx - radius * 0.36f,
-            cy - radius * 0.42f,
-            radius * 0.62f,
-            intArrayOf(ColorUtils.setAlphaComponent(Color.WHITE, 100), Color.TRANSPARENT),
-            null,
-            Shader.TileMode.CLAMP
-        )
-        canvas.drawCircle(cx, cy, radius, highlightPaint)
-        highlightPaint.shader = null
+        if (!inkSurface) {
+            highlightPaint.shader = RadialGradient(
+                cx - radius * 0.36f,
+                cy - radius * 0.42f,
+                radius * 0.62f,
+                intArrayOf(ColorUtils.setAlphaComponent(Color.WHITE, 100), Color.TRANSPARENT),
+                null,
+                Shader.TileMode.CLAMP
+            )
+            canvas.drawCircle(cx, cy, radius, highlightPaint)
+            highlightPaint.shader = null
+        }
 
-        borderPaint.color = if (error) tokens.warning else ColorUtils.setAlphaComponent(accent.startColor, 190)
+        borderPaint.color = when {
+            error -> tokens.warning
+            inkSurface -> 0xCCF3EBDD.toInt()
+            else -> ColorUtils.setAlphaComponent(accent.startColor, 190)
+        }
         borderPaint.strokeWidth = if (error) 2.2f * density else 1.3f * density
         canvas.drawCircle(cx, cy, radius, borderPaint)
-        // 顶部高光弧线
-        borderPaint.color = ColorUtils.setAlphaComponent(Color.WHITE, 35)
-        borderPaint.strokeWidth = 1f * density
-        canvas.drawArc(
-            RectF(cx - radius + dp(8f), cy - radius + dp(8f), cx + radius - dp(8f), cy + radius - dp(8f)),
-            200f, 120f, false, borderPaint
-        )
+        // 顶部高光弧线（墨水黑主题不要光效）
+        if (!inkSurface) {
+            borderPaint.color = ColorUtils.setAlphaComponent(Color.WHITE, 35)
+            borderPaint.strokeWidth = 1f * density
+            canvas.drawArc(
+                RectF(cx - radius + dp(8f), cy - radius + dp(8f), cx + radius - dp(8f), cy + radius - dp(8f)),
+                200f, 120f, false, borderPaint
+            )
+        }
 
         val raw = editText.text?.toString().orEmpty()
         val total = lines.sumOf { it.amountCents }
