@@ -127,7 +127,11 @@ class GradientActionButton @JvmOverloads constructor(
 
         if (isEnabled) {
             // 静态渐变填充；不再绘制流光/外发光边框
-            if (!accent.isTransparent) {
+            if (accent.isInk) {
+                fillPaint.shader = null
+                fillPaint.color = accent.startColor
+                canvas.drawRoundRect(rect, radius, radius, fillPaint)
+            } else if (!accent.isTransparent) {
                 fillShader?.let { shader ->
                     fillPaint.shader = shader
                     canvas.drawRoundRect(rect, radius, radius, fillPaint)

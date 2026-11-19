@@ -623,5 +623,5 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 黑色主题下 `ButtonAccentManager.current` 返回墨水黑样式（文字米白），因此底部 tabs、主要按钮、chips、模式切换等统一为墨水黑无光效；`GradientTabView`/`GradientActionButton`/`GlassChipView` 均做了 ink 分支。
 - 入口涟漪粒子改为米白/白/浅蓝灰固定色，不再使用绿色 accent。
 - Agent 页新增 `Theme.Sagittarius.Agent`（父 Black），`SagittariusActivity` 强制使用该主题，`followsThemeChanges=false`、禁用 Glass 模糊；即使全局选择浅色，Agent 页仍为墨水黑。
-- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 440 warning；APK `dist/sgr-debug-2.6-ink-theme.apk`（SHA256 `4ED2F62D…FF22`，17MB）。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 440 warning；APK `dist/sgr-debug-2.6-ink-theme.apk`（SHA256 `6AA1A02A…6067`，17MB）。
 - 未完成：本机无设备/模拟器，黑色主题全局观感、浅色主题下 Agent 固定墨水黑未真机验收；未 push。
