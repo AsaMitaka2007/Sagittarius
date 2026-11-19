@@ -71,6 +71,7 @@ class LiquidGlassView @JvmOverloads constructor(
     private var phase = 0f
     private var isExpanded = false
     private var compact = false
+    private var glowEnabled = true
     private var palette: GlassPalette = BudgetPalette.forRatio(null, ThemeManager.isLight)
 
     private val phaseAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
@@ -128,6 +129,12 @@ class LiquidGlassView @JvmOverloads constructor(
         invalidate()
     }
 
+    fun setGlowEnabled(enabled: Boolean) {
+        if (glowEnabled == enabled) return
+        glowEnabled = enabled
+        invalidate()
+    }
+
     fun setCompact(value: Boolean) {
         if (compact == value) return
         compact = value
@@ -163,7 +170,7 @@ class LiquidGlassView @JvmOverloads constructor(
         if (rect.width() <= 0f || rect.height() <= 0f) return
 
         ensureCachedGradients(rect)
-        drawOuterGlow(canvas, rect, radius)
+        if (glowEnabled) drawOuterGlow(canvas, rect, radius)
         drawGlassBase(canvas, rect, radius)
         drawLiquidBlobs(canvas, rect, radius)
         drawTopHighlight(canvas, rect, radius)

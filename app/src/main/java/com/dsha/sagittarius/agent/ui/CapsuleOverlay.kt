@@ -72,6 +72,7 @@ class CapsuleOverlay(
         val glass = LiquidGlassView(host.context).apply {
             clipChildren = false
             clipToPadding = false
+            setGlowEnabled(false)
             setCompact(true)
             setExpanded(false)
             setPadding(
