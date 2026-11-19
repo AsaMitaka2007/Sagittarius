@@ -6,6 +6,8 @@ import android.graphics.Bitmap
 import android.graphics.BitmapShader
 import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
 import android.graphics.LinearGradient
 import android.graphics.Matrix
 import android.graphics.Paint
@@ -16,6 +18,7 @@ import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import androidx.core.graphics.ColorUtils
 import com.dsha.sagittarius.ui.MotionUtils
 import com.dsha.sagittarius.ui.ThemeTokens
@@ -51,6 +54,7 @@ class VerticalLevelSliderView @JvmOverloads constructor(
     private var starMode = false
     private var phase = 0f
     private var starAnimator: ValueAnimator? = null
+    private var snapAnimator: ValueAnimator? = null
     private var starFrame: Bitmap? = null
     private var starLoading = false
 
@@ -73,7 +77,17 @@ class VerticalLevelSliderView @JvmOverloads constructor(
     }
 
     fun setProgress(value: Int) {
+        snapAnimator?.cancel()
         applyProgress(value.coerceIn(0, 100) / 100f)
+    }
+
+    /** 关闭胶囊时调用：把当前预览吸附到档位并立即提交最终配置。 */
+    fun commit() {
+        snapAnimator?.cancel()
+        val target = snap(progress)
+        applyProgress(target)
+        performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+        onProgressChanged?.invoke((target * 100).toInt())
     }
 
     private fun applyProgress(value: Float) {
@@ -144,24 +158,17 @@ class VerticalLevelSliderView @JvmOverloads constructor(
         }
     }
 
-    private fun gradientColors(): IntArray = when {
-        progress < 0.34f -> intArrayOf(
-            Color.parseColor("#A8E6FF"),
-            Color.parseColor("#6FB6FF")
-        )
-        progress < 0.67f -> intArrayOf(
-            Color.parseColor("#A8E6FF"),
-            Color.parseColor("#6FB6FF"),
-            Color.parseColor("#8B6CFF")
-        )
-        else -> intArrayOf(
-            Color.parseColor("#A8E6FF"),
-            Color.parseColor("#6FB6FF"),
-            Color.parseColor("#8B6CFF"),
-            Color.parseColor("#B45CFF"),
-            Color.parseColor("#E05CFF"),
-            Color.parseColor("#FF6FD8")
-        )
+    /**
+     * 用连续色相插值生成填充色：浅蓝(约196°) → 蓝紫(约260°) → 紫(约300°)
+     * → 品红(约326°)。不使用分档阈值，避免拖动到临界点时颜色突然跳变。
+     */
+    private fun gradientColors(): IntArray {
+        val p = progress.coerceIn(0f, 1f)
+        val hue = 196f + 130f * p
+        val bottom = Color.HSVToColor(floatArrayOf(hue, 0.24f, 1f))
+        val middle = Color.HSVToColor(floatArrayOf(hue + 8f, 0.52f, 1f))
+        val top = Color.HSVToColor(floatArrayOf(hue + 16f, 0.68f, 1f))
+        return intArrayOf(bottom, middle, top)
     }
 
     private fun drawStarfield(canvas: Canvas, rect: RectF, barWidth: Float) {
@@ -181,19 +188,23 @@ class VerticalLevelSliderView @JvmOverloads constructor(
             )
             shader.setLocalMatrix(starMatrix)
             starPaint.shader = shader
+            starPaint.colorFilter = ColorMatrixColorFilter(
+                ColorMatrix().apply { setSaturation(0f) }
+            )
             starPaint.alpha = 235
             canvas.drawRect(rect, starPaint)
             starPaint.shader = null
+            starPaint.colorFilter = null
         }
         // 动态闪烁星点；没有解码到视频帧时也能呈现星空
         starfield.forEach { star ->
             val x = rect.left + rect.width() * star.x
             val y = rect.top + rect.height() * star.y
             val alpha = (90 + 150 * (sin(phase * star.speed + star.phase) * 0.5 + 0.5)).toInt()
-            twinklePaint.color = ColorUtils.setAlphaComponent(
-                if (star.radius > 1.7f) Color.parseColor("#9BD8FF") else Color.WHITE,
-                alpha
-            )
+            // 只保留白色发光星点，先画外圈柔光再画亮核
+            twinklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha / 4)
+            canvas.drawCircle(x, y, star.radius * 2.6f * density, twinklePaint)
+            twinklePaint.color = ColorUtils.setAlphaComponent(Color.WHITE, alpha)
             canvas.drawCircle(x, y, star.radius * density, twinklePaint)
         }
         canvas.restoreToCount(layer)
@@ -269,10 +280,32 @@ class VerticalLevelSliderView @JvmOverloads constructor(
         applyProgress(raw)
         onProgressPreview?.invoke((raw * 100).toInt())
         if (commit) {
-            val snapped = snap(raw)
-            applyProgress(snapped)
-            performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
-            onProgressChanged?.invoke((snapped * 100).toInt())
+            animateSnap(snap(raw))
+        }
+    }
+
+    private fun animateSnap(target: Float) {
+        snapAnimator?.cancel()
+        if (abs(target - progress) < 0.001f) {
+            applyProgress(target)
+            onProgressChanged?.invoke((target * 100).toInt())
+            return
+        }
+        snapAnimator = ValueAnimator.ofFloat(progress, target).apply {
+            duration = 150L
+            interpolator = DecelerateInterpolator()
+            addUpdateListener {
+                applyProgress(it.animatedValue as Float)
+                onProgressPreview?.invoke((progress * 100).toInt())
+            }
+            addListener(object : android.animation.AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: android.animation.Animator) {
+                    applyProgress(target)
+                    performHapticFeedback(HapticFeedbackConstants.KEYBOARD_TAP)
+                    onProgressChanged?.invoke((target * 100).toInt())
+                }
+            })
+            start()
         }
     }
 
@@ -287,6 +320,8 @@ class VerticalLevelSliderView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         stopStarAnimator()
+        snapAnimator?.cancel()
+        snapAnimator = null
         super.onDetachedFromWindow()
     }
 

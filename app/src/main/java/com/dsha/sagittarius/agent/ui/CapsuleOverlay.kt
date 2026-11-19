@@ -28,6 +28,9 @@ class CapsuleOverlay(
     private var dismissAnimator: ValueAnimator? = null
     private var generation = 0
 
+    /** 关闭动画开始前回调，用于提交滑条最终档位。 */
+    var onBeforeDismiss: (() -> Unit)? = null
+
     val isShowing: Boolean get() = capsule != null
 
     fun show(
@@ -139,6 +142,7 @@ class CapsuleOverlay(
 
     fun dismiss() {
         val ink = capsule ?: return
+        onBeforeDismiss?.invoke()
         val scrimView = scrim
         animator?.cancel()
         particles?.burst()
@@ -184,6 +188,7 @@ class CapsuleOverlay(
 
     /** 立即清空，用于在会话/推理胶囊之间切换，避免旧遮罩残留。 */
     fun dismissNow() {
+        onBeforeDismiss?.invoke()
         generation++
         animator?.cancel()
         dismissAnimator?.cancel()

@@ -28,10 +28,8 @@ class ParticleEdgeView @JvmOverloads constructor(
 
     private val density = resources.displayMetrics.density
     private val colors = intArrayOf(
-        Color.parseColor("#F3EBDD"),
         Color.WHITE,
-        Color.parseColor("#7BF7FF"),
-        Color.parseColor("#B8C0CC")
+        Color.BLACK
     )
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val trailPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

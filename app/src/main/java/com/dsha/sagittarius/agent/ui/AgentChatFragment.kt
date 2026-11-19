@@ -456,26 +456,6 @@ class AgentChatFragment : Fragment() {
         val content = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.VERTICAL
         }
-        val header = LinearLayout(requireContext()).apply {
-            orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
-        }
-        header.addView(TextView(requireContext()).apply {
-            text = getString(R.string.agent_reasoning_dialog_title)
-            setTextColor(AgentInkColors.TEXT_PRIMARY)
-            textSize = 16f
-            setTypeface(typeface, android.graphics.Typeface.BOLD)
-        }, LinearLayout.LayoutParams(0, dp(40f), 1f))
-        val done = TextView(requireContext()).apply {
-            text = getString(R.string.agent_session_done)
-            setTextColor(AgentInkColors.CREAM)
-            textSize = 12f
-            gravity = Gravity.CENTER
-            setPadding(dp(8f), 0, dp(8f), 0)
-        }
-        header.addView(done, LinearLayout.LayoutParams(dp(56f), dp(40f)))
-        content.addView(header)
-
         val columns = LinearLayout(requireContext()).apply {
             orientation = LinearLayout.HORIZONTAL
         }
@@ -557,14 +537,18 @@ class AgentChatFragment : Fragment() {
         val overlay = CapsuleOverlay(binding.capsuleHost, tokens)
         capsuleOverlay = overlay
         activeCapsule = CapsuleKind.REASONING
-        done.setOnClickListener { overlay.dismiss() }
+        overlay.onBeforeDismiss = {
+            effortSlider.commit()
+            liveSlider.commit()
+        }
         closeButton.setOnClickListener { overlay.dismiss() }
 
         val hostW = binding.chatRoot.width
         val hostH = binding.chatRoot.height
         val width = minOf(dp(190f), hostW - dp(32f)).coerceAtLeast(dp(168f))
         val maxHeight = (hostH - dp(24f)).coerceAtLeast(dp(220f))
-        val height = minOf((hostH * 0.52f).toInt(), dp(380f), maxHeight)
+        // 比上一版加高约 1.5cm（94dp），并额外获得删掉标题后释放的空间
+        val height = minOf((hostH * 0.72f).toInt(), dp(474f), maxHeight)
         val anchorLocation = IntArray(2)
         val hostLocation = IntArray(2)
         binding.btnReasoning.getLocationOnScreen(anchorLocation)

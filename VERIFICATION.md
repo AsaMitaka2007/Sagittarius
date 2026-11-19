@@ -625,3 +625,14 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - Agent 页新增 `Theme.Sagittarius.Agent`（父 Black），`SagittariusActivity` 强制使用该主题，`followsThemeChanges=false`、禁用 Glass 模糊；即使全局选择浅色，Agent 页仍为墨水黑。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 440 warning；APK `dist/sgr-debug-2.6-ink-theme.apk`（SHA256 `6AA1A02A…6067`，17MB）。
 - 未完成：本机无设备/模拟器，黑色主题全局观感、浅色主题下 Agent 固定墨水黑未真机验收；未 push。
+
+
+## 1.8 滑条与纯黑白粒子（2026-11-19）
+
+- 推理胶囊高度增加约 1.5cm（最大 474dp），删除「推理与生动度」标题和「完成」按钮，仅保留底部「关闭」。
+- 关闭/切换胶囊前调用滑条 `commit()`，立即吸附档位并保存当前配置，不再等待收起动画结束。
+- 松手吸附改为 150ms Decelerate 动画，拖动过程连续更新、无档位突变；填充色改为 HSV 连续插值（浅蓝→蓝紫→紫→品红），无硬阈值跳色。
+- 最高档星空：视频帧做饱和度归零过滤，消除蓝色星点；程序化星点只使用白色，并叠加双层柔光；不再出现蓝色星。
+- 胶囊展开/收起粒子与入口涟漪粒子统一为黑/白两色，删除青蓝与米白彩色粒子。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 441 warning；APK `dist/sgr-debug-2.7-ink-final.apk`（SHA256 `490EBE34…9313`，18MB）。
+- 未完成：本机无设备/模拟器，滑条吸附手感、星空视频帧与黑白粒子未真机验收；未 push。

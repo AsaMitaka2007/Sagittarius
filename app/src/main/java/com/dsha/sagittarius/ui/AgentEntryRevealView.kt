@@ -34,10 +34,8 @@ class AgentEntryRevealView @JvmOverloads constructor(
         strokeWidth = 0.9f * density
     }
     private val colors = intArrayOf(
-        Color.parseColor("#F3EBDD"),
-        Color.parseColor("#FFFFFF"),
-        Color.parseColor("#7BF7FF"),
-        Color.parseColor("#B8C0CC")
+        Color.WHITE,
+        Color.BLACK
     )
     private val random = Random(System.nanoTime())
     private val particles = ArrayList<Particle>()
