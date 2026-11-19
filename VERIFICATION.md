@@ -612,5 +612,5 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 进度条重绘（`VerticalLevelSliderView`）：轨道宽约 0.8cm、填充略窄；高度不变。填充由下往上浅蓝→蓝紫→紫色系渐变，实时按进度计算、`CLAMP` 无循环接缝；松手吸附后再回调最终档位。
 - 最高档：轨道转深黑，填充切换为 `assets/starry_sky.mp4` 解码帧 + 程序化闪烁星点；视频帧异步加载，失败时仍用程序化星空。
 - 将 `E:\AGI-sagittarius` 通过目录联接挂到 `E:\Sagittarius\AGI-sagittarius`，并加入 `.gitignore`，便于在工作区内访问素材与验证截图。
-- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 436 warning；APK `dist/sgr-debug-2.5-star-slider.apk`（SHA256 `F3973CA2…4773`，17MB，含星空素材）。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 436 warning；APK `dist/sgr-debug-2.5-star-slider.apk`（SHA256 `9928C751…A472`，17MB，含星空素材）。
 - 未完成：本机无设备/模拟器，星空视频解码、渐变与胶囊连续点击未真机验收；未 push。

@@ -37,6 +37,7 @@ class CapsuleOverlay(
         onDismiss: (() -> Unit)? = null
     ) {
         if (isShowing) dismissNow()
+        host.removeAllViews()
         generation++
         dismissListener = onDismiss
         host.visibility = View.VISIBLE
@@ -193,6 +194,7 @@ class CapsuleOverlay(
         particles = null
         scrim = null
         dismissListener = null
+        host.removeAllViews()
         host.visibility = View.GONE
     }
 }
