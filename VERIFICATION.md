@@ -529,3 +529,13 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 移除 `SodiumBarView` 与 `VitaminGridView`，统一复用 `NutrientRingView`。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 18 个测试类 / 47 用例 / 0 失败；`lintDebug` 0 error / 403 warning。
 - 未完成：本机无设备/模拟器，圆环触摸区域与文字排版未做真机验收。
+
+
+## 1.1.2 主环并入钠与维生素（2026-11-19）
+
+- 按反馈撤销「独立小环」方案：钠与维生素并入营养页主复合环，变为 8 个同心圆，由外向内为：钠、维生素、热量、碳水、脂肪、蛋白质、纤维、水。
+- 主环不再绘制每圈数字，避免 8 圈时与中心文字重叠；百分比统一在下方图例展示（8 项：热量、蛋白质、碳水、脂肪、纤维、水、钠、维生素）。
+- 触摸任意一圈，下方明细行显示该项目摄入量 / 目标 / 百分比；触摸维生素圈显示 A/B1/B2/B3/C/E 细分，触摸钠圈显示钠摄入与是否超限。
+- 删除 `NutrientRingView` 与独立小环布局；图例高度 82dp → 112dp。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 18 个测试类 / 47 用例 / 0 失败；`lintDebug` 0 error / 401 warning。
+- 未完成：本机无设备/模拟器，8 圈间距与触摸命中区域未做真机验收。
