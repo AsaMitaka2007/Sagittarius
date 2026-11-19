@@ -25,7 +25,6 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dsha.sagittarius.R
-import com.dsha.sagittarius.agent.llm.ProviderRegistry
 import com.dsha.sagittarius.databinding.FragmentAgentChatBinding
 import com.dsha.sagittarius.ui.ButtonAccentManager
 import com.dsha.sagittarius.ui.ThemeTokens
@@ -93,8 +92,6 @@ class AgentChatFragment : Fragment() {
         binding.btnReasoning.setOnClickListener { showReasoningCapsule() }
         binding.btnRetry.setOnClickListener { viewModel.retry() }
         binding.btnScrollBottom.setOnClickListener { scrollToBottom() }
-        binding.tvProvider.setOnClickListener { openConfigTab() }
-        binding.tvModel.setOnClickListener { openConfigTab() }
 
         binding.etInput.doAfterTextChanged { updateSendButton() }
         binding.chipExpense.setOnClickListener { fillInput(R.string.agent_example_expense) }
@@ -168,9 +165,6 @@ class AgentChatFragment : Fragment() {
                     }
                 }
                 launch { viewModel.generating.collect { updateSendButton() } }
-                launch { viewModel.provider.collect { id -> updateProviderLabel(id) } }
-                launch { viewModel.modelId.collect { updateModelLabel(it) } }
-                launch { viewModel.models.collect { updateModelLabel(viewModel.modelId.value) } }
                 launch {
                     viewModel.effort.collect { effort ->
                         if (!viewModel.forcedThinking.value) {
@@ -202,17 +196,6 @@ class AgentChatFragment : Fragment() {
                 }
             }
         }
-    }
-
-    private fun updateProviderLabel(id: String) {
-        val label = if (id == "custom") getString(R.string.agent_custom_provider)
-        else ProviderRegistry.get(id)?.displayName ?: id
-        binding.tvProvider.text = label
-    }
-
-    private fun updateModelLabel(id: String) {
-        val label = viewModel.models.value.firstOrNull { it.id == id }?.displayName ?: id
-        binding.tvModel.text = label
     }
 
     private fun updateWebSearchButton(enabled: Boolean) {
@@ -270,13 +253,6 @@ class AgentChatFragment : Fragment() {
             else -> getString(R.string.agent_effort_off)
         }
         binding.btnReasoning.text = getString(R.string.agent_reasoning_short) + "·" + label
-        binding.tvReasoningState.text = when {
-            forced -> getString(R.string.agent_forced_thinking)
-            effort == "low" -> getString(R.string.agent_reasoning_light)
-            effort == "high" -> getString(R.string.agent_reasoning_balanced)
-            effort == "max" -> getString(R.string.agent_reasoning_deep)
-            else -> getString(R.string.agent_reasoning_fast)
-        }
         binding.btnReasoning.isEnabled = !viewModel.generating.value && !forced
         binding.btnReasoning.alpha = if (binding.btnReasoning.isEnabled) 1f else 0.5f
     }
@@ -654,10 +630,6 @@ class AgentChatFragment : Fragment() {
     private fun fillInput(res: Int) {
         binding.etInput.setText(res)
         binding.etInput.setSelection(binding.etInput.text?.length ?: 0)
-    }
-
-    private fun openConfigTab() {
-        (activity as? SagittariusActivity)?.selectTab(1)
     }
 
     private fun scrollToBottom() {

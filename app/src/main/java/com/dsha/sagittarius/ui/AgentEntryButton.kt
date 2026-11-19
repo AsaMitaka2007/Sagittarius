@@ -27,6 +27,7 @@ class AgentEntryButton @JvmOverloads constructor(
     private val accent = ButtonAccentManager.current
     private val logo = BitmapFactory.decodeResource(resources, R.drawable.agent_entry_logo)
     private val rect = RectF()
+    private val inset = 6f * density
     private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val logoPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply { isFilterBitmap = true }
     private val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -48,15 +49,15 @@ class AgentEntryButton @JvmOverloads constructor(
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
-        rect.set(0f, 0f, w.toFloat(), h.toFloat())
+        rect.set(inset, inset, w - inset, h - inset)
         backgroundPaint.shader = LinearGradient(
-            0f, 0f, w.toFloat(), h.toFloat(),
+            rect.left, rect.top, rect.right, rect.bottom,
             intArrayOf(0xF20B1220.toInt(), 0xF21B2742.toInt(), 0xF20B1220.toInt()),
             floatArrayOf(0f, 0.55f, 1f),
             Shader.TileMode.CLAMP
         )
         borderPaint.shader = LinearGradient(
-            0f, 0f, w.toFloat(), h.toFloat(),
+            rect.left, rect.top, rect.right, rect.bottom,
             intArrayOf(accent.startColor, accent.endColor),
             null,
             Shader.TileMode.CLAMP
@@ -68,18 +69,18 @@ class AgentEntryButton @JvmOverloads constructor(
         val radius = 18f * density
         canvas.drawRoundRect(rect, radius, radius, backgroundPaint)
 
-        val target = minOf(width, height) * 0.74f
-        val left = (width - target) / 2f
-        val top = (height - target) / 2f
+        val target = minOf(rect.width(), rect.height()) * 0.74f
+        val left = rect.centerX() - target / 2f
+        val top = rect.centerY() - target / 2f
         logoPaint.alpha = (255 * (0.94f - glow * 0.06f)).toInt()
         canvas.drawBitmap(logo, null, RectF(left, top, left + target, top + target), logoPaint)
 
-        // 外圈描边 + 按压光晕
+        // 外圈描边 + 按压光晕；光晕限制在 view 内留白中，避免被父布局裁掉
         val inner = RectF(rect).apply { inset(0.6f, 0.6f) }
         canvas.drawRoundRect(inner, radius, radius, borderPaint)
         if (glow > 0f) {
             glowPaint.color = ColorUtils.setAlphaComponent(accent.startColor, (150 * glow).toInt())
-            val spread = 2f + glow * 5f
+            val spread = (1f + glow * 3.8f)
             val outer = RectF(rect).apply { inset(-spread, -spread) }
             canvas.drawRoundRect(outer, radius + spread, radius + spread, glowPaint)
             glowPaint.color = ColorUtils.setAlphaComponent(0xFFFFFFFF.toInt(), (70 * glow).toInt())

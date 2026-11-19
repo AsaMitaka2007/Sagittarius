@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ScrollView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,13 +20,12 @@ import com.dsha.sagittarius.agent.tools.AgentTool
 import com.dsha.sagittarius.agent.tools.ToolCatalog
 import com.dsha.sagittarius.databinding.FragmentAgentTerminalBinding
 import com.dsha.sagittarius.ui.ThemeTokens
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-/** 终端页：运行日志与工具目录，均可展开查看并导出。 */
+/** 终端页：日志窗口与工具目录窗口内嵌显示，两个窗口各自可导出。 */
 class AgentTerminalFragment : Fragment() {
 
     private var _binding: FragmentAgentTerminalBinding? = null
@@ -54,8 +53,6 @@ class AgentTerminalFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.cardLogs.setOnClickListener { showLogsDialog() }
-        binding.cardTools.setOnClickListener { showToolsDialog() }
         binding.btnExportLogs.setOnClickListener { requestLogExport() }
         binding.btnExportTools.setOnClickListener { requestToolExport() }
         observe()
@@ -66,62 +63,61 @@ class AgentTerminalFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     AgentRuntimeLog.entries.collect { entries ->
-                        binding.tvLogSummary.text = if (entries.isEmpty()) {
+                        binding.tvLogSummary.text = entries.size.toString()
+                        binding.tvLogWindow.text = if (entries.isEmpty()) {
                             getString(R.string.agent_terminal_logs_empty)
                         } else {
-                            val last = entries.last()
-                            "${entries.size} 条 · ${last.level.name} ${last.message.take(40)}"
+                            AgentRuntimeLog.format(entries)
+                        }
+                        binding.logScroll.post {
+                            binding.logScroll.fullScroll(View.FOCUS_DOWN)
                         }
                     }
                 }
                 launch {
                     viewModel.tools.collect { tools ->
-                        val categories = tools.map { ToolCatalog.metaFor(it).category }.distinct()
-                        binding.tvToolSummary.text =
-                            "${tools.size} ${getString(R.string.agent_terminal_tools_unit)} · " +
-                                categories.joinToString(" / ")
+                        binding.tvToolSummary.text = tools.size.toString()
+                        renderTools(tools)
                     }
                 }
             }
         }
     }
 
-    private fun showLogsDialog() {
-        val tokens = ThemeTokens.of(requireContext())
-        val text = TextView(requireContext()).apply {
-            typeface = Typeface.MONOSPACE
-            textSize = 10f
-            setTextIsSelectable(true)
-            setPadding(24, 16, 24, 16)
-            setTextColor(tokens.textSecondary)
-            text = AgentRuntimeLog.format(AgentRuntimeLog.snapshot())
-                .ifBlank { getString(R.string.agent_terminal_logs_empty) }
+    private fun renderTools(tools: List<AgentTool>) {
+        val container = binding.toolContainer
+        container.removeAllViews()
+        if (tools.isEmpty()) {
+            container.addView(TextView(requireContext()).apply {
+                text = "暂无工具"
+                setTextColor(ThemeTokens.of(requireContext()).textTertiary)
+                textSize = 11f
+                setPadding(0, 8, 0, 8)
+            })
+            return
         }
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.agent_terminal_logs_title)
-            .setView(ScrollView(requireContext()).apply { addView(text) })
-            .setPositiveButton(R.string.agent_terminal_export) { _, _ -> requestLogExport() }
-            .setNeutralButton(R.string.agent_terminal_clear) { _, _ -> AgentRuntimeLog.clear() }
-            .setNegativeButton(R.string.agent_terminal_close, null)
-            .show()
-    }
-
-    private fun showToolsDialog() {
         val tokens = ThemeTokens.of(requireContext())
-        val text = TextView(requireContext()).apply {
-            typeface = Typeface.MONOSPACE
-            textSize = 10f
-            setTextIsSelectable(true)
-            setPadding(24, 16, 24, 16)
-            setTextColor(tokens.textSecondary)
-            text = buildToolsText(viewModel.tools.value)
+        tools.forEach { tool ->
+            val meta = ToolCatalog.metaFor(tool)
+            val row = LinearLayout(requireContext()).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, 7, 0, 7)
+            }
+            row.addView(TextView(requireContext()).apply {
+                text = meta.displayName + "  [" + meta.category + "]" +
+                    if (meta.readOnly) " 只读" else ""
+                setTextColor(tokens.textPrimary)
+                textSize = 12f
+                setTypeface(typeface, Typeface.BOLD)
+            })
+            row.addView(TextView(requireContext()).apply {
+                text = tool.name + " · " + tool.description
+                setTextColor(tokens.textTertiary)
+                textSize = 10f
+                setPadding(0, 2, 0, 0)
+            })
+            container.addView(row)
         }
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.agent_terminal_tools_title)
-            .setView(ScrollView(requireContext()).apply { addView(text) })
-            .setPositiveButton(R.string.agent_terminal_export) { _, _ -> requestToolExport() }
-            .setNegativeButton(R.string.agent_terminal_close, null)
-            .show()
     }
 
     private fun requestLogExport() {
@@ -133,15 +129,6 @@ class AgentTerminalFragment : Fragment() {
     private fun requestToolExport() {
         pendingToolCsv = buildToolCsv(viewModel.tools.value)
         exportTools.launch(fileName("tools", "csv"))
-    }
-
-    private fun buildToolsText(tools: List<AgentTool>): String {
-        if (tools.isEmpty()) return "暂无工具"
-        return tools.joinToString("\n\n") { tool ->
-            val meta = ToolCatalog.metaFor(tool)
-            "${tool.name}  [${meta.category}]${if (meta.readOnly) " 只读" else ""}\n" +
-                "  ${meta.displayName}\n  ${tool.description}"
-        }
     }
 
     private fun buildToolCsv(tools: List<AgentTool>): String {

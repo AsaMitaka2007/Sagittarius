@@ -552,3 +552,15 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 终端页：常驻内存日志（环形 500 条、自动脱敏 Key）、工具目录（工具名/中文名/分类/说明）；两个卡片均可展开查看并导出 TXT / CSV。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 20 个测试类 / 53 用例 / 0 失败；`lintDebug` 0 error / 421 warning；Python 回放 10→11 迁移通过；APK `dist/sgr-debug-2.0-agent-ui.apk`（SHA256 `9C5D4EB6…0013`）。
 - 未完成：本机无设备/模拟器，入口扩散、胶囊形变、竖向滑条与三 Tab 布局未做真机验收；未 push。
+
+
+## 1.2.1 AI UI 二次重绘（2026-11-19）
+
+- 按反馈移除顶部 Sagittarius 标题、返回按钮与三 Tab 按钮；改为 ViewPager2 左右滑动，仅保留非交互三点页码指示器。
+- 入口特效改为从按钮扩散的实色覆盖层：先铺满整个屏幕，再让页面淡入，最后覆盖层淡出；粒子仍沿扩张边缘运动。
+- 对话页删除服务商/模型状态栏；底部改为两行 dock（输入在上，会话/联网/推理/发送在下），按钮 44dp 以上并预留光晕空间。
+- 入口按钮改为 72dp 内缩绘制（视觉 60dp），光晕限制在 view 留白内，修复边缘流光被裁切。
+- 胶囊改用预算悬浮窗同款 `LiquidGlassView` + `SpringAnimation` + compact/expanded 状态切换，替换自绘 `MorphCapsuleView`。
+- 终端页改为内嵌日志窗口与工具目录窗口，实时显示内容；保留 TXT/CSV 导出。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 20 个测试类 / 53 用例 / 0 失败；`lintDebug` 0 error / 441 warning；APK `dist/sgr-debug-2.1-agent-redraw.apk`（SHA256 `8C0ED635…F5CF`）。
+- 未完成：本机无设备/模拟器，覆盖式转场、滑动切页、胶囊形变与内嵌窗口未做真机验收；未 push。

@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/transparent">
+    android:background="@android:color/transparent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -113,10 +115,10 @@
 
     <com.dsha.sagittarius.ui.AgentEntryButton
         android:id="@+id/fabAgent"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
         android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="88dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="86dp"
         android:contentDescription="@string/agent_fab_description" />
 </FrameLayout>

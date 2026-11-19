@@ -2,103 +2,29 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/root"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <LinearLayout
         android:id="@+id/contentRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipChildren="false"
         android:orientation="vertical">
 
-        <LinearLayout
+        <com.dsha.sagittarius.agent.ui.AgentPageIndicatorView
+            android:id="@+id/pageIndicator"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingStart="8dp"
-            android:paddingEnd="12dp">
-
-            <ImageView
-                android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:contentDescription="@string/agent_back"
-                android:padding="10dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/ic_arrow_back" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="sans-serif-medium"
-                android:text="@string/agent_title"
-                android:textColor="?attr/blTextPrimary"
-                android:textSize="18sp" />
-
-            <TextView
-                android:id="@+id/tvModelStatus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:maxWidth="160dp"
-                android:singleLine="true"
-                android:textColor="?attr/blTextTertiary"
-                android:textSize="11sp" />
-        </LinearLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="44dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="6dp">
-
-            <View
-                android:id="@+id/tabPill"
-                android:layout_width="0dp"
-                android:layout_height="34dp"
-                android:layout_gravity="center_vertical" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/tabChat"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/agent_tab_chat"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/tabConfig"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/agent_tab_config"
-                    android:textSize="13sp" />
-
-                <TextView
-                    android:id="@+id/tabTerminal"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="@string/agent_tab_terminal"
-                    android:textSize="13sp" />
-            </LinearLayout>
-        </FrameLayout>
+            android:layout_height="30dp"
+            android:layout_marginTop="4dp" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:clipChildren="false" />
     </LinearLayout>
 
     <com.dsha.sagittarius.ui.AgentEntryRevealView

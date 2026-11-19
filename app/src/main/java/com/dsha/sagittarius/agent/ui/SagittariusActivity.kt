@@ -1,17 +1,12 @@
 package com.dsha.sagittarius.agent.ui
 
-import android.animation.ValueAnimator
 import android.content.Intent
-import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
 import androidx.activity.addCallback
 import androidx.activity.viewModels
-import androidx.core.graphics.ColorUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -19,17 +14,15 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.dsha.sagittarius.R
 import com.dsha.sagittarius.SagittariusApp
 import com.dsha.sagittarius.databinding.ActivitySagittariusBinding
-import com.dsha.sagittarius.ui.ButtonAccentManager
-import com.dsha.sagittarius.ui.ThemeTokens
 import com.dsha.sagittarius.ui.ThemedActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 
 /**
- * AI 管家宿主：对话 / 配置 / 终端三选项卡。
+ * AI 管家宿主：对话 / 配置 / 终端三页，左右滑动切换。
  *
- * 生成任务、工具审批与会话切换都收敛在这里的共享 ViewModel，
- * 切 Tab 不会中断请求。桌宠已移除，预算悬浮胶囊不受影响。
+ * 不设顶部标题、返回按钮或 tab 按钮；退出依赖系统返回手势。
+ * 生成任务、工具审批与会话切换收敛在共享 ViewModel。
  */
 class SagittariusActivity : ThemedActivity() {
 
@@ -38,16 +31,12 @@ class SagittariusActivity : ThemedActivity() {
         SagittariusViewModel.Factory(application as SagittariusApp)
     }
 
-    private val tokens by lazy { ThemeTokens.of(this) }
-    private var tabAnimator: ValueAnimator? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySagittariusBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupPager()
-        setupTabs()
         setupEntryReveal(savedInstanceState)
         val startTab = intent.getIntExtra(EXTRA_START_TAB, 0)
         if (startTab != 0) {
@@ -77,85 +66,56 @@ class SagittariusActivity : ThemedActivity() {
             }
         }
         binding.viewPager.offscreenPageLimit = 2
-        binding.viewPager.isUserInputEnabled = false
+        binding.viewPager.isUserInputEnabled = true
         binding.viewPager.registerOnPageChangeCallback(
             object : androidx.viewpager2.widget.ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
-                    updateTabs(position, animate = true)
+                    binding.pageIndicator.setCurrent(position, animate = true)
+                }
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+                    binding.pageIndicator.setScrollProgress(position + positionOffset)
                 }
             }
         )
-    }
-
-    private fun setupTabs() {
-        binding.btnBack.setOnClickListener { finish() }
-        binding.tabPill.background = GradientDrawable().apply {
-            cornerRadius = 17f * resources.displayMetrics.density
-            setColor(ColorUtils.setAlphaComponent(ButtonAccentManager.current.startColor, 28))
-        }
-        binding.tabChat.setOnClickListener { selectTab(0) }
-        binding.tabConfig.setOnClickListener { selectTab(1) }
-        binding.tabTerminal.setOnClickListener { selectTab(2) }
-        binding.viewPager.post { updateTabs(0, animate = false) }
+        binding.viewPager.post { binding.pageIndicator.setCurrent(0, animate = false) }
     }
 
     fun selectTab(index: Int) {
         val safe = index.coerceIn(0, 2)
         if (binding.viewPager.currentItem != safe) {
             binding.viewPager.setCurrentItem(safe, true)
-        } else {
-            updateTabs(safe, animate = true)
-        }
-    }
-
-    private fun updateTabs(index: Int, animate: Boolean) {
-        val tabs = listOf(binding.tabChat, binding.tabConfig, binding.tabTerminal)
-        tabs.forEachIndexed { i, tab ->
-            val selected = i == index
-            tab.setTextColor(if (selected) tokens.textPrimary else tokens.textTertiary)
-            tab.setTypeface(null, if (selected) Typeface.BOLD else Typeface.NORMAL)
-        }
-        val target = tabs[index.coerceIn(0, 2)]
-        if (target.width == 0) return
-        val margin = (4f * resources.displayMetrics.density).toInt()
-        val targetWidth = (target.width - margin * 2).coerceAtLeast(1)
-        val targetX = target.x + margin
-        val pill = binding.tabPill
-        tabAnimator?.cancel()
-        if (!animate) {
-            val lp = pill.layoutParams
-            lp.width = targetWidth
-            pill.layoutParams = lp
-            pill.x = targetX
-            return
-        }
-        val startX = pill.x
-        val startWidth = pill.width.coerceAtLeast(1)
-        tabAnimator = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 240L
-            addUpdateListener {
-                val p = it.animatedValue as Float
-                val lp = pill.layoutParams
-                lp.width = (startWidth + (targetWidth - startWidth) * p).toInt()
-                pill.layoutParams = lp
-                pill.x = startX + (targetX - startX) * p
-            }
-            start()
         }
     }
 
     private fun setupEntryReveal(savedInstanceState: Bundle?) {
-        if (savedInstanceState != null) return
         val ox = intent.getFloatExtra(EXTRA_REVEAL_X, -1f)
         val oy = intent.getFloatExtra(EXTRA_REVEAL_Y, -1f)
-        if (ox < 0f || oy < 0f) return
+        if (savedInstanceState != null || ox < 0f || oy < 0f) {
+            binding.contentRoot.alpha = 1f
+            return
+        }
         val radius = intent.getFloatExtra(
             EXTRA_REVEAL_RADIUS, 32f * resources.displayMetrics.density
         )
+        binding.contentRoot.alpha = 0f
         binding.entryReveal.post {
             val rootLocation = IntArray(2)
             binding.root.getLocationOnScreen(rootLocation)
-            binding.entryReveal.start(ox - rootLocation[0], oy - rootLocation[1], radius)
+            binding.entryReveal.start(
+                ox - rootLocation[0],
+                oy - rootLocation[1],
+                radius,
+                onFilled = {
+                    binding.contentRoot.animate()
+                        .alpha(1f)
+                        .setDuration(260L)
+                        .start()
+                }
+            )
         }
     }
 
@@ -203,7 +163,6 @@ class SagittariusActivity : ThemedActivity() {
 
     override fun onDestroy() {
         if (isFinishing) viewModel.stop()
-        tabAnimator?.cancel()
         super.onDestroy()
     }
 
