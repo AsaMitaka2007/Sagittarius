@@ -1,5 +1,6 @@
 package com.dsha.sagittarius.ui
 
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -56,6 +57,7 @@ class NutritionFragment : Fragment() {
         binding.recyclerDiet.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerDiet.adapter = adapter
         attachSwipe()
+        setupNutrientRings()
         binding.btnEditGoals.setOnClickListener {
             NutritionGoalSheet.show(requireContext(), goal) { newGoal ->
                 viewLifecycleOwner.lifecycleScope.launch { repository.saveGoal(newGoal) }
@@ -111,15 +113,51 @@ class NutritionFragment : Fragment() {
             totals.calories, totals.protein, totals.carbs, totals.fat,
             totals.fiber, totals.water, goal
         )
-        binding.sodiumBar.setData(totals.sodium, goal.sodium)
-        binding.vitaminGrid.setData(
-            totals.vitaminA, totals.vitaminB1, totals.vitaminB2,
-            totals.vitaminB3, totals.vitaminC, totals.vitaminE
+        binding.tvSodiumHint.text = getString(R.string.nutrition_sodium_hint, goal.sodium)
+        binding.sodiumRing.setData(
+            shortLabel = "钠",
+            fullLabel = "钠",
+            value = totals.sodium,
+            target = goal.sodium,
+            unit = "mg",
+            color = SODIUM_COLOR,
+            decimals = 0,
+            referenceLabel = "参考上限",
+            warnWhenOver = true
+        )
+        binding.vitaminA.setData(
+            "VA", "维生素 A", totals.vitaminA, 800.0, "μg", VITAMIN_COLORS[0], 0
+        )
+        binding.vitaminB1.setData(
+            "VB1", "维生素 B1", totals.vitaminB1, 1.4, "mg", VITAMIN_COLORS[1], 2
+        )
+        binding.vitaminB2.setData(
+            "VB2", "维生素 B2", totals.vitaminB2, 1.4, "mg", VITAMIN_COLORS[2], 2
+        )
+        binding.vitaminB3.setData(
+            "VB3", "烟酸 B3", totals.vitaminB3, 14.0, "mg", VITAMIN_COLORS[3], 2
+        )
+        binding.vitaminC.setData(
+            "VC", "维生素 C", totals.vitaminC, 100.0, "mg", VITAMIN_COLORS[4], 1
+        )
+        binding.vitaminE.setData(
+            "VE", "维生素 E", totals.vitaminE, 14.0, "mg", VITAMIN_COLORS[5], 1
         )
         binding.tvNutritionDate.text = DateText.full(selectedDate)
         binding.tvNutritionTotal.text = getString(
             R.string.nutrition_total, totals.calories, goal.calories
         )
+    }
+
+    private fun setupNutrientRings() {
+        binding.sodiumRing.onSelected = { text -> binding.tvSodiumHint.text = text }
+        val onVitamin: (String) -> Unit = { text -> binding.tvVitaminDetail.text = text }
+        binding.vitaminA.onSelected = onVitamin
+        binding.vitaminB1.onSelected = onVitamin
+        binding.vitaminB2.onSelected = onVitamin
+        binding.vitaminB3.onSelected = onVitamin
+        binding.vitaminC.onSelected = onVitamin
+        binding.vitaminE.onSelected = onVitamin
     }
 
     private fun attachSwipe() {
@@ -165,5 +203,17 @@ class NutritionFragment : Fragment() {
         recordsJob?.cancel()
         _binding = null
         super.onDestroyView()
+    }
+
+    companion object {
+        private val SODIUM_COLOR = Color.parseColor("#5AD8D8")
+        private val VITAMIN_COLORS = intArrayOf(
+            Color.parseColor("#FF9F43"),
+            Color.parseColor("#65D6A5"),
+            Color.parseColor("#FFD166"),
+            Color.parseColor("#B18CFF"),
+            Color.parseColor("#5AAEFF"),
+            Color.parseColor("#FF7B9C")
+        )
     }
 }
