@@ -562,5 +562,5 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 入口按钮改为 72dp 内缩绘制（视觉 60dp），光晕限制在 view 留白内，修复边缘流光被裁切。
 - 胶囊改用预算悬浮窗同款 `LiquidGlassView` + `SpringAnimation` + compact/expanded 状态切换，替换自绘 `MorphCapsuleView`。
 - 终端页改为内嵌日志窗口与工具目录窗口，实时显示内容；保留 TXT/CSV 导出。
-- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 20 个测试类 / 53 用例 / 0 失败；`lintDebug` 0 error / 441 warning；APK `dist/sgr-debug-2.1-agent-redraw.apk`（SHA256 `8C0ED635…F5CF`）。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 20 个测试类 / 53 用例 / 0 失败；`lintDebug` 0 error / 441 warning；APK `dist/sgr-debug-2.1-agent-redraw.apk`（SHA256 `EB1A411E…81A0`）。
 - 未完成：本机无设备/模拟器，覆盖式转场、滑动切页、胶囊形变与内嵌窗口未做真机验收；未 push。

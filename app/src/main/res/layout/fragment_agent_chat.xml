@@ -150,8 +150,8 @@
 
                 <ImageView
                     android:id="@+id/btnSessions"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="10dp"
                     android:background="@drawable/bg_agent_pill"
                     android:contentDescription="@string/agent_sessions"
@@ -161,8 +161,8 @@
 
                 <TextView
                     android:id="@+id/btnWebSearch"
-                    android:layout_width="44dp"
-                    android:layout_height="44dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
                     android:background="@drawable/bg_agent_pill"
                     android:contentDescription="@string/agent_web_search"
                     android:gravity="center"
@@ -178,7 +178,7 @@
                 <TextView
                     android:id="@+id/btnReasoning"
                     android:layout_width="wrap_content"
-                    android:layout_height="44dp"
+                    android:layout_height="48dp"
                     android:layout_marginEnd="10dp"
                     android:background="@drawable/bg_agent_pill"
                     android:gravity="center"
@@ -192,8 +192,8 @@
 
                 <TextView
                     android:id="@+id/btnSend"
-                    android:layout_width="50dp"
-                    android:layout_height="44dp"
+                    android:layout_width="52dp"
+                    android:layout_height="48dp"
                     android:background="@drawable/bg_agent_pill"
                     android:contentDescription="@string/agent_send"
                     android:gravity="center"
