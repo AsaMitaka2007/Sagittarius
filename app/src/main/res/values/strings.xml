@@ -365,9 +365,9 @@
 <string name="nutrition_subtitle">让身体的每一种需要，都被温柔看见。</string>
 <string name="nutrition_today_calories">今日总热量</string>
 <string name="nutrition_total">%1$.0f / %2$.0f kcal</string>
-<string name="nutrition_vitamin_breakdown">维生素细分（仅参考，不计入达标）</string>
-<string name="nutrition_vitamin_touch_hint">轻触维生素圆环查看具体摄入量</string>
-<string name="nutrition_sodium_hint">参考上限 %1$.0f mg，轻触圆环查看摄入</string>
+<string name="nutrition_ring_touch_hint">触摸圆环查看钠与维生素明细</string>
+<string name="nutrition_sodium_detail">钠：%1$.0f / %2$.0f mg（%3$d%%）</string>
+<string name="nutrition_vitamin_detail">维生素细分：A %1$.0f μg · B1 %2$.2f mg · B2 %3$.2f mg · B3 %4$.2f mg · C %5$.1f mg · E %6$.1f mg</string>
 <string name="over_budget">已超支</string>
 <string name="overlay_guide_dialog_body">将跳转到系统「显示在其他应用上层」页面。\n请找到「Sagittarius」并打开开关。\n\nHyperOS 若没有直接显示该开关，请到：设置 → 应用设置 → 应用管理 → Sagittarius → 权限管理 → 悬浮窗。</string>
 <string name="overlay_guide_dialog_title">开启悬浮窗权限</string>

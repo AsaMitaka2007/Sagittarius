@@ -56,92 +56,18 @@
         <com.dsha.sagittarius.ui.NutritionLegendView
             android:id="@+id/nutritionLegend"
             android:layout_width="match_parent"
-            android:layout_height="82dp"
+            android:layout_height="112dp"
             android:layout_marginTop="2dp" />
 
-        <com.dsha.sagittarius.ui.NutrientRingView
-            android:id="@+id/sodiumRing"
-            android:layout_width="140dp"
-            android:layout_height="140dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="4dp" />
-
         <TextView
-            android:id="@+id/tvSodiumHint"
+            android:id="@+id/tvNutrientDetail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
             android:gravity="center"
+            android:text="@string/nutrition_ring_touch_hint"
             android:textColor="?attr/blTextTertiary"
-            android:textSize="10sp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/nutrition_vitamin_breakdown"
-            android:textColor="?attr/blTextSecondary"
             android:textSize="11sp" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
-
-            <com.dsha.sagittarius.ui.NutrientRingView
-                android:id="@+id/vitaminA"
-                android:layout_width="0dp"
-                android:layout_height="108dp"
-                android:layout_weight="1" />
-
-            <com.dsha.sagittarius.ui.NutrientRingView
-                android:id="@+id/vitaminB1"
-                android:layout_width="0dp"
-                android:layout_height="108dp"
-                android:layout_weight="1" />
-
-            <com.dsha.sagittarius.ui.NutrientRingView
-                android:id="@+id/vitaminB2"
-                android:layout_width="0dp"
-                android:layout_height="108dp"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:baselineAligned="false"
-            android:orientation="horizontal">
-
-            <com.dsha.sagittarius.ui.NutrientRingView
-                android:id="@+id/vitaminB3"
-                android:layout_width="0dp"
-                android:layout_height="108dp"
-                android:layout_weight="1" />
-
-            <com.dsha.sagittarius.ui.NutrientRingView
-                android:id="@+id/vitaminC"
-                android:layout_width="0dp"
-                android:layout_height="108dp"
-                android:layout_weight="1" />
-
-            <com.dsha.sagittarius.ui.NutrientRingView
-                android:id="@+id/vitaminE"
-                android:layout_width="0dp"
-                android:layout_height="108dp"
-                android:layout_weight="1" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/tvVitaminDetail"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:gravity="center"
-            android:text="@string/nutrition_vitamin_touch_hint"
-            android:textColor="?attr/blTextTertiary"
-            android:textSize="10sp" />
 
         <LinearLayout
             android:layout_width="match_parent"

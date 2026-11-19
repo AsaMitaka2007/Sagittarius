@@ -6,8 +6,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import java.util.Locale
-import kotlin.math.min
 
 /** 营养环图例，同时显示达标百分比。 */
 class NutritionLegendView @JvmOverloads constructor(
@@ -34,19 +32,27 @@ class NutritionLegendView @JvmOverloads constructor(
         Color.parseColor("#65D6A5"),
         Color.parseColor("#FFD166"),
         Color.parseColor("#B18CFF"),
-        Color.parseColor("#5AD8D8")
+        Color.parseColor("#5AD8D8"),
+        Color.parseColor("#FF7B9C"),
+        Color.parseColor("#A3E635")
     )
-    private val labels = arrayOf("热量", "蛋白质", "碳水", "脂肪", "纤维", "水")
-    private var ratios = FloatArray(6)
+    private val labels = arrayOf("热量", "蛋白质", "碳水", "脂肪", "纤维", "水", "钠", "维生素")
+    private var ratios = FloatArray(8)
 
-    fun setData(calories: Double, protein: Double, carbs: Double, fat: Double, fiber: Double, water: Double, goal: com.dsha.sagittarius.data.NutritionGoalEntity) {
+    fun setData(
+        calories: Double, protein: Double, carbs: Double, fat: Double,
+        fiber: Double, water: Double, sodium: Double, vitamin: Double,
+        goal: com.dsha.sagittarius.data.NutritionGoalEntity
+    ) {
         ratios = floatArrayOf(
             ratio(calories, goal.calories),
             ratio(protein, goal.protein),
             ratio(carbs, goal.carbs),
             ratio(fat, goal.fat),
             ratio(fiber, goal.fiber),
-            ratio(water, goal.water)
+            ratio(water, goal.water),
+            ratio(sodium, goal.sodium),
+            ratio(vitamin, goal.vitamin)
         )
         invalidate()
     }
@@ -54,10 +60,10 @@ class NutritionLegendView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val columns = 2
-        val rows = 3
+        val rows = 4
         val cellW = width / columns.toFloat()
         val cellH = height / rows.toFloat()
-        for (i in 0 until 6) {
+        for (i in 0 until 8) {
             val col = i % columns
             val row = i / columns
             val left = col * cellW + dp(16f)
@@ -73,7 +79,7 @@ class NutritionLegendView @JvmOverloads constructor(
     }
 
     private fun ratio(value: Double, target: Double): Float =
-        if (target <= 0.0) 0f else (value / target).toFloat().coerceIn(0f, 1.1f)
+        if (target <= 0.0) 0f else (value / target).toFloat().coerceAtLeast(0f)
 
     private fun dp(value: Float): Float = value * density
 }

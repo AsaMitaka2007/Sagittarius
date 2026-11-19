@@ -1,6 +1,5 @@
 package com.dsha.sagittarius.ui
 
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +19,7 @@ import com.dsha.sagittarius.data.DietRecordEntity
 import com.dsha.sagittarius.data.DietRepository
 import com.dsha.sagittarius.data.NutritionGoalEntity
 import com.dsha.sagittarius.data.NutritionMath
+import com.dsha.sagittarius.data.NutritionValues
 import com.dsha.sagittarius.databinding.FragmentNutritionBinding
 import com.dsha.sagittarius.util.DateText
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.Locale
+import kotlin.math.roundToInt
 
 class NutritionFragment : Fragment() {
 
@@ -40,6 +41,7 @@ class NutritionFragment : Fragment() {
     private var goal = NutritionGoalEntity()
     private var recordsJob: Job? = null
     private var currentRecords: List<DietRecordEntity> = emptyList()
+    private var currentTotals: NutritionValues? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -57,7 +59,7 @@ class NutritionFragment : Fragment() {
         binding.recyclerDiet.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerDiet.adapter = adapter
         attachSwipe()
-        setupNutrientRings()
+        setupRingSelection()
         binding.btnEditGoals.setOnClickListener {
             NutritionGoalSheet.show(requireContext(), goal) { newGoal ->
                 viewLifecycleOwner.lifecycleScope.launch { repository.saveGoal(newGoal) }
@@ -105,60 +107,61 @@ class NutritionFragment : Fragment() {
 
     private fun render(records: List<DietRecordEntity> = currentRecords) {
         val totals = NutritionMath.sum(records)
+        currentTotals = totals
         binding.nutritionRings.setData(
             totals.calories, totals.carbs, totals.fat, totals.protein,
-            totals.fiber, totals.water, goal
+            totals.fiber, totals.water, totals.sodium, totals.vitamin, goal
         )
         binding.nutritionLegend.setData(
             totals.calories, totals.protein, totals.carbs, totals.fat,
-            totals.fiber, totals.water, goal
+            totals.fiber, totals.water, totals.sodium, totals.vitamin, goal
         )
-        binding.tvSodiumHint.text = getString(R.string.nutrition_sodium_hint, goal.sodium)
-        binding.sodiumRing.setData(
-            shortLabel = "钠",
-            fullLabel = "钠",
-            value = totals.sodium,
-            target = goal.sodium,
-            unit = "mg",
-            color = SODIUM_COLOR,
-            decimals = 0,
-            referenceLabel = "参考上限",
-            warnWhenOver = true
-        )
-        binding.vitaminA.setData(
-            "VA", "维生素 A", totals.vitaminA, 800.0, "μg", VITAMIN_COLORS[0], 0
-        )
-        binding.vitaminB1.setData(
-            "VB1", "维生素 B1", totals.vitaminB1, 1.4, "mg", VITAMIN_COLORS[1], 2
-        )
-        binding.vitaminB2.setData(
-            "VB2", "维生素 B2", totals.vitaminB2, 1.4, "mg", VITAMIN_COLORS[2], 2
-        )
-        binding.vitaminB3.setData(
-            "VB3", "烟酸 B3", totals.vitaminB3, 14.0, "mg", VITAMIN_COLORS[3], 2
-        )
-        binding.vitaminC.setData(
-            "VC", "维生素 C", totals.vitaminC, 100.0, "mg", VITAMIN_COLORS[4], 1
-        )
-        binding.vitaminE.setData(
-            "VE", "维生素 E", totals.vitaminE, 14.0, "mg", VITAMIN_COLORS[5], 1
-        )
+        binding.tvNutrientDetail.text = getString(R.string.nutrition_ring_touch_hint)
         binding.tvNutritionDate.text = DateText.full(selectedDate)
         binding.tvNutritionTotal.text = getString(
             R.string.nutrition_total, totals.calories, goal.calories
         )
     }
 
-    private fun setupNutrientRings() {
-        binding.sodiumRing.onSelected = { text -> binding.tvSodiumHint.text = text }
-        val onVitamin: (String) -> Unit = { text -> binding.tvVitaminDetail.text = text }
-        binding.vitaminA.onSelected = onVitamin
-        binding.vitaminB1.onSelected = onVitamin
-        binding.vitaminB2.onSelected = onVitamin
-        binding.vitaminB3.onSelected = onVitamin
-        binding.vitaminC.onSelected = onVitamin
-        binding.vitaminE.onSelected = onVitamin
+    private fun setupRingSelection() {
+        binding.nutritionRings.onRingSelected = { index ->
+            binding.tvNutrientDetail.text = describeRing(index)
+        }
     }
+
+    private fun describeRing(index: Int): String {
+        val totals = currentTotals ?: return ""
+        return when (index) {
+            0 -> {
+                val over = goal.sodium > 0.0 && totals.sodium > goal.sodium
+                getString(
+                    R.string.nutrition_sodium_detail,
+                    totals.sodium, goal.sodium, percent(totals.sodium, goal.sodium)
+                ) + if (over) "，已超出" else ""
+            }
+            1 -> getString(
+                R.string.nutrition_vitamin_detail,
+                totals.vitaminA, totals.vitaminB1, totals.vitaminB2,
+                totals.vitaminB3, totals.vitaminC, totals.vitaminE
+            )
+            2 -> ringDetail("热量", totals.calories, goal.calories, "kcal")
+            3 -> ringDetail("碳水", totals.carbs, goal.carbs, "g")
+            4 -> ringDetail("脂肪", totals.fat, goal.fat, "g")
+            5 -> ringDetail("蛋白质", totals.protein, goal.protein, "g")
+            6 -> ringDetail("纤维", totals.fiber, goal.fiber, "g")
+            7 -> ringDetail("水", totals.water, goal.water, "g")
+            else -> ""
+        }
+    }
+
+    private fun ringDetail(label: String, value: Double, target: Double, unit: String): String =
+        String.format(
+            Locale.CHINA, "%s：%.1f / %.1f %s（%d%%）",
+            label, value, target, unit, percent(value, target)
+        )
+
+    private fun percent(value: Double, target: Double): Int =
+        if (target <= 0.0) 0 else (value / target * 100.0).roundToInt()
 
     private fun attachSwipe() {
         ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
@@ -203,17 +206,5 @@ class NutritionFragment : Fragment() {
         recordsJob?.cancel()
         _binding = null
         super.onDestroyView()
-    }
-
-    companion object {
-        private val SODIUM_COLOR = Color.parseColor("#5AD8D8")
-        private val VITAMIN_COLORS = intArrayOf(
-            Color.parseColor("#FF9F43"),
-            Color.parseColor("#65D6A5"),
-            Color.parseColor("#FFD166"),
-            Color.parseColor("#B18CFF"),
-            Color.parseColor("#5AAEFF"),
-            Color.parseColor("#FF7B9C")
-        )
     }
 }
