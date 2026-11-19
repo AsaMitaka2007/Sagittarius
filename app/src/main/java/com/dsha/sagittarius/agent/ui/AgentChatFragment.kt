@@ -25,7 +25,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dsha.sagittarius.R
 import com.dsha.sagittarius.databinding.FragmentAgentChatBinding
-import com.dsha.sagittarius.ui.ButtonAccentManager
 import com.dsha.sagittarius.ui.ThemeTokens
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -201,7 +200,6 @@ class AgentChatFragment : Fragment() {
     }
 
     private fun updateWebSearchButton(enabled: Boolean) {
-        val accent = ButtonAccentManager.current
         binding.btnWebSearch.background =
             ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
         binding.btnWebSearch.imageTintList = android.content.res.ColorStateList.valueOf(
@@ -221,7 +219,6 @@ class AgentChatFragment : Fragment() {
         binding.btnSend.isEnabled =
             generating || binding.etInput.text?.toString()?.isNotBlank() == true
         binding.btnSend.alpha = if (binding.btnSend.isEnabled) 1f else 0.45f
-        val accent = ButtonAccentManager.current
         binding.btnSend.background =
             ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
         binding.btnSend.setTextColor(
@@ -534,7 +531,7 @@ class AgentChatFragment : Fragment() {
                 textSize = 11f
                 gravity = Gravity.CENTER
             }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(28f)))
-            column.addView(slider, LinearLayout.LayoutParams(dp(64f), 0, 1f))
+            column.addView(slider, LinearLayout.LayoutParams(dp(56f), 0, 1f))
             column.addView(value, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(28f)))
             columns.addView(column, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1f))
         }

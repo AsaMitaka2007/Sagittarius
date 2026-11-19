@@ -9,6 +9,7 @@ captures/
 .externalNativeBuild/
 .cxx/
 .zcode/
+AGI-sagittarius/
 
 keystore/
 *.jks
