@@ -7,7 +7,6 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.graphics.ColorUtils
-import com.dsha.sagittarius.ui.ButtonAccentManager
 import com.dsha.sagittarius.ui.ThemeTokens
 
 /** 三页滑动指示器：纯展示，不接收点击。 */
@@ -18,9 +17,7 @@ class AgentPageIndicatorView @JvmOverloads constructor(
 
     private val density = resources.displayMetrics.density
     private val tokens = ThemeTokens.of(context)
-    private val accent = ButtonAccentManager.current
-    private val accentColor: Int
-        get() = if (accent.isTransparent) tokens.textSecondary else accent.startColor
+    private val accentColor: Int = AgentInkColors.CREAM
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var position = 0f
     private var animator: ValueAnimator? = null

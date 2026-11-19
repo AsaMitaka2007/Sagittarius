@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.dsha.sagittarius.theme.ThemeManager
+import com.dsha.sagittarius.theme.ThemeMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,8 +36,15 @@ data class ButtonAccentStyle(
     val isTransparent: Boolean
         get() = Color.alpha(startColor) == 0 && Color.alpha(endColor) == 0
 
+    val isInk: Boolean
+        get() = id == "ink"
+
     val textColor: Int
-        get() = if (isLight) Color.parseColor("#101828") else Color.WHITE
+        get() = when {
+            isInk -> Color.parseColor("#F3EBDD")
+            isLight -> Color.parseColor("#101828")
+            else -> Color.WHITE
+        }
 }
 
 object ButtonAccentManager {
@@ -55,7 +64,11 @@ object ButtonAccentManager {
 
     private val _style = MutableStateFlow(presets[1])
     val style: StateFlow<ButtonAccentStyle> = _style.asStateFlow()
-    val current: ButtonAccentStyle get() = _style.value
+    private val inkStyle = ButtonAccentStyle(
+        "ink", "墨水黑", Color.parseColor("#0B1220"), Color.parseColor("#0B1220")
+    )
+    val current: ButtonAccentStyle
+        get() = if (ThemeManager.current == ThemeMode.BLACK) inkStyle else _style.value
 
     @Volatile
     private var initialized = false

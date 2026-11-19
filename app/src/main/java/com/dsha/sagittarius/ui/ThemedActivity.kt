@@ -20,7 +20,7 @@ abstract class ThemedActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appliedMode = ThemeManager.current
-        setTheme(appliedMode.themeRes)
+        setTheme(themeResFor(appliedMode))
         super.onCreate(savedInstanceState)
         applyGlassBlurIfNeeded()
         lifecycleScope.launch {
@@ -28,14 +28,23 @@ abstract class ThemedActivity : AppCompatActivity() {
                 ThemeManager.mode.collect { mode ->
                     if (mode != appliedMode) {
                         appliedMode = mode
-                        recreate()
+                        if (followsThemeChanges()) recreate()
                     }
                 }
             }
         }
     }
 
+    /** 子类可强制固定主题（例如 Agent 页始终墨水黑）。 */
+    protected open fun themeResFor(mode: ThemeMode): Int = mode.themeRes
+
+    /** Agent 页不随全局主题重建。 */
+    protected open fun followsThemeChanges(): Boolean = true
+
+    protected open fun allowsGlassBlur(): Boolean = true
+
     private fun applyGlassBlurIfNeeded() {
+        if (!allowsGlassBlur()) return
         if (appliedMode != ThemeMode.GLASS) return
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) return
         runCatching {

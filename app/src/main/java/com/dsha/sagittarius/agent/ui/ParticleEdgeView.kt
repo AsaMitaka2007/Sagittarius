@@ -12,7 +12,6 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import androidx.core.graphics.ColorUtils
-import com.dsha.sagittarius.ui.ButtonAccentManager
 import com.dsha.sagittarius.ui.MotionUtils
 import kotlin.math.hypot
 import kotlin.math.max
@@ -28,12 +27,11 @@ class ParticleEdgeView @JvmOverloads constructor(
 ) : View(context, attrs) {
 
     private val density = resources.displayMetrics.density
-    private val accent = ButtonAccentManager.current
     private val colors = intArrayOf(
-        if (accent.isTransparent) Color.WHITE else accent.startColor,
-        if (accent.isTransparent) Color.WHITE else accent.endColor,
+        Color.parseColor("#F3EBDD"),
+        Color.WHITE,
         Color.parseColor("#7BF7FF"),
-        Color.WHITE
+        Color.parseColor("#B8C0CC")
     )
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val trailPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {

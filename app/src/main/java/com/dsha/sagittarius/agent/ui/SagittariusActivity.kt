@@ -57,6 +57,13 @@ class SagittariusActivity : ThemedActivity() {
         handleVoiceIntent(intent)
     }
 
+    override fun themeResFor(mode: com.dsha.sagittarius.theme.ThemeMode): Int =
+        R.style.Theme_Sagittarius_Agent
+
+    override fun followsThemeChanges(): Boolean = false
+
+    override fun allowsGlassBlur(): Boolean = false
+
     private fun setupPager() {
         binding.viewPager.adapter = object : FragmentStateAdapter(this) {
             override fun getItemCount(): Int = 3

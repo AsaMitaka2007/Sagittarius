@@ -27,10 +27,6 @@ class AgentEntryRevealView @JvmOverloads constructor(
 ) : View(context, attrs) {
 
     private val density = resources.displayMetrics.density
-    private val accent = ButtonAccentManager.current
-    private val tokens = ThemeTokens.of(context)
-    private val accentStart = if (accent.isTransparent) tokens.textSecondary else accent.startColor
-    private val accentEnd = if (accent.isTransparent) tokens.textSecondary else accent.endColor
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val particlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val trailPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -38,10 +34,10 @@ class AgentEntryRevealView @JvmOverloads constructor(
         strokeWidth = 0.9f * density
     }
     private val colors = intArrayOf(
-        accentStart,
-        accentEnd,
+        Color.parseColor("#F3EBDD"),
+        Color.parseColor("#FFFFFF"),
         Color.parseColor("#7BF7FF"),
-        Color.parseColor("#FFFFFF")
+        Color.parseColor("#B8C0CC")
     )
     private val random = Random(System.nanoTime())
     private val particles = ArrayList<Particle>()
