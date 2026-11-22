@@ -10,6 +10,7 @@
         android:id="@+id/contentRoot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/bg_screen_black"
         android:clipChildren="false"
         android:orientation="vertical">
 

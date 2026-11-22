@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Agent 页进入时，首页保持不动，只让新页面覆盖上来 -->
+<!-- 首页保持可见，直到涟漪铺满并淡出；时长需覆盖 AgentEntryRevealView 的扩散+淡出 -->
 <alpha xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="220"
+    android:duration="1400"
     android:fromAlpha="1.0"
     android:toAlpha="1.0" />

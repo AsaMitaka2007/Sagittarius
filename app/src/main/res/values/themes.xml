@@ -94,7 +94,12 @@
 
     <!-- Agent 页固定墨水黑，不跟随全局主题 -->
     <style name="Theme.Sagittarius.Agent" parent="Theme.Sagittarius.Black">
-        <item name="android:windowBackground">@drawable/bg_screen_black</item>
+        <!-- 透明窗口：涟漪扩散时能透出首页原页面，页面本体用 contentRoot 的不透明墨底 -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowShowWallpaper">false</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowDisablePreview">true</item>
         <item name="android:navigationBarColor">#0B1220</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>

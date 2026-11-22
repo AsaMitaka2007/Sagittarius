@@ -678,3 +678,12 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 新增偏好 `new_session_on_enter`（默认开启）：每次进入 AI 页自动新建会话；设置页「可见性与权限」新增「每次进入新建会话」开关，关闭后回到上次会话。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-3.1-terminal-logo.apk`（SHA256 `D08D113B…2DF9`，17MB）。
 - 未完成：本机无设备/模拟器，代码框排版、星芒下落重生、logo 动画与新会话开关未真机验收；未 push。
+
+
+## 2.3 入口涟漪透出原页面（2026-11-22）
+
+- `Theme.Sagittarius.Agent` 改为半透明窗口：`windowIsTranslucent=true`、`windowBackground=transparent`、`windowShowWallpaper=false`、`windowDisablePreview=true`，不再用主题不透明底挡住首页。
+- AI 页 `contentRoot` 增加 `bg_screen_black` 不透明墨底；初始 `alpha=0`，涟漪外的区域保持透明，因此扩散时能看到首页原选项卡（天气等），铺满后页面淡入再淡出覆盖层，形成“从按钮流出整页并覆盖”的效果。
+- 首页退出转场 `agent_fade_hold` 时长 220ms → 1400ms，覆盖涟漪扩散（980ms）+ 交叉淡入/淡出（约 380ms），保证整段动画期间首页仍在底层可见。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-3.2-ripple.apk`（SHA256 `3F53E7E3…53B3`，17MB）。
+- 未完成：本机无设备/模拟器，透出首页的转场效果未真机验收；未 push。
