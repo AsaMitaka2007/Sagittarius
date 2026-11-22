@@ -5,8 +5,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.RadialGradient
-import android.graphics.Shader
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.DecelerateInterpolator
@@ -18,8 +16,8 @@ import kotlin.math.sin
 import kotlin.random.Random
 
 /**
- * 入口“铺满”转场：从按钮圆心向外扩散一整块不透明色域，
- * 边缘带引力场粒子；铺满后回调 onFilled，页面再淡入，最后覆盖层淡出。
+ * 入口“铺满”转场：真正把 AI 页面以圆形从按钮处揭开，
+ * 圆外保持透明，露出首页原选项卡；边缘带引力场粒子，铺满后淡出。
  */
 class AgentEntryRevealView @JvmOverloads constructor(
     context: Context,
@@ -27,7 +25,6 @@ class AgentEntryRevealView @JvmOverloads constructor(
 ) : View(context, attrs) {
 
     private val density = resources.displayMetrics.density
-    private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val particlePaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val trailPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
@@ -37,7 +34,6 @@ class AgentEntryRevealView @JvmOverloads constructor(
         Color.WHITE,
         Color.BLACK
     )
-    private val ink = 0xFF0B1220.toInt()
     private val random = Random(System.nanoTime())
     private val particles = ArrayList<Particle>()
     private var originX = 0f
@@ -48,8 +44,14 @@ class AgentEntryRevealView @JvmOverloads constructor(
     private var running = false
     private var filledNotified = false
     private var onFilled: (() -> Unit)? = null
+    private var onReveal: ((Float) -> Unit)? = null
     private var animator: ValueAnimator? = null
     private var fadeAnimator: ValueAnimator? = null
+
+    /** 每帧回传当前扩散半径，宿主用它裁剪页面。 */
+    fun setOnReveal(listener: ((Float) -> Unit)?) {
+        onReveal = listener
+    }
 
     init {
         setWillNotDraw(false)
@@ -74,12 +76,14 @@ class AgentEntryRevealView @JvmOverloads constructor(
         running = true
         alpha = 1f
         visibility = VISIBLE
+        onReveal?.invoke(startRadius)
         animator?.cancel()
         animator = ValueAnimator.ofFloat(0f, 1f).apply {
             duration = if (particles.isEmpty()) 520L else 980L
             interpolator = DecelerateInterpolator(0.92f)
             addUpdateListener {
                 progress = it.animatedValue as Float
+                onReveal?.invoke(currentRadius())
                 if (progress >= 0.995f && !filledNotified) {
                     filledNotified = true
                     onFilled?.invoke()
@@ -88,6 +92,8 @@ class AgentEntryRevealView @JvmOverloads constructor(
             }
             addListener(object : android.animation.AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: android.animation.Animator) {
+                    progress = 1f
+                    onReveal?.invoke(maxRadius)
                     if (!filledNotified) {
                         filledNotified = true
                         onFilled?.invoke()
@@ -121,36 +127,13 @@ class AgentEntryRevealView @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         if (!running) return
-        val eased = 1f - (1f - progress) * (1f - progress)
-        val radius = startRadius + (maxRadius - startRadius) * eased
-        // 可见的深蓝墨渐变：由中心亮蓝逐渐收束到页面墨黑，外缘柔和透明。
-        // 之前四档全是近似墨色，叠在黑色窗口上看起来就是“直接黑屏”。
-        val settle = eased.coerceIn(0f, 1f)
-        fillPaint.shader = RadialGradient(
-            originX, originY, radius.coerceAtLeast(1f),
-            intArrayOf(
-                blend(0xFF33507E.toInt(), ink, settle),
-                blend(0xFF1B2C4C.toInt(), ink, settle),
-                blend(0xFF0D1829.toInt(), ink, settle),
-                Color.TRANSPARENT
-            ),
-            floatArrayOf(0f, 0.58f, 0.95f, 1f),
-            Shader.TileMode.CLAMP
-        )
-        canvas.drawCircle(originX, originY, radius, fillPaint)
-        fillPaint.shader = null
-        drawParticles(canvas, radius)
+        drawParticles(canvas, currentRadius())
     }
 
-    private fun blend(from: Int, to: Int, t: Float): Int {
-        val f = t.coerceIn(0f, 1f)
-        fun mix(a: Int, b: Int) = (a + (b - a) * f).toInt().coerceIn(0, 255)
-        return Color.argb(
-            mix(Color.alpha(from), Color.alpha(to)),
-            mix(Color.red(from), Color.red(to)),
-            mix(Color.green(from), Color.green(to)),
-            mix(Color.blue(from), Color.blue(to))
-        )
+    /** 当前圆形揭开半径。 */
+    private fun currentRadius(): Float {
+        val eased = 1f - (1f - progress) * (1f - progress)
+        return startRadius + (maxRadius - startRadius) * eased
     }
 
     private fun drawParticles(canvas: Canvas, radius: Float) {

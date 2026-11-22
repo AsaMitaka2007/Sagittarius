@@ -687,3 +687,12 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 首页退出转场 `agent_fade_hold` 时长 220ms → 1400ms，覆盖涟漪扩散（980ms）+ 交叉淡入/淡出（约 380ms），保证整段动画期间首页仍在底层可见。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-3.2-ripple.apk`（SHA256 `3F53E7E3…53B3`，17MB）。
 - 未完成：本机无设备/模拟器，透出首页的转场效果未真机验收；未 push。
+
+
+## 2.4 圆形揭开首页（2026-11-22）
+
+- 入口转场从“深色圆盘铺满再淡入页面”改为真正的圆形揭开：AI 页 `contentRoot` 用 `ViewOutlineProvider` + `clipToOutline` 按按钮圆心裁剪，扩散半径通过 `AgentEntryRevealView.setOnReveal` 每帧回传；圆内是 AI 页面本体，圆外窗口保持透明，直接露出首页当前选项卡（天气等）。
+- 首帧前同步设置裁剪，避免闪出整页；铺满后关闭 `clipToOutline` 恢复整页，粒子覆盖层在 380ms 内淡出。
+- Agent 主题保持半透明窗口（`windowIsTranslucent=true`、透明 window 背景），`contentRoot` 使用 `bg_screen_black` 不透明墨底；首页退场 `agent_fade_hold` 保持 1400ms，覆盖 980ms 扩散 + 淡出。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 444 warning；APK `dist/sgr-debug-3.3-reveal.apk`（SHA256 `0990C9AF…EB4F`，17MB）。
+- 未完成：本机无设备/模拟器，圆形裁剪边缘是否锯齿、首页是否完整透出未真机验收；未 push。

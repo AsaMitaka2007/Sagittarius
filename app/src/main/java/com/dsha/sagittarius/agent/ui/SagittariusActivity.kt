@@ -1,8 +1,10 @@
 package com.dsha.sagittarius.agent.ui
 
 import android.content.Intent
+import android.graphics.Outline
 import android.os.Bundle
-import android.view.animation.DecelerateInterpolator
+import android.view.View
+import android.view.ViewOutlineProvider
 import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.core.view.ViewCompat
@@ -103,27 +105,49 @@ class SagittariusActivity : ThemedActivity() {
         val ox = intent.getFloatExtra(EXTRA_REVEAL_X, -1f)
         val oy = intent.getFloatExtra(EXTRA_REVEAL_Y, -1f)
         if (savedInstanceState != null || ox < 0f || oy < 0f) {
-            binding.contentRoot.alpha = 1f
+            binding.contentRoot.clipToOutline = false
+            binding.contentRoot.outlineProvider = null
             return
         }
         val radius = intent.getFloatExtra(
             EXTRA_REVEAL_RADIUS, 32f * resources.displayMetrics.density
         )
-        binding.contentRoot.alpha = 0f
+        var cx = ox
+        var cy = oy
+        var revealRadius = radius
+        // 圆形裁剪 AI 页面：圆外保持透明，露出首页原选项卡。
+        // 先同步设好裁剪，避免首帧闪出整页。
+        binding.contentRoot.outlineProvider = object : ViewOutlineProvider() {
+            override fun getOutline(view: View, outline: Outline) {
+                val r = revealRadius.toInt().coerceAtLeast(1)
+                outline.setOval(
+                    (cx - r).toInt(),
+                    (cy - r).toInt(),
+                    (cx + r).toInt(),
+                    (cy + r).toInt()
+                )
+            }
+        }
+        binding.contentRoot.clipToOutline = true
+        binding.contentRoot.invalidateOutline()
         binding.entryReveal.post {
             val rootLocation = IntArray(2)
             binding.root.getLocationOnScreen(rootLocation)
+            cx = ox - rootLocation[0]
+            cy = oy - rootLocation[1]
+            binding.contentRoot.invalidateOutline()
+            binding.entryReveal.setOnReveal { r ->
+                revealRadius = r
+                binding.contentRoot.invalidateOutline()
+            }
             binding.entryReveal.start(
-                ox - rootLocation[0],
-                oy - rootLocation[1],
+                cx,
+                cy,
                 radius,
                 onFilled = {
-                    binding.contentRoot.animate()
-                        .alpha(1f)
-                        .setStartDelay(60L)
-                        .setDuration(320L)
-                        .setInterpolator(DecelerateInterpolator(0.9f))
-                        .start()
+                    binding.contentRoot.clipToOutline = false
+                    binding.contentRoot.outlineProvider = null
+                    binding.contentRoot.invalidate()
                 }
             )
         }
