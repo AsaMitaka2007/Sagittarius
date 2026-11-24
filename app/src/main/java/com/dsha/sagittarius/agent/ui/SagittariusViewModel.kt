@@ -201,6 +201,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
     fun switchSession(id: Long) {
         if (id == _sessionId.value) return
         stop()
+        turnImagePaths = emptyList()
         _sessionId.value = id
         _messages.value = emptyList()
         _tokenUsage.value = TokenUsage()
@@ -229,6 +230,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                 if (_sessionId.value in targets) {
                     val next = all.first()
                     _sessionId.value = next.id
+                    turnImagePaths = emptyList()
                     _messages.value = emptyList()
                     _tokenUsage.value = TokenUsage()
                     _lastError.value = null
@@ -396,7 +398,9 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         }.trim()
         _lastError.value = null
         hadToolInLastTurn = false
-        turnImagePaths = attachments.mapNotNull { it.imagePath }
+        if (attachments.isNotEmpty()) {
+            turnImagePaths = attachments.mapNotNull { it.imagePath }
+        }
         val titleSource = input.ifBlank { attachments.firstOrNull()?.name.orEmpty() }
         if (_messages.value.none { it.role == ChatItem.Role.USER }) maybeNameSession(titleSource)
         _messages.value = _messages.value + ChatItem(
@@ -508,7 +512,6 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                 updateAssistant(assistantId) { it.copy(streaming = false) }
                 val finalText = _messages.value.firstOrNull { it.id == assistantId }?.content.orEmpty()
                 saveHistory("assistant", finalText, sessionSnapshot)
-                turnImagePaths = emptyList()
             }
         }
     }

@@ -725,3 +725,10 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 每条 AI 回复右上角新增绿色余额角标：显示 `¥x.xx`，点击调用 `refreshBalance()` 刷新；非 DeepSeek 服务商不显示。角标随余额 Flow 更新，不需要重建列表。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 22 个测试类 / 58 用例 / 0 失败；`lintDebug` 0 error / 447 warning；APK `dist/sgr-debug-3.6-reasoning-balance.apk`（SHA256 `CCABCB46…867C`，17MB）。
 - 未完成：本机无设备/模拟器，执行过程去重、聊天图片覆盖食材图与余额角标未真机验收；未 push。
+
+
+## 2.8 上一轮图片仍可用于配图（2026-11-24）
+
+- 聊天图片路径不再在每轮结束时清空，而是保留到切换/删除会话或下一张图片上传；用户下一轮说“把刚才那张图设成洋葱的图片”时，`set_food_image(use_attachment=true)` 仍可用。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 22 个测试类 / 58 用例 / 0 失败；`lintDebug` 0 error / 447 warning；APK `dist/sgr-debug-3.7-fixes.apk`（SHA256 `CB92835A…340D`，17MB）。
+- 未完成：本机无设备/模拟器，跨轮附件配图未真机验收；未 push。
