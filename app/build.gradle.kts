@@ -1,8 +1,19 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.kapt")
     id("org.jetbrains.kotlin.plugin.serialization")
+}
+
+// 本地发布签名；keystore/ 已在 .gitignore 中，CI 没有该文件时 release 保持未签名。
+val keystorePropsFile = rootProject.file("keystore/keystore.properties")
+val keystoreProps = Properties().apply {
+    if (keystorePropsFile.exists()) {
+        val text = keystorePropsFile.readText(Charsets.UTF_8).removePrefix("\uFEFF")
+        text.reader().use { load(it) }
+    }
 }
 
 android {
@@ -13,12 +24,23 @@ android {
         applicationId = "com.dsha.sagittarius"
         minSdk = 26
         targetSdk = 34
-        versionCode = 62
-        versionName = "1.0"
+        versionCode = 63
+        versionName = "1.1.0"
         buildConfigField("String", "SAGITTARIUS_BASE_URL", "\"https://api.deepseek.com\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+    }
+
+    signingConfigs {
+        if (keystorePropsFile.exists()) {
+            create("release") {
+                storeFile = file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
     }
 
     buildTypes {
@@ -28,6 +50,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (keystorePropsFile.exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 

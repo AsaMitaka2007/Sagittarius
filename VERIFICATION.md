@@ -732,3 +732,14 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 聊天图片路径不再在每轮结束时清空，而是保留到切换/删除会话或下一张图片上传；用户下一轮说“把刚才那张图设成洋葱的图片”时，`set_food_image(use_attachment=true)` 仍可用。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 22 个测试类 / 58 用例 / 0 失败；`lintDebug` 0 error / 447 warning；APK `dist/sgr-debug-3.7-fixes.apk`（SHA256 `CB92835A…340D`，17MB）。
 - 未完成：本机无设备/模拟器，跨轮附件配图未真机验收；未 push。
+
+
+## 3.0 1.1.0 发布（2026-11-24）
+
+- 版本：`versionCode = 63`、`versionName = "1.1.0"`；包名不变 `com.dsha.sagittarius`。
+- Release APK 使用 1.0 同一证书签名（证书 SHA-256 `66EB47B2D8A7A17A1FAC4B2EA957FF15ACCC0D3C282DADDA3DE3363D484412E4`），已用 `apksigner verify` 确认 v2 签名通过，可直接覆盖升级 1.0。
+- 本地 release 签名读取 `keystore/keystore.properties`（已 gitignore）；CI 没有该文件时只构建 debug，不会产出未签名 release。
+- 产物：`dist/sgr-release-1.1.0.apk`，大小约 14.7MB，SHA-256 `CEBB8B86F8F52483B3F849245105D30E451294F12F7A85EEB707BBC16AE4E5FB`。
+- 本次发布包含：四套主题（黑/浅/磨砂/奶油）、圆形揭开转场、星座新会话 logo、终端代码框、星芒滑条、富文本 rainbow/b/i/u 等、AI 食物配图、聊天附件（图片/CSV/Word/Excel）、余额角标、query_data 查询增强与执行过程去重。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 22 个测试类 / 58 用例 / 0 失败；`lintDebug` 0 error / 447 warning；`assembleRelease` BUILD SUCCESSFUL。
+- 未完成：本机无设备/模拟器，1.1 覆盖安装与新增视觉效果未真机验收。

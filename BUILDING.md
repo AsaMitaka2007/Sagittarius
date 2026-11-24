@@ -69,13 +69,19 @@ export ANDROID_SDK_ROOT=$ANDROID_HOME
 
 - `versionCode`：**单调递增，只增不减**，每次对外发布至少 +1。
 - `versionName`：语义化版本 `MAJOR.MINOR.PATCH`；功能新增升 MINOR，修复升 PATCH。
-- 当前基线：`versionCode = 62`、`versionName = "1.0"`（已发布 APK 同为此版本）。
-  `"1.0"` 是历史遗留的两段式写法，从下一次对外发布起按 `1.0.x` / `1.1.0` 递增。
+- 当前基线：`versionCode = 63`、`versionName = "1.1.0"`（已发布 APK 同为此版本）。
 - 改版本号时两处必须同时改，并在发布前核对 `dist/` 下 APK 与 `build.gradle.kts` 一致。
+
+## 发布签名
+
+- `app/build.gradle.kts` 会读取 `keystore/keystore.properties`（已被 `.gitignore` 忽略），
+  里面包含 `storeFile`、`storePassword`、`keyAlias`、`keyPassword`。
+- 本地有该文件时 `assembleRelease` 自动签名；CI 没有该文件时只构建 debug，不产出 release 包。
+- **不要**把 keystore、密码或 `keystore.properties` 提交到 git。
 
 ## 数据库改动
 
-- 当前 Room 版本为 **9**，schema 已导出到 `app/schemas/`。
+- 当前 Room 版本为 **11**，schema 已导出到 `app/schemas/`。
 - 改实体必须同时：`version + 1`、编写 `Migration`、重新导出 schema、补迁移测试。
 - **禁止** `fallbackToDestructiveMigration`，会清空真实用户数据。
 
