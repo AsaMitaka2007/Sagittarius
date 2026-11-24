@@ -20,7 +20,8 @@ object ToolRegistryFactory {
         clock: Clock = Clock.systemDefaultZone(),
         logger: AgentDebugLogger = NoOpAgentDebugLogger,
         bochaKeyProvider: suspend () -> String? = { null },
-        memorySaver: suspend (category: String, content: String) -> Boolean = { _, _ -> false }
+        memorySaver: suspend (category: String, content: String) -> Boolean = { _, _ -> false },
+        attachmentImagesProvider: () -> List<String> = { emptyList() }
     ): ToolRegistry {
         val expense = BudgetRepositoryExpensePort(budgetRepository)
         val diet = DietRepositoryDietPort(dietRepository)
@@ -43,7 +44,7 @@ object ToolRegistryFactory {
             register(AddDietTool(diet, clock))
             register(AddFoodToLibraryTool(diet))
             register(SetFoodUnitTool(diet))
-            register(SetFoodImageTool(diet, context.applicationContext))
+            register(SetFoodImageTool(diet, context.applicationContext, attachmentImagesProvider))
             register(ManageFoodCategoryTool(diet))
             register(SearchFoodCnLocalTool(cnSource))
             register(GetCnFoodNutritionTool(cnSource))

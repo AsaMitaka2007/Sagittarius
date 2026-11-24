@@ -31,15 +31,25 @@ import java.util.concurrent.TimeUnit
  */
 class SetFoodImageTool(
     private val diet: DietPort,
-    private val context: Context
+    private val context: Context,
+    private val attachmentImagesProvider: () -> List<String> = { emptyList() }
 ) : AgentTool {
 
     override val name = "set_food_image"
-    override val description = "给食材库中的食物设置图片：可传图片 URL，也可自动从维基共享资源搜索并下载"
+    override val description =
+        "给食材设置或更换图片：可用聊天里用户上传的图片、图片 URL，或自动从维基共享资源搜索下载"
     override val parametersSchema: JsonObject = buildJsonObject {
         put("type", "object")
         put("properties", buildJsonObject {
             put("food_name", buildJsonObject { put("type", "string") })
+            put("use_attachment", buildJsonObject {
+                put("type", "boolean")
+                put("description", "true 时使用用户本轮上传的图片附件")
+            })
+            put("attachment_index", buildJsonObject {
+                put("type", "integer")
+                put("description", "使用第几张图片附件，从 0 开始，默认 0")
+            })
             put("image_url", buildJsonObject {
                 put("type", "string")
                 put("description", "可选；http/https 图片地址。为空时自动搜索")
@@ -48,7 +58,10 @@ class SetFoodImageTool(
                 put("type", "string")
                 put("description", "可选；自动搜索用的关键词，中文或英文均可")
             })
-            put("overwrite", buildJsonObject { put("type", "boolean") })
+            put("overwrite", buildJsonObject {
+                put("type", "boolean")
+                put("description", "默认 true；传 false 时已有图片不会被替换")
+            })
         })
         put("required", kotlinx.serialization.json.buildJsonArray {
             add(kotlinx.serialization.json.JsonPrimitive("food_name"))
@@ -59,27 +72,41 @@ class SetFoodImageTool(
         val foodName = args["food_name"]?.jsonPrimitive?.content?.trim().orEmpty()
         if (foodName.isEmpty()) return@withContext fail("缺少食物名称")
         val food = diet.findFoodByName(foodName) ?: return@withContext fail("食材库里没有「$foodName」，请先用 add_food_to_library 添加")
-        val overwrite = args["overwrite"]?.jsonPrimitive?.content?.toBooleanStrictOrNull() ?: false
+        val overwrite = args["overwrite"]?.jsonPrimitive?.content?.toBooleanStrictOrNull() ?: true
         if (!overwrite && !food.imageUri.isNullOrBlank()) {
-            return@withContext fail("「$foodName」已有图片；如需更换请传 overwrite=true")
+            return@withContext fail("「$foodName」已有图片；如需更换请不要传 overwrite=false")
         }
 
-        val provided = args["image_url"]?.jsonPrimitive?.content?.trim().orEmpty()
-        val query = args["search_query"]?.jsonPrimitive?.content?.trim()
-            ?.takeIf { it.isNotEmpty() } ?: foodName
-        val candidate = if (provided.isNotEmpty()) {
-            ImageCandidate(provided, "用户指定")
+        val useAttachment = args["use_attachment"]?.jsonPrimitive?.content
+            ?.toBooleanStrictOrNull() ?: false
+        val saved: File
+        val credit: String
+        if (useAttachment) {
+            val index = (args["attachment_index"]?.jsonPrimitive?.content?.toIntOrNull() ?: 0)
+                .coerceAtLeast(0)
+            val path = attachmentImagesProvider().getOrNull(index)
+                ?: return@withContext fail("本轮没有可用的图片附件，请让用户重新发送图片")
+            saved = copyAttachment(path, food.id)
+                ?: return@withContext fail("图片附件读取失败")
+            credit = "用户上传的聊天图片"
         } else {
-            searchCommons(query) ?: return@withContext fail("没有搜到「$query」的图片，请换一个搜索词或直接给图片 URL")
+            val provided = args["image_url"]?.jsonPrimitive?.content?.trim().orEmpty()
+            val query = args["search_query"]?.jsonPrimitive?.content?.trim()
+                ?.takeIf { it.isNotEmpty() } ?: foodName
+            val candidate = if (provided.isNotEmpty()) {
+                ImageCandidate(provided, "用户指定")
+            } else {
+                searchCommons(query) ?: return@withContext fail("没有搜到「$query」的图片，请换一个搜索词或直接给图片 URL")
+            }
+            saved = downloadAndSave(candidate.url, food.id)
+                ?: return@withContext fail("图片下载或解码失败")
+            credit = candidate.credit
         }
-
-        val saved = downloadAndSave(candidate.url, food.id)
-            ?: return@withContext fail("图片下载或解码失败")
         if (!diet.updateFoodImage(food.id, saved.absolutePath)) {
             return@withContext fail("写入食材图片失败")
         }
         val message = "已为「$foodName」设置图片" +
-            if (candidate.credit.isNotBlank()) "（${candidate.credit}）" else ""
+            if (credit.isNotBlank()) "（$credit）" else ""
         ToolResult(
             true,
             buildJsonObject {
@@ -87,7 +114,7 @@ class SetFoodImageTool(
                 put("name", food.name)
                 put("id", food.id)
                 put("image_path", saved.absolutePath)
-                put("source", candidate.credit)
+                put("source", credit)
             }.toString(),
             message
         )
@@ -141,6 +168,18 @@ class SetFoodImageTool(
                 }
         }.getOrNull() ?: return null
         val bitmap = decodeScaled(bytes) ?: return null
+        return saveBitmap(bitmap, foodId)
+    }
+
+    /** 把聊天附件图片复制成食材库图片。 */
+    private fun copyAttachment(path: String, foodId: Long): File? {
+        val file = File(path)
+        if (!file.exists()) return null
+        val bitmap = decodeScaled(file.readBytes()) ?: return null
+        return saveBitmap(bitmap, foodId)
+    }
+
+    private fun saveBitmap(bitmap: Bitmap, foodId: Long): File? {
         val dir = File(context.filesDir, "food_images").apply { mkdirs() }
         val target = File(dir, "food_${foodId}_${System.currentTimeMillis()}.jpg")
         val ok = runCatching {

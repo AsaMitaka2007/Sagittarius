@@ -108,9 +108,6 @@ class OkHttpLlmClient(
                         }
                         if (parsed.content.isNotBlank()) {
                             send(LlmEvent.ContentDelta(parsed.content))
-                        } else if (parsed.reasoning.isNotBlank()) {
-                            // 推理模型 content 可能为空，严格按需求用 reasoning_content 兜底展示。
-                            send(LlmEvent.ContentDelta(parsed.reasoning))
                         }
                         parsed.toolCalls.forEachIndexed { index, callInfo ->
                             send(

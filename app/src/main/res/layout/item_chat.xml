@@ -13,6 +13,22 @@
         android:padding="12dp">
 
         <TextView
+            android:id="@+id/tvBalance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginBottom="2dp"
+            android:background="@drawable/bg_agent_balance"
+            android:contentDescription="@string/agent_balance_refresh"
+            android:paddingStart="7dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="7dp"
+            android:paddingBottom="2dp"
+            android:textColor="#34D399"
+            android:textSize="10sp"
+            android:visibility="gone" />
+
+        <TextView
             android:id="@+id/tvWorkflowHeader"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -53,6 +53,8 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
     var onItemLongClick: ((ChatItem) -> Unit)? = null
     var onToolClick: ((ToolTrace) -> Unit)? = null
     var onChoiceSelected: ((ChatItem, ChatChoice) -> Unit)? = null
+    var onBalanceClick: (() -> Unit)? = null
+    private var balanceText: String? = null
     private val answeredChoices = mutableSetOf<String>()
     private val expanded = mutableSetOf<Long>()
     private val detailsExpanded = mutableSetOf<Long>()
@@ -65,6 +67,12 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
         return Holder(view)
     }
 
+    fun setBalance(text: String?) {
+        if (balanceText == text) return
+        balanceText = text
+        if (itemCount > 0) notifyItemRangeChanged(0, itemCount)
+    }
+
     override fun onBindViewHolder(holder: Holder, position: Int) = holder.bind(getItem(position))
 
     override fun onViewRecycled(holder: Holder) {
@@ -74,6 +82,7 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
 
     inner class Holder(view: View) : RecyclerView.ViewHolder(view) {
         private val bubble: View = view.findViewById(R.id.bubble)
+        private val balance: TextView = view.findViewById(R.id.tvBalance)
         private val content: RichTextView = view.findViewById(R.id.tvContent)
         private val attachmentLine: RichTextView = view.findViewById(R.id.tvAttachments)
         private val reasoning: TextView = view.findViewById(R.id.tvReasoning)
@@ -114,6 +123,12 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
             detailsBody.maxWidth = innerMax
             tail.maxWidth = innerMax
             attachmentLine.maxWidth = innerMax
+            val showBalance = !isUser && !balanceText.isNullOrBlank()
+            balance.visibility = if (showBalance) View.VISIBLE else View.GONE
+            if (showBalance) {
+                balance.text = balanceText
+                balance.setOnClickListener { onBalanceClick?.invoke() }
+            }
             if (item.attachments.isNotEmpty()) {
                 attachmentLine.visibility = View.VISIBLE
                 attachmentLine.text = item.attachments.joinToString("   ") { "📎 $it" }

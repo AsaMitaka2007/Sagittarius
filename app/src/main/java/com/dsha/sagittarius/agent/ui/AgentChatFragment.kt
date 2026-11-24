@@ -79,6 +79,7 @@ class AgentChatFragment : Fragment() {
                 binding.root.performHapticFeedback(android.view.HapticFeedbackConstants.KEYBOARD_TAP)
                 viewModel.sendChoice(item.id, choice)
             }
+            onBalanceClick = { viewModel.refreshBalance() }
         }
         binding.recyclerChat.layoutManager = LinearLayoutManager(requireContext()).apply {
             stackFromEnd = true
@@ -193,6 +194,7 @@ class AgentChatFragment : Fragment() {
                     }
                 }
                 launch { viewModel.webSearchEnabled.collect { updateWebSearchButton(it) } }
+                launch { viewModel.balanceText.collect { adapter.setBalance(it) } }
                 launch {
                     viewModel.sessions.collect { sessions ->
                         sessionAdapter?.submit(

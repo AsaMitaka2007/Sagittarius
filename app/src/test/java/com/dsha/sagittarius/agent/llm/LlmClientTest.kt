@@ -43,7 +43,7 @@ class LlmClientTest {
         assertTrue(body.containsKey("tools"))
     }
 
-    @Test fun emptyContentFallsBackToReasoning() = runBlocking {
+    @Test fun emptyContentStaysInReasoning() = runBlocking {
         server.enqueue(
             MockResponse().setResponseCode(200).setBody(
                 """{"choices":[{"message":{"content":null,"reasoning_content":"推理答案"},"finish_reason":"stop"}]}"""
@@ -53,7 +53,8 @@ class LlmClientTest {
         val events = client.stream(
             LlmRequest("deepseek-flash", listOf(ChatMessage("user", "你好")), JsonArray(emptyList()), false, "off", 4096)
         ).toList()
-        assertTrue(events.any { it is LlmEvent.ContentDelta && it.text == "推理答案" })
+        assertTrue(events.any { it is LlmEvent.ReasoningDelta && it.text == "推理答案" })
+        assertFalse(events.any { it is LlmEvent.ContentDelta })
     }
 
     @Test fun deepSeekEffortAndGlmForcedThinking() = runBlocking {

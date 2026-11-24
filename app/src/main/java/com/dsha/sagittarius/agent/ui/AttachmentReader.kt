@@ -21,6 +21,8 @@ data class ChatAttachment(
     val mime: String,
     val text: String? = null,
     val imageBase64: String? = null,
+    /** 压缩后的本地图片路径，供“设为食材图片”工具使用。 */
+    val imagePath: String? = null,
     val note: String? = null
 )
 
@@ -71,8 +73,18 @@ object AttachmentReader {
         val out = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)
         bitmap.recycle()
-        val base64 = Base64.encodeToString(out.toByteArray(), Base64.NO_WRAP)
-        return ChatAttachment(name, "image/jpeg", imageBase64 = "data:image/jpeg;base64,$base64")
+        val jpeg = out.toByteArray()
+        val base64 = Base64.encodeToString(jpeg, Base64.NO_WRAP)
+        val path = runCatching {
+            val dir = File(context.cacheDir, "agent_attachments").apply { mkdirs() }
+            File(dir, "attach_${System.nanoTime()}.jpg").also { it.writeBytes(jpeg) }.absolutePath
+        }.getOrNull()
+        return ChatAttachment(
+            name,
+            "image/jpeg",
+            imageBase64 = "data:image/jpeg;base64,$base64",
+            imagePath = path
+        )
     }
 
     private fun readText(context: Context, uri: Uri, name: String, mime: String): ChatAttachment {

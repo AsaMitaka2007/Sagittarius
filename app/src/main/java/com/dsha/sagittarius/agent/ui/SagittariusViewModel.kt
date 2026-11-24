@@ -96,6 +96,8 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
     private val _webSearchEnabled = MutableStateFlow(prefs.webSearchEnabled.value)
     val webSearchEnabled: StateFlow<Boolean> = _webSearchEnabled.asStateFlow()
     private var hadToolInLastTurn = false
+    /** 本轮聊天图片的本地路径，供 set_food_image(use_attachment=true) 使用。 */
+    private var turnImagePaths: List<String> = emptyList()
 
     init {
         _messages.value = listOf(
@@ -321,7 +323,8 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
             app, app.repository, app.dietRepository,
             logger = debugLogger,
             bochaKeyProvider = { keyStore.load("bocha") },
-            memorySaver = { category, content -> rememberPreference(category, content) }
+            memorySaver = { category, content -> rememberPreference(category, content) },
+            attachmentImagesProvider = { turnImagePaths }
         )
         _tools.value = registry.all()
         engine = AgentEngine(
@@ -393,6 +396,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         }.trim()
         _lastError.value = null
         hadToolInLastTurn = false
+        turnImagePaths = attachments.mapNotNull { it.imagePath }
         val titleSource = input.ifBlank { attachments.firstOrNull()?.name.orEmpty() }
         if (_messages.value.none { it.role == ChatItem.Role.USER }) maybeNameSession(titleSource)
         _messages.value = _messages.value + ChatItem(
@@ -504,6 +508,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                 updateAssistant(assistantId) { it.copy(streaming = false) }
                 val finalText = _messages.value.firstOrNull { it.id == assistantId }?.content.orEmpty()
                 saveHistory("assistant", finalText, sessionSnapshot)
+                turnImagePaths = emptyList()
             }
         }
     }

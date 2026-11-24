@@ -716,3 +716,12 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 提示词改为“图片会随本轮消息发送，接口不接受时系统自动降级”，不再宣称 DeepSeek 不能读图。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 22 个测试类 / 58 用例 / 0 失败；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-3.5-vision.apk`（SHA256 `CA304607…844B`，17MB）。
 - 未完成：本机无设备/模拟器，真实接口的图片请求与 400 降级路径未联调；未 push。
+
+
+## 2.7 执行过程去重、附件配图与余额角标（2026-11-24）
+
+- 修复执行过程重复：移除了 `OkHttpLlmClient` 在 content 为空时把 reasoning 当作正文发送的兜底；`AgentEngine` 再对“content 与 reasoning 完全相同/以 reasoning 开头”的响应做去重。执行过程只留在默认折叠的“执行过程”里，正文只显示最终输出；只有思考没有正文时正文区留空，不再把思考塞进对话。
+- 用户上传的图片可直接设为食材图片：聊天图片压缩后会同时写入 cache 路径，VM 把本轮图片路径通过 `attachmentImagesProvider` 传给 `set_food_image`；工具新增 `use_attachment` 与 `attachment_index`，默认允许覆盖已有图片（`overwrite=true`），提示词同步说明。
+- 每条 AI 回复右上角新增绿色余额角标：显示 `¥x.xx`，点击调用 `refreshBalance()` 刷新；非 DeepSeek 服务商不显示。角标随余额 Flow 更新，不需要重建列表。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 22 个测试类 / 58 用例 / 0 失败；`lintDebug` 0 error / 447 warning；APK `dist/sgr-debug-3.6-reasoning-balance.apk`（SHA256 `CCABCB46…867C`，17MB）。
+- 未完成：本机无设备/模拟器，执行过程去重、聊天图片覆盖食材图与余额角标未真机验收；未 push。

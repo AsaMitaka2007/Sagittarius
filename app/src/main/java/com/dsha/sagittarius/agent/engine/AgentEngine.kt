@@ -126,15 +126,24 @@ class AgentEngine(
                 return@flow
             }
             val toolCalls = calls.toSortedMap().values.mapNotNull { it.build() }
-            val contentText = content.toString()
-            if (contentText.isBlank() && toolCalls.isEmpty()) {
+            val reasoningText = reasoning.toString()
+            val rawContent = content.toString()
+            // 部分服务商把思考内容同时塞进 content，避免对话里重复显示“执行过程”。
+            val contentText = when {
+                reasoningText.isBlank() -> rawContent
+                rawContent.trim() == reasoningText.trim() -> ""
+                rawContent.trim().startsWith(reasoningText.trim()) ->
+                    rawContent.trim().removePrefix(reasoningText.trim()).trim()
+                else -> rawContent
+            }
+            if (contentText.isBlank() && reasoningText.isBlank() && toolCalls.isEmpty()) {
                 emit(AgentEvent.Failed(LlmError(LlmError.Kind.BAD_REQUEST, "模型没有返回内容，请重试")))
                 return@flow
             }
             val assistant = ChatMessage(
                 role = "assistant",
                 content = contentText.ifBlank { null },
-                reasoningContent = reasoning.toString().ifEmpty { null },
+                reasoningContent = reasoningText.ifEmpty { null },
                 toolCalls = toolCalls
             )
             history += assistant

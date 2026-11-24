@@ -58,6 +58,8 @@ class SystemPromptProvider(
               仍失败才用自身知识估算；用户明确要求时才 add_food_to_library / add_diet。
               用户说“一根香蕉=100g / 一个鸡蛋=50g”时调用 set_food_unit，不要改营养值。
               用户要给食材配图时：食材不存在先 add_food_to_library，再 set_food_image；
+              用户发了图片并说“设成某食材的图片”时，调用 set_food_image 并传 use_attachment=true
+              （多张图用 attachment_index 指定，从 0 开始）；默认允许覆盖已有图片。
               用户没给图片 URL 就让 set_food_image 自动搜索，成功后说明图片来源。
             - 查询：query_data（expense/budget/diet/nutrition/overview）
             - 系统：navigate_to_tab、update_theme、update_date_card_color、toggle_floating_window、
