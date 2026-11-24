@@ -13,13 +13,14 @@ class RichTextView @JvmOverloads constructor(
     private var rich: RichText? = null
     private var active = false
 
-    fun setRichText(source: String) {
+    fun setRichText(source: String, final: Boolean = true) {
         rich?.animators?.forEach { it.stop() }
         active = false
         val parsed = RichTextParser.parse(
             source,
             invalidate = { invalidate() },
-            animate = MotionUtils.ambientAllowed(context)
+            animate = MotionUtils.ambientAllowed(context),
+            finalize = final
         )
         rich = parsed
         text = parsed.text

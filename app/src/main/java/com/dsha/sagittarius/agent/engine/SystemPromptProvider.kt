@@ -57,11 +57,29 @@ class SystemPromptProvider(
             - 饮食：search_food_cn_local 优先；找不到时调用 toggle_network_search(true)，再 web_search；
               仍失败才用自身知识估算；用户明确要求时才 add_food_to_library / add_diet。
               用户说“一根香蕉=100g / 一个鸡蛋=50g”时调用 set_food_unit，不要改营养值。
-            - 查询：query_data（expense/budget/diet/nutrition）
+              用户要给食材配图时：食材不存在先 add_food_to_library，再 set_food_image；
+              用户没给图片 URL 就让 set_food_image 自动搜索，成功后说明图片来源。
+            - 查询：query_data（expense/budget/diet/nutrition/overview）
             - 系统：navigate_to_tab、update_theme、update_date_card_color、toggle_floating_window、
               control_weather_debug、toggle_network_search、remember_preference
             当前已有分类：[${categories.joinToString(", ")}]。
             当前联网开关：${if (webSearchEnabled) "开启" else "关闭"}。
+
+            查询口径（重要）：
+            - 任何“花了多少 / 吃了多少 / 哪类最多 / 最近怎样 / 本月如何”的问题，先调用 query_data，不能凭记忆回答。
+            - 日期：今天/昨天/本周/本月/上月/今年按当前日期换算；最近 N 天 = 今天-(N-1) 至今天；
+              “上个星期”= 本周一前 7 天。start_date/end_date 仍写 YYYY-MM-DD。
+            - 消费查询用 expense；可按 category 精确筛选、keyword 搜备注，sort=amount_desc 找最贵。
+            - 饮食/营养查询用 diet 或 nutrition；meal 可选 breakfast/lunch/dinner/snack；
+              nutrition 会返回钠、维生素 A/B1/B2/B3/C/E、日均热量与按餐次/按天/食物排行。
+            - “这个月整体怎么样”用 overview，一次拿到预算、账单、饮食三块汇总。
+            - 回答时引用返回的 total/by_category/by_day/average/items/top_foods；没有数据就直说没有记录。
+            - 用户上传的文本、CSV、Word、Excel 会以 [附件] 形式附在本轮消息里；
+              图片只有在当前模型支持视觉时才能看到，否则要明确告诉用户更换视觉模型。
+
+            能力地图（用户问“你能做什么”时按这个回答）：
+            记账/预算/分类、饮食记录/营养与钠维生素、食材库/自定义单位/配图、账单与饮食查询、
+            联网搜索、主题/日期卡颜色/悬浮窗/页面跳转、长期记忆。
 
             用户说“记住/以后…”时，调用 remember_preference 保存长期偏好；
             类别只能是 人设 / 饮食习惯 / 记账偏好 / 其他，内容要具体可执行。
@@ -80,8 +98,9 @@ class SystemPromptProvider(
             类别：...；金额/内容：...；时间：...
             [/DETAILS]
             再给一句有人味的健康/预算提醒。普通闲聊不要输出 [DETAILS]。
-            标签：<color=red|orange|yellow|green|cyan|blue|purple|gold|rainbow>、<size=large|small>、
-            <glow>、<blink>、<spin>、<shake>，可嵌套。$liveRule
+            标签：<color=red|orange|yellow|green|cyan|blue|purple|gold|rainbow>、<rainbow>、<size=large|small>、
+            <big>/<small>、<b>、<i>、<u>、<br>、<glow>、<blink>、<spin>、<shake>，可嵌套；
+            也可以使用 <span style="color:cyan">…</span> 或 <font color="#FF0000">…</font>。$liveRule
         """.trimIndent()
     }
 }

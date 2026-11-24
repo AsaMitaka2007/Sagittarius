@@ -174,19 +174,23 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                 var maxId = 0L
                 val items = rows.map { row ->
                     maxId = maxOf(maxId, row.id)
+                    val role = if (row.role == "user") ChatItem.Role.USER else ChatItem.Role.ASSISTANT
+                    val display = if (role == ChatItem.Role.USER) {
+                        splitAttachmentHistory(row.content)
+                    } else {
+                        row.content to emptyList()
+                    }
                     ChatItem(
                         id = row.id,
-                        role = if (row.role == "user") ChatItem.Role.USER else ChatItem.Role.ASSISTANT,
-                        content = row.content
+                        role = role,
+                        content = display.first,
+                        attachments = display.second
                     )
                 }
                 idGen.set(maxId + 1)
                 _messages.value = items
-                engine?.restoreHistory(items.map {
-                    ChatMessage(
-                        role = if (it.role == ChatItem.Role.USER) "user" else "assistant",
-                        content = it.content
-                    )
+                engine?.restoreHistory(rows.map {
+                    ChatMessage(role = it.role, content = it.content)
                 })
             }
         }
@@ -366,19 +370,45 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         send(choice.value)
     }
 
-    fun send(text: String) {
+    fun send(text: String, attachments: List<ChatAttachment> = emptyList()) {
         val input = text.trim()
-        if (input.isEmpty() || _generating.value) return
+        if ((input.isEmpty() && attachments.isEmpty()) || _generating.value) return
         val engine = engine ?: return
+        val vision = supportsVision(_modelId.value)
+        val imageDataUrls = if (vision) attachments.mapNotNull { it.imageBase64 } else emptyList()
+        val modelText = buildString {
+            append(input)
+            attachments.forEach { attachment ->
+                when {
+                    attachment.text != null -> append(
+                        "\n\n[附件: ${attachment.name}]\n${attachment.text}\n[/附件]"
+                    )
+                    attachment.imageBase64 != null -> append(
+                        "\n\n[图片附件: ${attachment.name}]" +
+                            if (vision) "" else "（当前模型不支持读图，请建议用户换用视觉模型）"
+                    )
+                    attachment.note != null -> append(
+                        "\n\n[附件: ${attachment.name}] ${attachment.note}"
+                    )
+                }
+            }
+        }.trim()
         _lastError.value = null
         hadToolInLastTurn = false
-        if (_messages.value.none { it.role == ChatItem.Role.USER }) maybeNameSession(input)
-        _messages.value = _messages.value + ChatItem(idGen.incrementAndGet(), ChatItem.Role.USER, input)
+        val titleSource = input.ifBlank { attachments.firstOrNull()?.name.orEmpty() }
+        if (_messages.value.none { it.role == ChatItem.Role.USER }) maybeNameSession(titleSource)
+        _messages.value = _messages.value + ChatItem(
+            id = idGen.incrementAndGet(),
+            role = ChatItem.Role.USER,
+            content = input,
+            attachments = attachments.map { it.name }
+        )
         val sessionSnapshot = _sessionId.value
-        saveHistory("user", input, sessionSnapshot)
+        saveHistory("user", modelText, sessionSnapshot)
         AgentRuntimeLog.info(
             "请求 provider=${_provider.value} model=${_modelId.value} " +
-                "effort=${_effort.value} web=${_webSearchEnabled.value} session=$sessionSnapshot"
+                "effort=${_effort.value} web=${_webSearchEnabled.value} " +
+                "attachments=${attachments.size} session=$sessionSnapshot"
         )
         val assistantId = idGen.incrementAndGet()
         _messages.value = _messages.value + ChatItem(
@@ -390,11 +420,12 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         generateJob = viewModelScope.launch {
             try {
                 engine.send(
-                    input,
+                    modelText,
                     _modelId.value,
                     _effort.value,
                     toolsEnabled = config().supportsTools && !toolsDisabled,
-                    webSearchEnabled = _webSearchEnabled.value
+                    webSearchEnabled = _webSearchEnabled.value,
+                    imageDataUrls = imageDataUrls
                 ).collect { event ->
                     when (event) {
                         is AgentEvent.Started -> Unit
@@ -477,6 +508,29 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                 saveHistory("assistant", finalText, sessionSnapshot)
             }
         }
+    }
+
+    /** 历史里的附件正文不展示，只还原附件名，避免气泡被整份表格撑满。 */
+    private fun splitAttachmentHistory(content: String): Pair<String, List<String>> {
+        val names = Regex("\\[(?:图片)?附件:\\s*([^\\]]+)\\]").findAll(content)
+            .map { it.groupValues[1].trim() }
+            .filter { it.isNotEmpty() }
+            .distinct()
+            .toList()
+        val display = content
+            .replace(Regex("\\[附件:[\\s\\S]*?\\[/附件\\]", RegexOption.IGNORE_CASE), "")
+            .replace(Regex("\\[图片附件:[^\\]]*\\](（[^）]*）)?"), "")
+            .trim()
+        return display to names
+    }
+
+    /** 粗略判断当前模型是否支持图片输入；不匹配时只把图片作为文件名提示。 */
+    private fun supportsVision(model: String): Boolean {
+        val name = model.lowercase()
+        return listOf(
+            "vision", "-vl", "vl-", "4v", "glm-4v", "gpt-4o", "gpt-4.1",
+            "gemini", "claude", "qwen-vl", "llava", "pixtral", "internvl"
+        ).any { name.contains(it) }
     }
 
     private fun friendlyError(error: com.dsha.sagittarius.agent.llm.LlmError): String = when (error.kind) {

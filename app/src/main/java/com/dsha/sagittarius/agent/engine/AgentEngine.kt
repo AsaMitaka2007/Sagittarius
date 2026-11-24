@@ -43,12 +43,19 @@ class AgentEngine(
         model: String,
         effort: String,
         toolsEnabled: Boolean = true,
-        webSearchEnabled: Boolean = false
+        webSearchEnabled: Boolean = false,
+        imageDataUrls: List<String> = emptyList()
     ): Flow<AgentEvent> = flow {
         emit(AgentEvent.Started)
         // 清理历史里可能存在的空 assistant，避免后续请求 400。
         history.removeAll { it.isInvalidAssistant() }
-        history += ChatMessage(role = "user", content = text)
+        // 图片只在本轮携带，后续轮次改为文字上下文，避免每轮重复上传 base64。
+        for (index in history.indices) {
+            if (history[index].imageDataUrls.isNotEmpty()) {
+                history[index] = history[index].copy(imageDataUrls = emptyList())
+            }
+        }
+        history += ChatMessage(role = "user", content = text, imageDataUrls = imageDataUrls)
         var allowTools = toolsEnabled
         var webAllowed = webSearchEnabled
         var rounds = 0

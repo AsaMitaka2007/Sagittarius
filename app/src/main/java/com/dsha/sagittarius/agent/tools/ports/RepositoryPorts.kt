@@ -63,6 +63,13 @@ class DietRepositoryDietPort(private val repository: DietRepository) : DietPort 
     override suspend fun addRecord(record: DietRecordEntity): Long = repository.addRecord(record)
     override suspend fun addFood(food: FoodEntity): FoodEntity? = repository.addFood(food)
     override suspend fun updateFood(food: FoodEntity) = repository.updateFood(food)
+
+    override suspend fun updateFoodImage(foodId: Long, imagePath: String): Boolean {
+        val food = repository.getFood(foodId) ?: return false
+        repository.updateFood(food.copy(imageUri = imagePath))
+        return true
+    }
+
     override suspend fun deleteFood(food: FoodEntity): Boolean = repository.deleteFood(food)
     override suspend fun recordsBetween(start: LocalDate, end: LocalDate): List<DietRecordEntity> =
         repository.getRecordsBetween(start, end)

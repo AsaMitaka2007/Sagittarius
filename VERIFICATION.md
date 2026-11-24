@@ -696,3 +696,13 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - Agent 主题保持半透明窗口（`windowIsTranslucent=true`、透明 window 背景），`contentRoot` 使用 `bg_screen_black` 不透明墨底；首页退场 `agent_fade_hold` 保持 1400ms，覆盖 980ms 扩散 + 淡出。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 21 个测试类 / 55 用例 / 0 失败；`lintDebug` 0 error / 444 warning；APK `dist/sgr-debug-3.3-reveal.apk`（SHA256 `0990C9AF…EB4F`，17MB）。
 - 未完成：本机无设备/模拟器，圆形裁剪边缘是否锯齿、首页是否完整透出未真机验收；未 push。
+
+
+## 2.5 特效标签、食材配图、附件与查询增强（2026-11-24）
+
+- 富文本：新增 `<rainbow>`、`<b>/<strong>`、`<i>/<em>`、`<u>`、`<big>/<small>`、`<br>`；`<span style="font-weight:bold|font-style:italic|text-decoration:underline">` 在无颜色时也能生效；非流式最终文本会补齐漏写的闭合标签，不再出现“标签写了但没效果”。
+- 食材配图：新增 `set_food_image` 工具。可传图片 URL，或按食物名/关键词从 Wikimedia Commons 搜索 900px 缩略图；下载后压缩为 JPEG 存入应用私有目录并写回 `foods.imageUri`，工具结果会带作者与许可信息。食材不存在时会提示先 `add_food_to_library`。同步移除思考提示里的“为了省钱钱，不会爬图图…”。
+- 聊天附件：dock 新增回形针按钮（最多 3 个），支持图片、TXT/MD/CSV/TSV/JSON/XML、DOCX、XLSX；文本/表格提取纯文本（每条上限 12000 字），图片压到 1024px 后转 data URL。文本附件以 `[附件]` 追加到本轮消息；图片仅在模型名匹配视觉模型（vision/vl/4v/gpt-4o/gemini/claude/qwen-vl/llava 等）时以 OpenAI 兼容的 `image_url` 发送，否则提示换视觉模型。用户气泡显示附件名，历史回放时剥离附件正文，避免撑满气泡。
+- 查询增强：`query_data` 支持 expense/budget/diet/nutrition/overview、日期相对词（today/yesterday/this_week/this_month/last_month）、category/keyword/meal 筛选、sort、limit、include_items；返回分类/按日/按餐次/食物排行、日均、最大单笔、钠与维生素 A/B1/B2/B3/C/E。系统提示词新增查询口径与能力地图；旧 `query_app_data` 不再注册，避免选错工具。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` **22 个测试类 / 58 用例 / 0 失败**（新增 QueryDataTool 3 例）；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-3.4-tools.apk`（SHA256 `0FB01F2D…86D5`，17MB）。
+- 未完成：本机无设备/模拟器，附件选择/解析、视觉模型读图、Wikimedia 搜图、富文本特效与新查询口径未做真机与真实 API 联调；PDF 仅提示不支持；未 push。

@@ -4,6 +4,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.graphics.RectF
+import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.view.KeyEvent
@@ -17,6 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -47,6 +49,10 @@ class AgentChatFragment : Fragment() {
     private var sessionSelectAll: TextView? = null
     private var sessionDelete: TextView? = null
     private var sessionSelectToggle: TextView? = null
+    private val pendingAttachments = mutableListOf<ChatAttachment>()
+    private val pickAttachments = registerForActivityResult(
+        ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris -> loadAttachments(uris) }
 
     private enum class CapsuleKind { SESSION, REASONING }
 
@@ -89,6 +95,14 @@ class AgentChatFragment : Fragment() {
         }
         binding.btnSessions.setOnClickListener { showSessionCapsule() }
         binding.btnWebSearch.setOnClickListener { viewModel.toggleWebSearch() }
+        binding.btnAttach.setOnClickListener {
+            val remaining = MAX_ATTACHMENTS - pendingAttachments.size
+            if (remaining <= 0) {
+                Toast.makeText(requireContext(), R.string.agent_attachment_limit, Toast.LENGTH_SHORT).show()
+            } else {
+                pickAttachments.launch(arrayOf("*/*"))
+            }
+        }
         binding.btnReasoning.setOnClickListener { showReasoningCapsule() }
         binding.btnRetry.setOnClickListener { viewModel.retry() }
         binding.btnScrollBottom.setOnClickListener { scrollToBottom() }
@@ -223,14 +237,64 @@ class AgentChatFragment : Fragment() {
         }
     }
 
+    private fun loadAttachments(uris: List<Uri>) {
+        if (uris.isEmpty()) return
+        val slots = MAX_ATTACHMENTS - pendingAttachments.size
+        if (slots <= 0) {
+            Toast.makeText(requireContext(), R.string.agent_attachment_limit, Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (uris.size > slots) {
+            Toast.makeText(requireContext(), R.string.agent_attachment_limit, Toast.LENGTH_SHORT).show()
+        }
+        viewLifecycleOwner.lifecycleScope.launch {
+            Toast.makeText(requireContext(), R.string.agent_attachment_reading, Toast.LENGTH_SHORT).show()
+            val loaded = uris.take(slots).mapNotNull { uri ->
+                runCatching { AttachmentReader.read(requireContext(), uri) }.getOrNull()
+            }
+            if (_binding == null) return@launch
+            pendingAttachments += loaded
+            renderAttachmentChips()
+            updateSendButton()
+        }
+    }
+
+    private fun renderAttachmentChips() {
+        val row = binding.attachmentRow
+        row.removeAllViews()
+        binding.attachmentScroll.visibility =
+            if (pendingAttachments.isEmpty()) View.GONE else View.VISIBLE
+        pendingAttachments.toList().forEach { attachment ->
+            val chip = TextView(requireContext()).apply {
+                text = "📎 ${attachment.name}  ×"
+                setTextColor(AgentInkColors.CREAM)
+                textSize = 10f
+                background = ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink_border)
+                setPadding(dp(10f), dp(6f), dp(10f), dp(6f))
+                setOnClickListener {
+                    pendingAttachments.remove(attachment)
+                    renderAttachmentChips()
+                    updateSendButton()
+                }
+            }
+            row.addView(chip, LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { marginEnd = dp(8f) })
+        }
+    }
+
+    private fun dp(value: Float): Int = (value * resources.displayMetrics.density).toInt()
+
     private fun updateSendButton() {
         val generating = viewModel.generating.value
         binding.btnSend.text = if (generating) "■" else "↑"
         binding.btnSend.contentDescription = getString(
             if (generating) R.string.agent_stop else R.string.agent_send
         )
-        binding.btnSend.isEnabled =
-            generating || binding.etInput.text?.toString()?.isNotBlank() == true
+        binding.btnSend.isEnabled = generating ||
+            binding.etInput.text?.toString()?.isNotBlank() == true ||
+            pendingAttachments.isNotEmpty()
         binding.btnSend.alpha = if (binding.btnSend.isEnabled) 1f else 0.45f
         binding.btnSend.background =
             ContextCompat.getDrawable(requireContext(), R.drawable.bg_agent_ink)
@@ -628,12 +692,15 @@ class AgentChatFragment : Fragment() {
 
     private fun sendCurrentInput() {
         val text = binding.etInput.text?.toString()?.trim().orEmpty()
-        if (text.isEmpty() || viewModel.generating.value) return
+        if ((text.isEmpty() && pendingAttachments.isEmpty()) || viewModel.generating.value) return
+        val attachments = pendingAttachments.toList()
         binding.etInput.setText("")
         binding.etInput.clearFocus()
+        pendingAttachments.clear()
+        renderAttachmentChips()
         val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(binding.etInput.windowToken, 0)
-        viewModel.send(text)
+        viewModel.send(text, attachments)
         updateSendButton()
     }
 
@@ -675,5 +742,9 @@ class AgentChatFragment : Fragment() {
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
+    }
+
+    private companion object {
+        const val MAX_ATTACHMENTS = 3
     }
 }

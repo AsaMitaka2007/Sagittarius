@@ -7,6 +7,7 @@ import android.graphics.LinearGradient
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Shader
+import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
 import android.text.TextPaint
@@ -14,6 +15,8 @@ import android.text.style.CharacterStyle
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
 import android.text.style.ReplacementSpan
+import android.text.style.StyleSpan
+import android.text.style.UnderlineSpan
 import kotlin.math.sin
 
 interface AnimatableRichSpan {
@@ -35,10 +38,20 @@ object RichTextParser {
         val origin: String = name
     )
 
-    private val recognized = setOf("color", "size", "glow", "blink", "spin", "shake")
+    private val recognized = setOf(
+        "color", "size", "bold", "italic", "underline", "glow", "blink", "spin", "shake"
+    )
     private val colorPattern = Regex("color\\s*[:=]\\s*([^;\"']+)", RegexOption.IGNORE_CASE)
+    private val boldPattern = Regex("font-weight\\s*:\\s*(bold|[6-9]00)", RegexOption.IGNORE_CASE)
+    private val italicPattern = Regex("font-style\\s*:\\s*italic", RegexOption.IGNORE_CASE)
+    private val underlinePattern = Regex("text-decoration[^;\"']*underline", RegexOption.IGNORE_CASE)
 
-    fun parse(source: String, invalidate: () -> Unit, animate: Boolean = true): RichText {
+    fun parse(
+        source: String,
+        invalidate: () -> Unit,
+        animate: Boolean = true,
+        finalize: Boolean = false
+    ): RichText {
         val out = SpannableStringBuilder()
         val open = ArrayDeque<OpenTag>()
         val animators = mutableListOf<AnimatableRichSpan>()
@@ -59,12 +72,28 @@ object RichTextParser {
                 .let { if (it < 0) body.length else it }
             val origin = body.substring(0, nameEnd).trim().lowercase()
             val attrs = body.substring(nameEnd).trim()
-            val name = when (origin) {
-                "span", "font" -> "color"
+            if (origin == "br") {
+                if (!closing) out.append('\n')
+                i = end + 1
+                continue
+            }
+            val name = when {
+                origin == "span" || origin == "font" -> {
+                    val color = htmlColor(attrs)
+                    if (color.isNotBlank()) "color" else htmlFormat(attrs) ?: "color"
+                }
+                origin == "rainbow" -> "color"
+                origin == "b" || origin == "strong" -> "bold"
+                origin == "i" || origin == "em" -> "italic"
+                origin == "u" -> "underline"
+                origin == "big" || origin == "small" -> "size"
                 else -> origin
             }
             val value = when (origin) {
                 "span", "font" -> htmlColor(attrs)
+                "rainbow" -> "rainbow"
+                "big" -> "large"
+                "small" -> "small"
                 else -> attrs.removePrefix("=").trim().lowercase()
             }
             if (name !in recognized) {
@@ -74,7 +103,7 @@ object RichTextParser {
             }
             if (!closing) {
                 // 没有颜色的 span/font 直接丢弃标签，避免源码泄漏到气泡里
-                if (origin != "color" && value.isBlank()) {
+                if (name == "color" && value.isBlank()) {
                     i = end + 1
                     continue
                 }
@@ -91,12 +120,29 @@ object RichTextParser {
             }
             i = end + 1
         }
+        if (finalize) {
+            // 非流式最终文本：模型偶尔漏写闭合标签，收尾时按剩余标签补到结尾。
+            while (open.isNotEmpty()) {
+                val tag = open.removeLast()
+                if (out.length > tag.start) {
+                    applySpan(out, tag, tag.start, out.length, open, invalidate, animators, animate)
+                }
+            }
+        }
         return RichText(SpannableString(out), animators)
     }
 
     /** 从 span/font 的属性里取颜色：支持 style="color:cyan"、color="#FF0000"。 */
     private fun htmlColor(attrs: String): String =
         colorPattern.find(attrs)?.groupValues?.get(1)?.trim().orEmpty()
+
+    /** span 没有颜色时退化为粗体/斜体/下划线。 */
+    private fun htmlFormat(attrs: String): String? = when {
+        boldPattern.containsMatchIn(attrs) -> "bold"
+        italicPattern.containsMatchIn(attrs) -> "italic"
+        underlinePattern.containsMatchIn(attrs) -> "underline"
+        else -> null
+    }
 
     private fun applySpan(
         out: SpannableStringBuilder,
@@ -123,6 +169,18 @@ object RichTextParser {
             }
             "size" -> out.setSpan(
                 RelativeSizeSpan(if (tag.value == "small") 0.8f else 1.3f),
+                start, end, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            "bold" -> out.setSpan(
+                StyleSpan(Typeface.BOLD),
+                start, end, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            "italic" -> out.setSpan(
+                StyleSpan(Typeface.ITALIC),
+                start, end, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            "underline" -> out.setSpan(
+                UnderlineSpan(),
                 start, end, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE
             )
             "glow" -> {

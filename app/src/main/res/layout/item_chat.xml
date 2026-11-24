@@ -39,6 +39,15 @@
             android:visibility="gone" />
 
         <com.dsha.sagittarius.agent.ui.RichTextView
+            android:id="@+id/tvAttachments"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:textColor="#CCF3EBDD"
+            android:textSize="10sp"
+            android:visibility="gone" />
+
+        <com.dsha.sagittarius.agent.ui.RichTextView
             android:id="@+id/tvContent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

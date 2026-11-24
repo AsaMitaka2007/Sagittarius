@@ -11,5 +11,7 @@ data class ChatMessage(
     val content: String? = null,
     val reasoningContent: String? = null,
     val toolCalls: List<ToolCall> = emptyList(),
-    val toolCallId: String? = null
+    val toolCallId: String? = null,
+    /** 仅用于本轮用户消息的图片 data URL（base64），历史恢复时为空。 */
+    val imageDataUrls: List<String> = emptyList()
 )

@@ -53,7 +53,25 @@ object LlmJson {
 
     private fun ChatMessage.toJson(provider: ProviderConfig): JsonObject = buildJsonObject {
         put("role", role)
-        if (content != null) put("content", content) else put("content", JsonNull)
+        if (role == "user" && imageDataUrls.isNotEmpty()) {
+            // OpenAI 兼容的多模态消息：文本 + image_url
+            put("content", buildJsonArray {
+                add(buildJsonObject {
+                    put("type", "text")
+                    put("text", content.orEmpty())
+                })
+                imageDataUrls.forEach { dataUrl ->
+                    add(buildJsonObject {
+                        put("type", "image_url")
+                        put("image_url", buildJsonObject { put("url", dataUrl) })
+                    })
+                }
+            })
+        } else if (content != null) {
+            put("content", content)
+        } else {
+            put("content", JsonNull)
+        }
         if (provider.echoReasoningContent && !reasoningContent.isNullOrEmpty()) {
             put("reasoning_content", reasoningContent)
         }

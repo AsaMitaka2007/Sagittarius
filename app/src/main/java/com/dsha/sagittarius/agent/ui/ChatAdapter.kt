@@ -42,7 +42,8 @@ data class ChatItem(
     val toolTraces: List<ToolTrace> = emptyList(),
     val error: String? = null,
     val streaming: Boolean = false,
-    val stopped: Boolean = false
+    val stopped: Boolean = false,
+    val attachments: List<String> = emptyList()
 ) {
     enum class Role { USER, ASSISTANT, TOOL, ERROR }
 }
@@ -74,6 +75,7 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
     inner class Holder(view: View) : RecyclerView.ViewHolder(view) {
         private val bubble: View = view.findViewById(R.id.bubble)
         private val content: RichTextView = view.findViewById(R.id.tvContent)
+        private val attachmentLine: RichTextView = view.findViewById(R.id.tvAttachments)
         private val reasoning: TextView = view.findViewById(R.id.tvReasoning)
         private val workflowHeader: TextView = view.findViewById(R.id.tvWorkflowHeader)
         private val workflowChips: LinearLayout = view.findViewById(R.id.workflowChips)
@@ -111,6 +113,14 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
             error.maxWidth = innerMax
             detailsBody.maxWidth = innerMax
             tail.maxWidth = innerMax
+            attachmentLine.maxWidth = innerMax
+            if (item.attachments.isNotEmpty()) {
+                attachmentLine.visibility = View.VISIBLE
+                attachmentLine.text = item.attachments.joinToString("   ") { "📎 $it" }
+            } else {
+                attachmentLine.visibility = View.GONE
+                attachmentLine.text = ""
+            }
 
             bubble.background = GradientDrawable().apply {
                 cornerRadius = (20 * context.resources.displayMetrics.density).toFloat()
@@ -137,7 +147,8 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
                 detailsCard.visibility = View.GONE
                 tail.visibility = View.GONE
                 choiceScroll.visibility = View.GONE
-                content.visibility = View.VISIBLE
+                content.visibility =
+                    if (item.content.isBlank() && item.attachments.isNotEmpty()) View.GONE else View.VISIBLE
                 content.text = item.content
                 content.setTextColor(AgentInkColors.TEXT_PRIMARY)
             } else {
@@ -149,7 +160,7 @@ class ChatAdapter : ListAdapter<ChatItem, ChatAdapter.Holder>(Diff) {
                     item.stopped -> parsed.first + "\n" + context.getString(R.string.agent_stopped)
                     else -> parsed.first
                 }
-                content.setRichText(finalText)
+                content.setRichText(finalText, final = !item.streaming)
                 if (item.streaming && item.content.isBlank()) startThinkingTips() else stopThinkingTips()
                 content.setTextColor(tokens.textPrimary)
                 renderDetails(item, parsed.second, parsed.third)

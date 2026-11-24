@@ -39,6 +39,7 @@ interface DietPort {
     suspend fun addRecord(record: DietRecordEntity): Long
     suspend fun addFood(food: FoodEntity): FoodEntity?
     suspend fun updateFood(food: FoodEntity)
+    suspend fun updateFoodImage(foodId: Long, imagePath: String): Boolean = false
     suspend fun deleteFood(food: FoodEntity): Boolean
     suspend fun recordsBetween(start: LocalDate, end: LocalDate): List<DietRecordEntity>
     suspend fun getGoal(): NutritionGoalEntity?
