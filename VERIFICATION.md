@@ -706,3 +706,13 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 查询增强：`query_data` 支持 expense/budget/diet/nutrition/overview、日期相对词（today/yesterday/this_week/this_month/last_month）、category/keyword/meal 筛选、sort、limit、include_items；返回分类/按日/按餐次/食物排行、日均、最大单笔、钠与维生素 A/B1/B2/B3/C/E。系统提示词新增查询口径与能力地图；旧 `query_app_data` 不再注册，避免选错工具。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` **22 个测试类 / 58 用例 / 0 失败**（新增 QueryDataTool 3 例）；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-3.4-tools.apk`（SHA256 `0FB01F2D…86D5`，17MB）。
 - 未完成：本机无设备/模拟器，附件选择/解析、视觉模型读图、Wikimedia 搜图、富文本特效与新查询口径未做真机与真实 API 联调；PDF 仅提示不支持；未 push。
+
+
+## 2.6 图片附件不再按模型名猜测（2026-11-24）
+
+- 修正 2.5 的保守策略：不再用模型名（vision/vl/...）判断能否读图，图片一律以 OpenAI 兼容的 `image_url` 随本轮消息发送，由接口自己决定是否支持。
+- `AgentEngine` 增加降级：若接口返回 400/解析失败且本轮带图，先剥离历史中的图片 data URL（并补一条“接口不接受图片输入”的文字说明）重试一次；仍失败才走原有的工具降级/报错。
+- 历史中只保留本轮图片；下一轮发送前自动清除旧图片 payload，避免每轮重复上传 base64。
+- 提示词改为“图片会随本轮消息发送，接口不接受时系统自动降级”，不再宣称 DeepSeek 不能读图。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` 22 个测试类 / 58 用例 / 0 失败；`lintDebug` 0 error / 446 warning；APK `dist/sgr-debug-3.5-vision.apk`（SHA256 `CA304607…844B`，17MB）。
+- 未完成：本机无设备/模拟器，真实接口的图片请求与 400 降级路径未联调；未 push。

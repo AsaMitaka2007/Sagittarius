@@ -58,6 +58,7 @@ class AgentEngine(
         history += ChatMessage(role = "user", content = text, imageDataUrls = imageDataUrls)
         var allowTools = toolsEnabled
         var webAllowed = webSearchEnabled
+        var imagesAllowed = imageDataUrls.isNotEmpty()
         var rounds = 0
         while (rounds < MAX_ROUNDS) {
             rounds++
@@ -107,6 +108,13 @@ class AgentEngine(
                 }
             }
             if (failed != null) {
+                // 有些 OpenAI 兼容接口不接受 image_url 内容；先去掉图片重试一次，再考虑降级工具。
+                if (imagesAllowed && (failed!!.kind == LlmError.Kind.BAD_REQUEST ||
+                        failed!!.kind == LlmError.Kind.PARSE)) {
+                    imagesAllowed = false
+                    stripImagePayloads()
+                    continue
+                }
                 val retryWithoutTools = failed!!.kind == LlmError.Kind.TOOLS_UNSUPPORTED ||
                     failed!!.kind == LlmError.Kind.BAD_REQUEST
                 if (retryWithoutTools && allowTools) {
@@ -206,6 +214,20 @@ class AgentEngine(
                 .let { if (it < 0) -1 else it + 1 }
             if (nextUser <= 0) break
             history.subList(0, nextUser).clear()
+        }
+    }
+
+    /** 接口不接受图片时，把历史里的 image_url 去掉，并留一条文字说明。 */
+    private fun stripImagePayloads() {
+        for (index in history.indices) {
+            val message = history[index]
+            if (message.imageDataUrls.isEmpty()) continue
+            val note = "[图片附件已上传；当前接口不接受图片输入，已降级为文字]"
+            val content = listOfNotNull(
+                message.content?.takeIf { it.isNotBlank() },
+                note
+            ).joinToString("\n\n")
+            history[index] = message.copy(content = content, imageDataUrls = emptyList())
         }
     }
 

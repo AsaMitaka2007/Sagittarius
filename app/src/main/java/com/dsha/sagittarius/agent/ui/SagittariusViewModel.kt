@@ -374,8 +374,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
         val input = text.trim()
         if ((input.isEmpty() && attachments.isEmpty()) || _generating.value) return
         val engine = engine ?: return
-        val vision = supportsVision(_modelId.value)
-        val imageDataUrls = if (vision) attachments.mapNotNull { it.imageBase64 } else emptyList()
+        val imageDataUrls = attachments.mapNotNull { it.imageBase64 }
         val modelText = buildString {
             append(input)
             attachments.forEach { attachment ->
@@ -384,8 +383,7 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
                         "\n\n[附件: ${attachment.name}]\n${attachment.text}\n[/附件]"
                     )
                     attachment.imageBase64 != null -> append(
-                        "\n\n[图片附件: ${attachment.name}]" +
-                            if (vision) "" else "（当前模型不支持读图，请建议用户换用视觉模型）"
+                        "\n\n[图片附件: ${attachment.name}]"
                     )
                     attachment.note != null -> append(
                         "\n\n[附件: ${attachment.name}] ${attachment.note}"
@@ -522,15 +520,6 @@ class SagittariusViewModel(private val app: SagittariusApp) : ViewModel() {
             .replace(Regex("\\[图片附件:[^\\]]*\\](（[^）]*）)?"), "")
             .trim()
         return display to names
-    }
-
-    /** 粗略判断当前模型是否支持图片输入；不匹配时只把图片作为文件名提示。 */
-    private fun supportsVision(model: String): Boolean {
-        val name = model.lowercase()
-        return listOf(
-            "vision", "-vl", "vl-", "4v", "glm-4v", "gpt-4o", "gpt-4.1",
-            "gemini", "claude", "qwen-vl", "llava", "pixtral", "internvl"
-        ).any { name.contains(it) }
     }
 
     private fun friendlyError(error: com.dsha.sagittarius.agent.llm.LlmError): String = when (error.kind) {
