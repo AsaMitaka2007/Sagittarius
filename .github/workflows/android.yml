@@ -28,8 +28,11 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: 安装 Android SDK
-        uses: android-actions/setup-android@v3
+      - name: 安装 Android SDK 组件
+        run: |
+          SDKMANAGER="$(find "$ANDROID_HOME/cmdline-tools" -maxdepth 3 -type f -name sdkmanager | head -n 1)"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0" >/dev/null
 
       - name: 配置 Gradle 缓存
         uses: gradle/actions/setup-gradle@v4
