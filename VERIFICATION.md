@@ -751,5 +751,5 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 食材录入步骤写入系统提示词：先查用户食材库 → 内置中国食物库 → 联网搜索/估算 → 写入尽可能全的营养 → 完成后先问是否配图，同意后再 `set_food_image`（支持聊天图片附件与覆盖旧图）。
 - 修复工具完成后偶发“请求错误”：DeepSeek 思考模式下带 `tool_calls` 的 assistant 消息现在总会带回 `reasoning_content`（无推理时补空字符串），`content` 也补空字符串；工具结果写入历史前截断到 16k 字；关闭工具重试时把 tool_calls/tool 消息折叠成普通文本；工具已成功但模型无补充文字时不再报错，直接结束。
 - 版本：`versionCode = 64`、`versionName = 1.1.1`；release APK 沿用 1.0 证书，可直接覆盖 1.1.0。
-- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` **24 个测试类 / 60 用例 / 0 失败**（新增 LlmJson 工具消息、食材全营养字段测试）；`lintDebug` 0 error / 447 warning；`assembleRelease` BUILD SUCCESSFUL；APK `dist/sgr-release-1.1.1.apk`（SHA256 `72AAF4C0…2BAB`，14.7MB）。
+- 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` **24 个测试类 / 60 用例 / 0 失败**（新增 LlmJson 工具消息、食材全营养字段测试）；`lintDebug` 0 error / 447 warning；`assembleRelease` BUILD SUCCESSFUL；APK `dist/sgr-release-1.1.1.apk`（SHA256 `00A99CDB…483D`，14.7MB）。
 - 未推送：1.1.1 尚未 push / 发 Release，等待确认。

@@ -37,7 +37,7 @@ class ManageFoodLibraryTool(
                     add(JsonPrimitive("水果蔬菜")); add(JsonPrimitive("肉禽蛋"))
                     add(JsonPrimitive("面食")); add(JsonPrimitive("零食")); add(JsonPrimitive("其他"))
                 })
-                put("description", "add/update 必填，必须根据食物属性选择")
+                put("description", "add 必填；update 不填则保留原分类")
             })
             put("limit", buildJsonObject { put("type", "integer"); put("description", "search/list 返回条数，默认 20") })
             put("calories", numberSchema("热量 kcal/100g"))
@@ -78,12 +78,13 @@ class ManageFoodLibraryTool(
                 val items = diet.searchFoods("", limit)
                 return@withContext searchSuccess(items, "食材库共返回 ${items.size} 个食材")
             }
-            "add", "update" -> {
+            "add" -> {
                 if (name.isEmpty()) return@withContext fail("缺少 food_name")
                 if (categoryKey == null) {
                     return@withContext fail("category 必须是水果蔬菜/肉禽蛋/面食/零食/其他")
                 }
             }
+            "update" -> if (name.isEmpty()) return@withContext fail("缺少 food_name")
             else -> if (name.isEmpty()) return@withContext fail("缺少 food_name")
         }
         val existing = diet.findFoodByName(name)
@@ -133,7 +134,7 @@ class ManageFoodLibraryTool(
                         vitaminB3Per100g = number(args, "vitamin_b3", existing.vitaminB3Per100g),
                         vitaminCPer100g = number(args, "vitamin_c", existing.vitaminCPer100g),
                         vitaminEPer100g = number(args, "vitamin_e", existing.vitaminEPer100g),
-                        category = categoryKey!!
+                        category = categoryKey ?: existing.category
                     )
                 )
                 val missing = nutritionKeys.filter { args[it] == null }
