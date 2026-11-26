@@ -100,6 +100,14 @@ class DietRepository private constructor(context: Context) {
         return foodDao.getAll().firstOrNull { it.name == target }
     }
 
+    suspend fun searchFoods(query: String, limit: Int = 20): List<FoodEntity> {
+        ensureSeeded()
+        val keyword = query.trim()
+        return foodDao.getAll()
+            .filter { keyword.isEmpty() || it.name.contains(keyword, ignoreCase = true) }
+            .take(limit.coerceIn(1, 100))
+    }
+
     suspend fun deleteRecord(record: DietRecordEntity) {
         recordDao.delete(record)
     }

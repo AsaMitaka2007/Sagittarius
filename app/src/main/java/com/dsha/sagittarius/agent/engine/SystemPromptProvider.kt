@@ -54,13 +54,19 @@ class SystemPromptProvider(
             - 记账：add_expense / update_expense / delete_expense / set_budget / allocate_budget_tree
               未知分类且用户同意时，先 manage_category 创建，再记账。
             - 分类：list_categories / manage_category
-            - 饮食：search_food_cn_local 优先；找不到时调用 toggle_network_search(true)，再 web_search；
-              仍失败才用自身知识估算；用户明确要求时才 add_food_to_library / add_diet。
+            - 饮食记录：search_food_cn_local 优先；找不到时调用 toggle_network_search(true)，再 web_search；
+              仍失败才用自身知识估算；用户明确要求时才 add_diet。
+            - 食材库与营养补全必须按顺序：
+              1) 先 manage_food_library(action="search", food_name=关键词) 查用户食材库；
+                 找到就用现有数据补全/更新，不要重复 add。
+              2) 没有再用内置中国食物库 search_food_cn_local，必要时 get_cn_food_nutrition。
+              3) 仍没有：toggle_network_search(true) 后 web_search；仍无数据才用自身知识估算。
+              4) 新食材用 add_food_to_library；已有食材用 manage_food_library(action="update")。
+                 尽量填满：热量/碳水/蛋白/脂肪/纤维/水分/钠/维生素总量/A/B1/B2/B3/C/E；
+                 工具返回 missing_nutrition 时继续查或估算并 update，不能只写四项。
+              5) 完成后先问用户“要不要我给它配张图？”，同意后再 set_food_image；
+                 用户上传了图片可传 use_attachment=true，默认允许覆盖已有图片。
               用户说“一根香蕉=100g / 一个鸡蛋=50g”时调用 set_food_unit，不要改营养值。
-              用户要给食材配图时：食材不存在先 add_food_to_library，再 set_food_image；
-              用户发了图片并说“设成某食材的图片”时，调用 set_food_image 并传 use_attachment=true
-              （多张图用 attachment_index 指定，从 0 开始）；默认允许覆盖已有图片。
-              用户没给图片 URL 就让 set_food_image 自动搜索，成功后说明图片来源。
             - 查询：query_data（expense/budget/diet/nutrition/overview）
             - 系统：navigate_to_tab、update_theme、update_date_card_color、toggle_floating_window、
               control_weather_debug、toggle_network_search、remember_preference

@@ -17,16 +17,26 @@ import kotlinx.serialization.json.JsonPrimitive
 
 class AddFoodToLibraryTool(private val diet: DietPort) : AgentTool {
     override val name = "add_food_to_library"
-    override val description = "向用户食材库添加食物，支持自定义单位"
+    override val description = "向用户食材库添加食物，支持完整营养成分与自定义单位"
     override val parametersSchema: JsonObject = buildJsonObject {
         put("type", "object")
         put("properties", buildJsonObject {
             put("name", buildJsonObject { put("type", "string") })
             put("category", buildJsonObject { put("type", "string"); put("enum", buildJsonArray { listOf("水果蔬菜", "肉禽蛋", "面食", "零食", "其他").forEach { add(JsonPrimitive(it)) } }) })
-            put("calories", buildJsonObject { put("type", "number") })
-            put("carbs", buildJsonObject { put("type", "number") })
-            put("protein", buildJsonObject { put("type", "number") })
-            put("fat", buildJsonObject { put("type", "number") })
+            put("calories", numberSchema("热量 kcal/100g"))
+            put("carbs", numberSchema("碳水 g/100g"))
+            put("protein", numberSchema("蛋白质 g/100g"))
+            put("fat", numberSchema("脂肪 g/100g"))
+            put("fiber", numberSchema("膳食纤维 g/100g"))
+            put("water", numberSchema("水分 g/100g"))
+            put("sodium", numberSchema("钠 mg/100g"))
+            put("vitamin", numberSchema("维生素总量 mg/100g"))
+            put("vitamin_a", numberSchema("维生素 A μg RE/100g"))
+            put("vitamin_b1", numberSchema("维生素 B1 mg/100g"))
+            put("vitamin_b2", numberSchema("维生素 B2 mg/100g"))
+            put("vitamin_b3", numberSchema("维生素 B3/烟酸 mg/100g"))
+            put("vitamin_c", numberSchema("维生素 C mg/100g"))
+            put("vitamin_e", numberSchema("维生素 E mg/100g"))
             put("custom_units", buildJsonObject { put("type", "array"); put("items", buildJsonObject { put("type", "object") }) })
         })
         put("required", buildJsonArray { add(JsonPrimitive("name")); add(JsonPrimitive("category")) })
@@ -45,7 +55,16 @@ class AddFoodToLibraryTool(private val diet: DietPort) : AgentTool {
             carbsPer100g = num(args, "carbs"),
             proteinPer100g = num(args, "protein"),
             fatPer100g = num(args, "fat"),
-            fiberPer100g = 0.0, vitaminPer100g = 0.0, waterPer100g = 0.0,
+            fiberPer100g = num(args, "fiber"),
+            waterPer100g = num(args, "water"),
+            sodiumPer100g = num(args, "sodium"),
+            vitaminPer100g = num(args, "vitamin"),
+            vitaminAPer100g = num(args, "vitamin_a"),
+            vitaminB1Per100g = num(args, "vitamin_b1"),
+            vitaminB2Per100g = num(args, "vitamin_b2"),
+            vitaminB3Per100g = num(args, "vitamin_b3"),
+            vitaminCPer100g = num(args, "vitamin_c"),
+            vitaminEPer100g = num(args, "vitamin_e"),
             isCustom = true
         )
         val saved = diet.addFood(food) ?: return@withContext fail("写入失败")
@@ -56,12 +75,34 @@ class AddFoodToLibraryTool(private val diet: DietPort) : AgentTool {
             val weight = obj["weight"]?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
             if (unitName.isNotEmpty() && weight > 0) diet.addUnit(saved.id, unitName, weight)
         }
-        ToolResult(true, buildJsonObject { put("ok", true); put("id", saved.id); put("name", saved.name) }.toString(), "已添加食材 $name")
+        val missing = nutritionKeys.filter { args[it] == null }
+        ToolResult(
+            true,
+            buildJsonObject {
+                put("ok", true)
+                put("id", saved.id)
+                put("name", saved.name)
+                put("missing_nutrition", buildJsonArray {
+                    missing.forEach { add(JsonPrimitive(it)) }
+                })
+            }.toString(),
+            "已添加食材 $name" + if (missing.isNotEmpty()) "；仍缺：${missing.joinToString("、")}" else ""
+        )
     }
+
+    private fun numberSchema(description: String) =
+        buildJsonObject { put("type", "number"); put("description", description) }
 
     private fun num(args: JsonObject, key: String) = args[key]?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
     private fun categoryKey(value: String) = when (value) { "水果蔬菜" -> "FRUIT_VEG"; "肉禽蛋" -> "MEAT_EGG"; "面食" -> "STAPLE"; "零食" -> "SNACK"; "其他" -> "OTHER"; else -> null }
     private fun fail(error: String) = ToolResult(false, buildJsonObject { put("ok", false); put("message", error) }.toString())
+
+    private companion object {
+        val nutritionKeys = listOf(
+            "calories", "carbs", "protein", "fat", "fiber", "water", "sodium", "vitamin",
+            "vitamin_a", "vitamin_b1", "vitamin_b2", "vitamin_b3", "vitamin_c", "vitamin_e"
+        )
+    }
 }
 
 class ManageFoodCategoryTool(private val diet: DietPort) : AgentTool {

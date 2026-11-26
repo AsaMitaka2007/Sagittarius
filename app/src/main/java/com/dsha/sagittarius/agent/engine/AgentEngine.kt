@@ -119,6 +119,7 @@ class AgentEngine(
                     failed!!.kind == LlmError.Kind.BAD_REQUEST
                 if (retryWithoutTools && allowTools) {
                     allowTools = false
+                    sanitizeToolProtocol()
                     emit(AgentEvent.ToolsUnsupported)
                     continue
                 }
@@ -137,6 +138,12 @@ class AgentEngine(
                 else -> rawContent
             }
             if (contentText.isBlank() && reasoningText.isBlank() && toolCalls.isEmpty()) {
+                // 工具已经执行成功、只是模型没再补充文字时，不再报“请求参数异常”。
+                if (rounds > 1 && history.any { it.role == "tool" }) {
+                    trimHistory()
+                    emit(AgentEvent.Finished)
+                    return@flow
+                }
                 emit(AgentEvent.Failed(LlmError(LlmError.Kind.BAD_REQUEST, "模型没有返回内容，请重试")))
                 return@flow
             }
@@ -180,7 +187,7 @@ class AgentEngine(
                 }
                 history += ChatMessage(
                     role = "tool",
-                    content = result.contentForModel,
+                    content = toolContentForModel(result),
                     toolCallId = call.id
                 )
             }
@@ -240,6 +247,42 @@ class AgentEngine(
         }
     }
 
+    /** 关闭工具后，把 tool_calls/tool 消息折叠成普通文本，避免接口因残留协议字段再次 400。 */
+    private fun sanitizeToolProtocol() {
+        val sanitized = ArrayList<ChatMessage>(history.size)
+        for (message in history) {
+            when {
+                message.role == "assistant" && message.toolCalls.isNotEmpty() -> {
+                    sanitized += message.copy(
+                        content = message.content?.takeIf { it.isNotBlank() } ?: "（已执行工具）",
+                        toolCalls = emptyList()
+                    )
+                }
+                message.role == "tool" -> {
+                    val previous = sanitized.lastOrNull()
+                    if (previous?.role == "assistant") {
+                        val note = "\n[工具结果] " + message.content.orEmpty().take(2_000)
+                        sanitized[sanitized.lastIndex] = previous.copy(
+                            content = (previous.content.orEmpty() + note).trim()
+                        )
+                    }
+                }
+                else -> sanitized += message
+            }
+        }
+        history = sanitized
+    }
+
+    /** 工具结果过长会让下一轮请求超上下文；保留前 16k 字并明确标记截断。 */
+    private fun toolContentForModel(result: ToolResult): String {
+        val text = result.contentForModel
+        return if (text.length <= MAX_TOOL_RESULT_CHARS) {
+            text
+        } else {
+            text.take(MAX_TOOL_RESULT_CHARS) + "\n…[工具结果过长，已截断]"
+        }
+    }
+
     private fun maxTokensFor(effort: String): Int = when (effort) {
         "low" -> 8192
         "high" -> 16384
@@ -266,5 +309,6 @@ class AgentEngine(
         private const val TOOL_TIMEOUT_MS = 10_000L
         private const val MAX_HISTORY_MESSAGES = 24
         private const val MAX_HISTORY_CHARS = 32_000
+        private const val MAX_TOOL_RESULT_CHARS = 16_000
     }
 }

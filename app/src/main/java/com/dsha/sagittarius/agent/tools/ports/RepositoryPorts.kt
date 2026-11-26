@@ -59,6 +59,9 @@ class BudgetRepositoryExpensePort(private val repository: BudgetRepository) : Ex
 class DietRepositoryDietPort(private val repository: DietRepository) : DietPort {
     override suspend fun ensureSeeded() = repository.ensureSeeded()
     override suspend fun findFoodByName(name: String): FoodEntity? = repository.findFoodByName(name)
+
+    override suspend fun searchFoods(query: String, limit: Int): List<FoodEntity> =
+        repository.searchFoods(query, limit)
     override suspend fun getUnits(foodId: Long): List<FoodUnitEntity> = repository.getUnits(foodId)
     override suspend fun addRecord(record: DietRecordEntity): Long = repository.addRecord(record)
     override suspend fun addFood(food: FoodEntity): FoodEntity? = repository.addFood(food)

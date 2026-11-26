@@ -69,11 +69,18 @@ object LlmJson {
             })
         } else if (content != null) {
             put("content", content)
+        } else if (toolCalls.isNotEmpty()) {
+            // 部分 OpenAI 兼容接口不接受 tool_calls 消息的 content=null
+            put("content", "")
         } else {
             put("content", JsonNull)
         }
-        if (provider.echoReasoningContent && !reasoningContent.isNullOrEmpty()) {
-            put("reasoning_content", reasoningContent)
+        if (provider.echoReasoningContent &&
+            (toolCalls.isNotEmpty() || !reasoningContent.isNullOrEmpty())
+        ) {
+            // DeepSeek 思考模式要求带 tool_calls 的 assistant 消息必须有 reasoning_content；
+            // 没有推理文本时补空字符串，否则下一轮会 400。
+            put("reasoning_content", reasoningContent.orEmpty())
         }
         if (toolCalls.isNotEmpty()) {
             put("tool_calls", buildJsonArray {

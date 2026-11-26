@@ -24,8 +24,8 @@ android {
         applicationId = "com.dsha.sagittarius"
         minSdk = 26
         targetSdk = 34
-        versionCode = 63
-        versionName = "1.1.0"
+        versionCode = 64
+        versionName = "1.1.1"
         buildConfigField("String", "SAGITTARIUS_BASE_URL", "\"https://api.deepseek.com\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
