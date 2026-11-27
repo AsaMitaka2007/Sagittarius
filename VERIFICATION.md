@@ -825,3 +825,19 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 食材库支持左右滑动切换分类（GestureDetector，排除拖动状态）。
 - 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 470 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,719 bytes，SHA256 `50353551…9A22`，versionCode 63 / 1.1.0）。
 - 未 push。
+
+
+## 4.0 1.2.0 正式发布（2026-11-27）
+
+- 版本：`versionCode = 64`、`versionName = "1.2.0"`；签名沿用 1.0 证书（SHA-256 `66EB47B2…12E4`）。
+- 1.2 主要内容：
+  - 食材库全屏胶囊页：分类/食材拖动排序、长按圆球拖动、原地松手删除/移动至分类、食材详情、左右滑动切分类；
+  - 食材详情 kJ/kcal 双输入（1 kcal = 4.184 kJ），卡片式主题表单；
+  - 默认分类改为果蔬/肉禽蛋/粮油调味/零食/补剂/套餐，新增酵母蛋白粉与粤卤记猪脚饭及图片；
+  - 历史饮食同步食材库（缺失黄色、变更绿色）；
+  - 营养页移除饮食列表，新增当日目标（勾选后给当日营养加量，次日重置）；
+  - AI 可 search/list/move/copy/add/update/delete 食材，修改/删除历史饮食，创建/读取/删除/完成当日目标；
+  - 聊天附件、食材配图、余额角标、富文本执行过程去重等 1.1 能力保留。
+- 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` **25 个测试类 / 64 用例 / 0 失败**；`lintDebug` 0 error / 470 warning；Room v12 schema 导出，11→12 迁移 SQL 校验通过。
+- 产物：`dist/sgr-release-1.2.0.apk`，14,853,723 bytes，SHA256 `51D4A279…1FC6`。
+- 本机无设备/模拟器，UI 与拖拽交互未真机验收。

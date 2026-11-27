@@ -57,3 +57,8 @@
 `app/src/main/res/drawable-nodpi/bg_ins_wash.jpg`（奶油主题背景）基于 Pexels 图片
 [#7630065](https://www.pexels.com/es-es/foto/arte-textura-abstracto-resumen-7630065/)，
 作者 Eva Bronzini，Pexels License。已做裁切、模糊、与奶油底色混合处理。
+
+# 用户提供素材
+
+`app/src/main/assets/food_images/food_protein_powder.jpg` 与 `food_pork_rice.jpg`
+为项目作者提供的自用食物照片，已裁切压缩，仅用于“补剂 / 套餐”默认食材展示。
