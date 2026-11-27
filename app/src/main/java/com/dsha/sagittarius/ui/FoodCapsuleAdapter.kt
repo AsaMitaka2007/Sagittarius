@@ -100,14 +100,17 @@ class FoodCapsuleAdapter(
         }
 
         fun enhanceDrag() {
+            val targetX = (itemView.height.toFloat() / itemView.width.coerceAtLeast(1))
+                .coerceIn(0.45f, 0.9f)
             card.animate()
-                .scaleX(0.9f)
+                .scaleX(targetX)
                 .scaleY(0.86f)
                 .setDuration(120L)
                 .start()
             card.radius = itemView.height / 2f
-            name.alpha = 0.25f
-            kcal.alpha = 0.25f
+            name.alpha = 0f
+            kcal.alpha = 0f
+            image.alpha = 0.35f
             quickAdd.visibility = View.GONE
             delete.visibility = View.GONE
         }
@@ -117,6 +120,7 @@ class FoodCapsuleAdapter(
             card.radius = 26f * density
             name.alpha = 1f
             kcal.alpha = 1f
+            image.alpha = 1f
             quickAdd.visibility = View.VISIBLE
         }
     }

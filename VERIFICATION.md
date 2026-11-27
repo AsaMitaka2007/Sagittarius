@@ -764,4 +764,4 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 食材详情：热量改为 kJ / kcal 双输入，编辑任意一栏按 1 kcal = 4.184 kJ 自动换算；详情页改为跟随主题的卡片式表单。
 - 版本：alpha-2.0 保持安装版本号 `versionCode 63 / versionName 1.1.0`（按约定 alpha 不改）；签名沿用 1.0 证书。
 - 验证：`assembleDebug` / `assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` **25 个测试类 / 63 用例 / 0 失败**（新增 DailyGoalMath 3 例）；`lintDebug` 0 error / 467 warning；Room v12 schema 已导出，11→12 迁移 SQL 用 sqlite3 校验通过。
-- 产物：`dist/sgr-alpha-2.0.apk`，14,750,184 bytes，SHA256 `4211CB7F…87CD`；未 push / 未发 Release。
+- 产物：`dist/sgr-alpha-2.0.apk`，14,750,184 bytes，SHA256 `58A1F9AB…031B`；未 push / 未发 Release。
