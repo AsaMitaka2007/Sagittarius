@@ -54,6 +54,15 @@ class FoodCapsuleAdapter(
         notifyItemChanged(position)
     }
 
+    fun hasPendingDelete(): Boolean = pendingDeleteId != null
+
+    fun clearPendingDelete() {
+        val id = pendingDeleteId ?: return
+        pendingDeleteId = null
+        val index = currentList.indexOfFirst { it.id == id }
+        if (index >= 0) notifyItemChanged(index)
+    }
+
     fun clearDelete(foodId: Long) {
         if (pendingDeleteId == foodId) pendingDeleteId = null
     }
@@ -95,6 +104,11 @@ class FoodCapsuleAdapter(
             name.text = food.name
             kcal.text = String.format(Locale.CHINA, "%.0f kcal / 100g", food.caloriesPer100g)
             card.setOnClickListener {
+                if (pendingDeleteId != null) {
+                    val wasPending = pendingDeleteId == food.id
+                    clearPendingDelete()
+                    if (wasPending) return@setOnClickListener
+                }
                 card.animate().scaleX(1.06f).scaleY(1.06f).setDuration(80L).withEndAction {
                     card.scaleX = 1f
                     card.scaleY = 1f

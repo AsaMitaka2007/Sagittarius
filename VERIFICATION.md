@@ -797,3 +797,11 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - `onMove` 触发列表重绑时，`bind()` 依据 `draggingId` 重新应用圆球状态；拖动结束才 `endDrag()` 恢复。
 - 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 467 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,579 bytes，SHA256 `7DA1400E…D996`，versionCode 63 / 1.1.0）。
 - 未 push。
+
+
+## 3.6 alpha-2.0 跨分类落点与删除按钮收起（2026-11-27）
+
+- 跨分类落点改由 `onChildDraw` 记录拖动卡片的屏幕中心（含 ItemTouchHelper 位移），再回退到手指坐标；松手后能正确命中上方分类并切页。
+- 删除按钮增加收起逻辑：点击同一胶囊主体先收起删除按钮；点击其他胶囊、分类、添加/分类或列表空白处都会清除；点删除按钮本身仍执行删除。
+- 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 467 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,579 bytes，SHA256 `D0062FBD…D651`，versionCode 63 / 1.1.0）。
+- 未 push。

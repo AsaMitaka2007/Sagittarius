@@ -3,6 +3,7 @@ package com.dsha.sagittarius.ui
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.Canvas
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.InputType
@@ -50,6 +51,8 @@ class FoodLibraryActivity : ThemedActivity() {
     private var dragFoodOrder: MutableList<Long> = mutableListOf()
     private var lastTouchX = 0f
     private var lastTouchY = 0f
+    private var lastDragCenterX = 0f
+    private var lastDragCenterY = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +70,12 @@ class FoodLibraryActivity : ThemedActivity() {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
                 lastTouchX = e.rawX
                 lastTouchY = e.rawY
+                if (e.actionMasked == MotionEvent.ACTION_DOWN &&
+                    foodAdapter.hasPendingDelete() &&
+                    rv.findChildViewUnder(e.x, e.y) == null
+                ) {
+                    foodAdapter.clearPendingDelete()
+                }
                 return false
             }
 
@@ -169,6 +178,24 @@ class FoodLibraryActivity : ThemedActivity() {
                 return ok
             }
 
+            override fun onChildDraw(
+                c: Canvas,
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                dX: Float,
+                dY: Float,
+                actionState: Int,
+                isCurrentlyActive: Boolean
+            ) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+                if (isCurrentlyActive) {
+                    val location = IntArray(2)
+                    viewHolder.itemView.getLocationOnScreen(location)
+                    lastDragCenterX = location[0] + viewHolder.itemView.width / 2f
+                    lastDragCenterY = location[1] + viewHolder.itemView.height / 2f
+                }
+            }
+
             override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
                 super.onSelectedChanged(viewHolder, actionState)
                 if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && viewHolder != null) {
@@ -192,7 +219,8 @@ class FoodLibraryActivity : ThemedActivity() {
                 if (!moved) {
                     foodAdapter.showDelete(foodAdapter.currentList.indexOfFirst { it.id == food.id })
                 } else {
-                    val targetKey = categoryKeyAt(lastTouchX, lastTouchY)
+                    val targetKey = categoryKeyAt(lastDragCenterX, lastDragCenterY)
+                        ?: categoryKeyAt(lastTouchX, lastTouchY)
                         ?: categoryKeyAt(viewHolder.itemView)
                     if (targetKey != null && targetKey != selectedKey) {
                         lifecycleScope.launch {
@@ -266,6 +294,7 @@ class FoodLibraryActivity : ThemedActivity() {
     }
 
     private fun selectCategory(key: String) {
+        foodAdapter.clearPendingDelete()
         if (key == selectedKey) return
         selectedKey = key
         categoryAdapter.setSelected(key)
@@ -279,6 +308,7 @@ class FoodLibraryActivity : ThemedActivity() {
     }
 
     private fun openEditor(food: FoodEntity?) {
+        foodAdapter.clearPendingDelete()
         val intent = Intent(this, FoodEditActivity::class.java)
             .putExtra(FoodEditActivity.EXTRA_CATEGORY, food?.category ?: selectedKey)
         if (food != null) intent.putExtra(FoodEditActivity.EXTRA_FOOD_ID, food.id)
@@ -287,6 +317,7 @@ class FoodLibraryActivity : ThemedActivity() {
     }
 
     private fun quickAdd(food: FoodEntity) {
+        foodAdapter.clearPendingDelete()
         lifecycleScope.launch {
             val units = repository.getUnits(food.id)
             FoodAmountSheet.show(this@FoodLibraryActivity, food, units) { amount, unit ->
