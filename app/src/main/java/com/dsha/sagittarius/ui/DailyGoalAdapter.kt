@@ -1,5 +1,7 @@
 package com.dsha.sagittarius.ui
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
@@ -38,6 +40,10 @@ class DailyGoalAdapter(
             effect.text = DailyGoalMath.label(goal.nutrientKey, goal.amount)
             checkbox.setOnCheckedChangeListener(null)
             checkbox.isChecked = completed
+            val accent = ButtonAccentManager.current
+            checkbox.buttonTintList = ColorStateList.valueOf(
+                if (accent.isInk) Color.parseColor("#F3EBDD") else accent.startColor
+            )
             checkbox.setOnCheckedChangeListener { _, checked -> onToggle(goal, checked) }
             val alpha = if (completed) 0.45f else 1f
             title.alpha = alpha

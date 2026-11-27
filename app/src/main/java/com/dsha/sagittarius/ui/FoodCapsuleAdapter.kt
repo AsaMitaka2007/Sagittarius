@@ -69,6 +69,10 @@ class FoodCapsuleAdapter(
 
         fun bind(food: FoodEntity) {
             card.radius = 26f * density
+            val accent = ButtonAccentManager.current
+            card.strokeColor = accent.borderColor
+            card.strokeWidth = (1.2f * density).toInt().coerceAtLeast(1)
+            quickAdd.setTextColor(accent.textColor)
             card.scaleX = 1f
             card.scaleY = 1f
             name.alpha = 1f

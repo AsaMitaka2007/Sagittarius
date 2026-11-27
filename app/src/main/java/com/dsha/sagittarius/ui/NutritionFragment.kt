@@ -1,6 +1,7 @@
 package com.dsha.sagittarius.ui
 
 import android.os.Bundle
+import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -81,6 +82,19 @@ class NutritionFragment : Fragment() {
                 }
             }
         }
+        val uiTokens = ThemeTokens.of(requireContext())
+        val accent = ButtonAccentManager.current
+        binding.goalCard.background = GradientDrawable(
+            GradientDrawable.Orientation.TOP_BOTTOM,
+            intArrayOf(uiTokens.cardFillTop, uiTokens.cardFillBottom)
+        ).apply {
+            cornerRadius = 20f * resources.displayMetrics.density
+            setStroke(
+                (1.2f * resources.displayMetrics.density).toInt().coerceAtLeast(1),
+                accent.borderColor
+            )
+        }
+        binding.btnAddGoal.setTextColor(accent.textColor)
         setupRingSelection()
         binding.btnEditGoals.setOnClickListener {
             NutritionGoalSheet.show(requireContext(), goal) { newGoal ->

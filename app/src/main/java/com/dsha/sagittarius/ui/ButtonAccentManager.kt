@@ -39,6 +39,10 @@ data class ButtonAccentStyle(
     val isInk: Boolean
         get() = id == "ink"
 
+    /** 胶囊/卡片描边：墨水黑用米白，其余用当前按钮色的半透明版本。 */
+    val borderColor: Int
+        get() = if (isInk) Color.parseColor("#CCF3EBDD") else ColorUtils.setAlphaComponent(startColor, 210)
+
     val textColor: Int
         get() = when {
             isInk -> Color.parseColor("#F3EBDD")

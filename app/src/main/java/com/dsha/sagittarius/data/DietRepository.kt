@@ -50,13 +50,48 @@ class DietRepository private constructor(context: Context) {
             foodDao.insertAll(FoodCatalog.presets)
         }
         val categorySeed = listOf(
-            FoodCategoryEntity(categoryKey = "FRUIT_VEG", name = "水果蔬菜", isPreset = true, sortOrder = 0),
+            FoodCategoryEntity(categoryKey = "FRUIT_VEG", name = "果蔬", isPreset = true, sortOrder = 0),
             FoodCategoryEntity(categoryKey = "MEAT_EGG", name = "肉禽蛋", isPreset = true, sortOrder = 1),
-            FoodCategoryEntity(categoryKey = "STAPLE", name = "面食", isPreset = true, sortOrder = 2),
+            FoodCategoryEntity(categoryKey = "STAPLE", name = "粮油调味", isPreset = true, sortOrder = 2),
             FoodCategoryEntity(categoryKey = "SNACK", name = "零食", isPreset = true, sortOrder = 3),
-            FoodCategoryEntity(categoryKey = "OTHER", name = "其他", isPreset = true, sortOrder = 4)
+            FoodCategoryEntity(categoryKey = "SUPPLEMENT", name = "补剂", isPreset = true, sortOrder = 4),
+            FoodCategoryEntity(categoryKey = "COMBO", name = "套餐", isPreset = true, sortOrder = 5)
         )
         categoryDao.insertAll(categorySeed)
+        // 旧版本的预置分类改名，保持 foods.category 的 key 不变。
+        categoryDao.getAll().forEach { category ->
+            val newName = when (category.categoryKey) {
+                "FRUIT_VEG" -> "果蔬"
+                "STAPLE" -> "粮油调味"
+                "MEAT_EGG" -> "肉禽蛋"
+                "SNACK" -> "零食"
+                else -> null
+            }
+            if (category.isPreset && newName != null && category.name != newName) {
+                categoryDao.update(category.copy(name = newName))
+            }
+        }
+        // 旧“其他”没有食材时移除，保证默认分类只有六类。
+        categoryDao.getAll().firstOrNull { it.categoryKey == "OTHER" && it.isPreset }
+            ?.takeIf { categoryDao.foodCount("OTHER") == 0 }
+            ?.let { categoryDao.deleteById(it.id) }
+        FoodCatalog.extras.forEach { extra ->
+            if (foodDao.getAll().none { it.name == extra.name }) {
+                val id = foodDao.insert(extra.copy(id = 0))
+                if (id > 0) {
+                    unitDao.insert(FoodUnitEntity(foodId = id, unitName = "g", weightInGrams = 1.0))
+                    if (extra.unit != "g" && extra.weightPerUnit > 0) {
+                        unitDao.insert(
+                            FoodUnitEntity(
+                                foodId = id,
+                                unitName = extra.unit,
+                                weightInGrams = extra.weightPerUnit
+                            )
+                        )
+                    }
+                }
+            }
+        }
         foodDao.getAll().forEach { food ->
             if (unitDao.getForFood(food.id).isEmpty()) {
                 unitDao.insert(FoodUnitEntity(foodId = food.id, unitName = "g", weightInGrams = 1.0))

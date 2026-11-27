@@ -101,5 +101,51 @@ object FoodCatalog {
         food(35, "海带", kcal = 13.0, carbs = 2.1, fat = 0.1, protein = 1.2, fiber = 0.5, vitamin = 0.0, water = 94.4, sodium = 8.6, vitA = 0.0, vitB1 = 0.02, vitB2 = 0.15, vitB3 = 1.3, vitC = 0.0, vitE = 1.85)
     )
 
+    /** 2.0 新增的两类默认食物；不带图片，等用户或 AI 配图。 */
+    val extras: List<FoodEntity> = listOf(
+        FoodEntity(
+            name = "酵母蛋白粉（75%）",
+            unit = "杯",
+            weightPerUnit = 30.0,
+            caloriesPer100g = 277.0,
+            carbsPer100g = 8.0,
+            fatPer100g = 4.0,
+            proteinPer100g = 75.0,
+            fiberPer100g = 0.0,
+            vitaminPer100g = 0.0,
+            waterPer100g = 0.0,
+            sodiumPer100g = 100.0,
+            vitaminAPer100g = 400.0,
+            vitaminB1Per100g = 0.88,
+            vitaminB2Per100g = 0.88,
+            vitaminB3Per100g = 8.87,
+            vitaminCPer100g = 62.6,
+            vitaminEPer100g = 0.0,
+            category = "SUPPLEMENT",
+            imageUri = "asset:food_images/food_protein_powder.jpg",
+            isCustom = false,
+            sortOrder = 36
+        ),
+        FoodEntity(
+            name = "粤卤记猪脚饭",
+            unit = "份",
+            weightPerUnit = 550.0,
+            caloriesPer100g = 162.0,
+            carbsPer100g = 13.7,
+            fatPer100g = 8.5,
+            proteinPer100g = 7.3,
+            fiberPer100g = 2.5,
+            vitaminPer100g = 0.0,
+            waterPer100g = 0.0,
+            sodiumPer100g = 0.0,
+            vitaminAPer100g = 121.0,
+            vitaminCPer100g = 9.9,
+            category = "COMBO",
+            imageUri = "asset:food_images/food_pork_rice.jpg",
+            isCustom = false,
+            sortOrder = 37
+        )
+    )
+
     val defaultGoal = NutritionGoalEntity()
 }

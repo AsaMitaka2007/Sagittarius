@@ -765,3 +765,16 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 版本：alpha-2.0 保持安装版本号 `versionCode 63 / versionName 1.1.0`（按约定 alpha 不改）；签名沿用 1.0 证书。
 - 验证：`assembleDebug` / `assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` **25 个测试类 / 63 用例 / 0 失败**（新增 DailyGoalMath 3 例）；`lintDebug` 0 error / 467 warning；Room v12 schema 已导出，11→12 迁移 SQL 用 sqlite3 校验通过。
 - 产物：`dist/sgr-alpha-2.0.apk`，14,750,184 bytes，SHA256 `58A1F9AB…031B`；未 push / 未发 Release。
+
+
+## 3.3 alpha-2.0 体验修正（2026-11-27）
+
+- 食材库转场改为纯淡入淡出（新增 `fade_in_pure` / `fade_out_pure`），去掉默认平移；返回记饮食页同样淡出。
+- 食材跨分类拖动改为按手指落点判定分类按钮，松手后自动切到目标分类页面；分类按钮拖动/原地松手菜单保留。
+- 食材库、分类、目标卡、目标勾选框、快捷加号与「添加/分类」文字统一读取 `ButtonAccentManager.current`：非墨水主题用按钮色的半透明描边，墨水主题用米白。
+- 长按拖动食材时隐藏图片与文字，按原矩形高度收束成圆形胶囊。
+- 默认分类改为：果蔬、肉禽蛋、粮油调味、零食、补剂、套餐；旧预置分类自动改名，空「其他」自动移除。
+- 补剂新增「酵母蛋白粉（75%）」：1159kJ/100g（277kcal）、蛋白 75g、脂肪 4g、碳水 8g、钠 100mg、维A 400μg、B1/B2 0.88mg、烟酸 8.87mg、维C 62.6mg，一杯 30g。
+- 套餐新增「粤卤记猪脚饭」：一份 550g，100g 热量 162kcal、蛋白 7.3g、脂肪 8.5g、碳水 13.7g、纤维 2.5g、维A 121μg、维C 9.9mg；两张默认图片使用用户提供的素材，已裁切压缩进 `assets/food_images/`。
+- 验证：`assembleDebug` / `assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 467 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,555 bytes，SHA256 `16078B2C…6387`，versionCode 63 / 1.1.0）。
+- 未 push；alpha 期间安装版本号保持不变。

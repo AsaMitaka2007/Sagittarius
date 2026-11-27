@@ -89,6 +89,8 @@ class DietAddFragment : Fragment() {
                     .putExtra(FoodLibraryActivity.EXTRA_DATE, selectedDate.toString())
                     .putExtra(FoodLibraryActivity.EXTRA_MEAL, mealType.name)
             )
+            @Suppress("DEPRECATION")
+            requireActivity().overridePendingTransition(R.anim.fade_in_pure, R.anim.fade_out_pure)
         }
         binding.btnClearDiet.setOnClickListener {
             pending.clear()

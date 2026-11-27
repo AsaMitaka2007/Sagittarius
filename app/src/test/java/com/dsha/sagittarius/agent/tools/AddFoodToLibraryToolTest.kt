@@ -40,7 +40,7 @@ class AddFoodToLibraryToolTest {
         val result = AddFoodToLibraryTool(port).execute(
             Json.parseToJsonElement(
                 """
-                {"name":"鹰嘴豆","category":"其他","calories":364,"carbs":61,"protein":19,
+                {"name":"鹰嘴豆","category":"粮油调味","calories":364,"carbs":61,"protein":19,
                  "fat":6,"fiber":17,"water":12,"sodium":24,"vitamin":2,
                  "vitamin_a":3,"vitamin_b1":0.5,"vitamin_b2":0.2,"vitamin_b3":1.5,"vitamin_c":4}
                 """.trimIndent()

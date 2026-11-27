@@ -36,16 +36,18 @@ class ManageFoodLibraryTool(
             put("target_category", buildJsonObject {
                 put("type", "string")
                 put("enum", buildJsonArray {
-                    add(JsonPrimitive("水果蔬菜")); add(JsonPrimitive("肉禽蛋"))
-                    add(JsonPrimitive("面食")); add(JsonPrimitive("零食")); add(JsonPrimitive("其他"))
+                    add(JsonPrimitive("果蔬")); add(JsonPrimitive("肉禽蛋"))
+                    add(JsonPrimitive("粮油调味")); add(JsonPrimitive("零食"))
+                    add(JsonPrimitive("补剂")); add(JsonPrimitive("套餐"))
                 })
                 put("description", "move/copy 的目标分类")
             })
             put("category", buildJsonObject {
                 put("type", "string")
                 put("enum", buildJsonArray {
-                    add(JsonPrimitive("水果蔬菜")); add(JsonPrimitive("肉禽蛋"))
-                    add(JsonPrimitive("面食")); add(JsonPrimitive("零食")); add(JsonPrimitive("其他"))
+                    add(JsonPrimitive("果蔬")); add(JsonPrimitive("肉禽蛋"))
+                    add(JsonPrimitive("粮油调味")); add(JsonPrimitive("零食"))
+                    add(JsonPrimitive("补剂")); add(JsonPrimitive("套餐"))
                 })
                 put("description", "add 必填；update 不填则保留原分类")
             })
@@ -93,7 +95,7 @@ class ManageFoodLibraryTool(
             "add" -> {
                 if (name.isEmpty()) return@withContext fail("缺少 food_name")
                 if (categoryKey == null) {
-                    return@withContext fail("category 必须是水果蔬菜/肉禽蛋/面食/零食/其他")
+                    return@withContext fail("category 必须是果蔬/肉禽蛋/粮油调味/零食/补剂/套餐")
                 }
             }
             "update" -> if (name.isEmpty()) return@withContext fail("缺少 food_name")
@@ -216,11 +218,12 @@ class ManageFoodLibraryTool(
     }
 
     private fun categoryKey(value: String): String? = when (value) {
-        "水果蔬菜" -> "FRUIT_VEG"
+        "果蔬" -> "FRUIT_VEG"
         "肉禽蛋" -> "MEAT_EGG"
-        "面食" -> "STAPLE"
+        "粮油调味" -> "STAPLE"
         "零食" -> "SNACK"
-        "其他" -> "OTHER"
+        "补剂" -> "SUPPLEMENT"
+        "套餐" -> "COMBO"
         else -> null
     }
 

@@ -54,19 +54,23 @@ class FoodCategoryAdapter(
             val density = context.resources.displayMetrics.density
             val radius = 20f * density
             val selected = category.categoryKey == selectedKey
+            val accent = ButtonAccentManager.current
             view.text = category.name
             view.typeface = Typeface.create("sans-serif", if (selected) Typeface.BOLD else Typeface.NORMAL)
-            view.setTextColor(if (selected) Color.WHITE else tokens.textSecondary)
+            view.setTextColor(if (selected) accent.textColor else tokens.textSecondary)
             view.background = if (selected) {
                 GradientDrawable(
                     GradientDrawable.Orientation.LEFT_RIGHT,
-                    intArrayOf(tokens.gradientStart, tokens.gradientMid)
-                ).apply { cornerRadius = radius }
+                    accent.colors
+                ).apply {
+                    cornerRadius = radius
+                    setStroke((1.2f * density).toInt().coerceAtLeast(1), accent.borderColor)
+                }
             } else {
                 GradientDrawable().apply {
                     cornerRadius = radius
                     setColor(tokens.chipUnselectedFill)
-                    setStroke((1f * density).toInt().coerceAtLeast(1), tokens.chipUnselectedStroke)
+                    setStroke((1f * density).toInt().coerceAtLeast(1), accent.borderColor)
                 }
             }
             view.setOnClickListener { onClick(category) }

@@ -7,6 +7,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.text.InputType
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -47,6 +48,8 @@ class FoodLibraryActivity : ThemedActivity() {
     private var meal: MealType = MealType.BREAKFAST
     private var dragCategoryOrder: MutableList<String> = mutableListOf()
     private var dragFoodOrder: MutableList<Long> = mutableListOf()
+    private var lastTouchX = 0f
+    private var lastTouchY = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,9 +58,24 @@ class FoodLibraryActivity : ThemedActivity() {
         repository = (application as SagittariusApp).dietRepository
         date = runCatching { LocalDate.parse(intent.getStringExtra(EXTRA_DATE)) }.getOrDefault(LocalDate.now())
         meal = MealType.fromStorage(intent.getStringExtra(EXTRA_MEAL)) ?: MealType.BREAKFAST
+        val accent = ButtonAccentManager.current
+        binding.btnAddFood.setTextColor(accent.textColor)
+        binding.btnManageCategories.setTextColor(accent.textColor)
 
         setupCategories()
         setupFoods()
+        binding.foodGrid.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
+            override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                lastTouchX = e.rawX
+                lastTouchY = e.rawY
+                return false
+            }
+
+            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
+                lastTouchX = e.rawX
+                lastTouchY = e.rawY
+            }
+        })
         binding.btnAddFood.setOnClickListener { openEditor(null) }
         binding.btnManageCategories.setOnClickListener { showAddCategory() }
         observe()
@@ -174,10 +192,12 @@ class FoodLibraryActivity : ThemedActivity() {
                 if (!moved) {
                     foodAdapter.showDelete(foodAdapter.currentList.indexOfFirst { it.id == food.id })
                 } else {
-                    val targetKey = categoryKeyAt(viewHolder.itemView)
+                    val targetKey = categoryKeyAt(lastTouchX, lastTouchY)
+                        ?: categoryKeyAt(viewHolder.itemView)
                     if (targetKey != null && targetKey != selectedKey) {
                         lifecycleScope.launch {
                             repository.moveFood(food.id, targetKey)
+                            selectCategory(targetKey)
                             Toast.makeText(
                                 this@FoodLibraryActivity,
                                 "已移动到 ${categories.firstOrNull { it.categoryKey == targetKey }?.name }",
@@ -199,13 +219,15 @@ class FoodLibraryActivity : ThemedActivity() {
     private fun categoryKeyAt(itemView: View): String? {
         val r = Rect()
         itemView.getGlobalVisibleRect(r)
-        val cx = (r.left + r.right) / 2
-        val cy = (r.top + r.bottom) / 2
+        return categoryKeyAt((r.left + r.right) / 2f, (r.top + r.bottom) / 2f)
+    }
+
+    private fun categoryKeyAt(x: Float, y: Float): String? {
         for (index in 0 until binding.categoryList.childCount) {
             val child = binding.categoryList.getChildAt(index) ?: continue
             val cr = Rect()
             child.getGlobalVisibleRect(cr)
-            if (cr.contains(cx, cy)) {
+            if (cr.contains(x.toInt(), y.toInt())) {
                 val position = binding.categoryList.getChildAdapterPosition(child)
                 return categoryAdapter.currentList.getOrNull(position)?.categoryKey
             }
@@ -248,6 +270,12 @@ class FoodLibraryActivity : ThemedActivity() {
         selectedKey = key
         categoryAdapter.setSelected(key)
         renderFoods()
+    }
+
+    override fun finish() {
+        super.finish()
+        @Suppress("DEPRECATION")
+        overridePendingTransition(R.anim.fade_in_pure, R.anim.fade_out_pure)
     }
 
     private fun openEditor(food: FoodEntity?) {

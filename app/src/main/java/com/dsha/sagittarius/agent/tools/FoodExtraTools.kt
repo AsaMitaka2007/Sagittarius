@@ -22,7 +22,7 @@ class AddFoodToLibraryTool(private val diet: DietPort) : AgentTool {
         put("type", "object")
         put("properties", buildJsonObject {
             put("name", buildJsonObject { put("type", "string") })
-            put("category", buildJsonObject { put("type", "string"); put("enum", buildJsonArray { listOf("水果蔬菜", "肉禽蛋", "面食", "零食", "其他").forEach { add(JsonPrimitive(it)) } }) })
+            put("category", buildJsonObject { put("type", "string"); put("enum", buildJsonArray { listOf("果蔬", "肉禽蛋", "粮油调味", "零食", "补剂", "套餐").forEach { add(JsonPrimitive(it)) } }) })
             put("calories", numberSchema("热量 kcal/100g"))
             put("carbs", numberSchema("碳水 g/100g"))
             put("protein", numberSchema("蛋白质 g/100g"))
@@ -94,7 +94,7 @@ class AddFoodToLibraryTool(private val diet: DietPort) : AgentTool {
         buildJsonObject { put("type", "number"); put("description", description) }
 
     private fun num(args: JsonObject, key: String) = args[key]?.jsonPrimitive?.content?.toDoubleOrNull() ?: 0.0
-    private fun categoryKey(value: String) = when (value) { "水果蔬菜" -> "FRUIT_VEG"; "肉禽蛋" -> "MEAT_EGG"; "面食" -> "STAPLE"; "零食" -> "SNACK"; "其他" -> "OTHER"; else -> null }
+    private fun categoryKey(value: String) = when (value) { "果蔬" -> "FRUIT_VEG"; "肉禽蛋" -> "MEAT_EGG"; "粮油调味" -> "STAPLE"; "零食" -> "SNACK"; "补剂" -> "SUPPLEMENT"; "套餐" -> "COMBO"; else -> null }
     private fun fail(error: String) = ToolResult(false, buildJsonObject { put("ok", false); put("message", error) }.toString())
 
     private companion object {
