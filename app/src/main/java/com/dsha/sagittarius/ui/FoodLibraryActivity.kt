@@ -176,6 +176,7 @@ class FoodLibraryActivity : ThemedActivity() {
                     dragged = foodAdapter.currentList.getOrNull(viewHolder.bindingAdapterPosition)
                     dragFoodOrder = foodAdapter.currentList.map { it.id }.toMutableList()
                     dragged?.let { foodAdapter.startDrag(it) }
+                    (viewHolder as? FoodCapsuleAdapter.Holder)?.enhanceDrag()
                     binding.foodGrid.translationZ = 30f * resources.displayMetrics.density
                     Haptics.longPress(viewHolder.itemView)
                 }

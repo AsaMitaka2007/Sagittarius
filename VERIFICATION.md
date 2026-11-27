@@ -788,3 +788,12 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 分类落点改为优先使用手指 raw 坐标；松手后移动到目标分类并自动切到该分类页面。
 - 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 467 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,579 bytes，SHA256 `DDA106D5…5747`，versionCode 63 / 1.1.0）。
 - 未 push。
+
+
+## 3.5 alpha-2.0 拖动被误判松手修正（2026-11-27）
+
+- 根因：`onSelectedChanged(ACTION_STATE_DRAG)` 里调用 `notifyItemChanged` 重绑了正在拖动的 ViewHolder，ItemTouchHelper 立即丢失 drag 并走 `clearView`，于是表现为“长按变球但无法拖动”。
+- `FoodCapsuleAdapter.startDrag` 不再 notify，只记录 `draggingId`；由 `Holder.enhanceDrag()` 直接改当前 View（隐藏图片/文字、圆角半高、scaleX=高/宽）完成圆球视觉。
+- `onMove` 触发列表重绑时，`bind()` 依据 `draggingId` 重新应用圆球状态；拖动结束才 `endDrag()` 恢复。
+- 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 467 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,579 bytes，SHA256 `7DA1400E…D996`，versionCode 63 / 1.1.0）。
+- 未 push。

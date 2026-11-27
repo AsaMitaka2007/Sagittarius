@@ -37,8 +37,8 @@ class FoodCapsuleAdapter(
     fun startDrag(food: FoodEntity) {
         pendingDeleteId = null
         draggingId = food.id
-        val index = currentList.indexOfFirst { it.id == food.id }
-        if (index >= 0) notifyItemChanged(index)
+        // 不能在这里 notifyItemChanged：会把正在拖动的 ViewHolder 重绑，
+        // ItemTouchHelper 会立刻丢失拖动并当成“原地松手”。
     }
 
     fun endDrag() {
@@ -135,16 +135,16 @@ class FoodCapsuleAdapter(
 
         fun enhanceDrag() {
             val targetX = (itemView.height.toFloat() / itemView.width.coerceAtLeast(1))
-                .coerceIn(0.45f, 0.9f)
+                .coerceIn(0.4f, 1f)
             card.animate()
                 .scaleX(targetX)
-                .scaleY(0.86f)
+                .scaleY(1f)
                 .setDuration(120L)
                 .start()
             card.radius = itemView.height / 2f
             name.alpha = 0f
             kcal.alpha = 0f
-            image.alpha = 0.35f
+            image.alpha = 0f
             quickAdd.visibility = View.GONE
             delete.visibility = View.GONE
         }
