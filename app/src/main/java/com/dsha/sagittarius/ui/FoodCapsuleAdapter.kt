@@ -22,6 +22,7 @@ class FoodCapsuleAdapter(
 ) : ListAdapter<FoodEntity, FoodCapsuleAdapter.Holder>(Diff) {
 
     private var pendingDeleteId: Long? = null
+    private var draggingId: Long? = null
 
     fun ids(): List<Long> = currentList.map { it.id }
 
@@ -33,9 +34,18 @@ class FoodCapsuleAdapter(
         return true
     }
 
-    fun startDrag(position: Int) {
+    fun startDrag(food: FoodEntity) {
         pendingDeleteId = null
-        notifyItemChanged(position)
+        draggingId = food.id
+        val index = currentList.indexOfFirst { it.id == food.id }
+        if (index >= 0) notifyItemChanged(index)
+    }
+
+    fun endDrag() {
+        val id = draggingId ?: return
+        draggingId = null
+        val index = currentList.indexOfFirst { it.id == id }
+        if (index >= 0) notifyItemChanged(index)
     }
 
     fun showDelete(position: Int) {
@@ -100,6 +110,26 @@ class FoodCapsuleAdapter(
                 pendingDeleteId = null
                 delete.visibility = View.GONE
                 onDelete(food)
+            }
+            if (food.id == draggingId) {
+                name.alpha = 0f
+                kcal.alpha = 0f
+                image.alpha = 0f
+                quickAdd.visibility = View.GONE
+                delete.visibility = View.GONE
+                card.radius = itemView.height / 2f
+                itemView.post {
+                    if (food.id != draggingId) return@post
+                    val width = itemView.width
+                    val height = itemView.height
+                    if (width > 0 && height > 0) {
+                        card.radius = height / 2f
+                        card.scaleX = (height.toFloat() / width).coerceIn(0.4f, 1f)
+                        card.scaleY = 1f
+                    }
+                }
+            } else {
+                image.alpha = 1f
             }
         }
 

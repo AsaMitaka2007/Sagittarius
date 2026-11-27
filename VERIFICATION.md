@@ -778,3 +778,13 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 套餐新增「粤卤记猪脚饭」：一份 550g，100g 热量 162kcal、蛋白 7.3g、脂肪 8.5g、碳水 13.7g、纤维 2.5g、维A 121μg、维C 9.9mg；两张默认图片使用用户提供的素材，已裁切压缩进 `assets/food_images/`。
 - 验证：`assembleDebug` / `assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 467 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,555 bytes，SHA256 `16078B2C…6387`，versionCode 63 / 1.1.0）。
 - 未 push；alpha 期间安装版本号保持不变。
+
+
+## 3.4 alpha-2.0 拖拽层级与圆球修正（2026-11-27）
+
+- 分类栏与食材列表改为可跨层绘制：根布局与 `foodGrid` 设置 `clipChildren=false`，拖动时把 `foodGrid.translationZ` 抬高，食材胶囊可以盖过上方分类按钮，不再被列表边界裁掉。
+- 拖动开始/结束由 `FoodCapsuleAdapter.startDrag/endDrag` 维护 `draggingId`；即使 `onMove` 触发列表重绑，绑定阶段也会重新隐藏图片/文字并收束成圆形，拖动中不会恢复成长条。
+- 圆形直径为原卡片高度（短边），`scaleX = height / width`、`radius = height / 2`，图片 alpha=0。
+- 分类落点改为优先使用手指 raw 坐标；松手后移动到目标分类并自动切到该分类页面。
+- 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 467 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,579 bytes，SHA256 `DDA106D5…5747`，versionCode 63 / 1.1.0）。
+- 未 push。

@@ -63,7 +63,6 @@ class FoodLibraryActivity : ThemedActivity() {
         binding.btnManageCategories.setTextColor(accent.textColor)
 
         setupCategories()
-        setupFoods()
         binding.foodGrid.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
                 lastTouchX = e.rawX
@@ -76,6 +75,7 @@ class FoodLibraryActivity : ThemedActivity() {
                 lastTouchY = e.rawY
             }
         })
+        setupFoods()
         binding.btnAddFood.setOnClickListener { openEditor(null) }
         binding.btnManageCategories.setOnClickListener { showAddCategory() }
         observe()
@@ -148,7 +148,6 @@ class FoodLibraryActivity : ThemedActivity() {
         binding.foodGrid.adapter = foodAdapter
         var moved = false
         var dragged: FoodEntity? = null
-        var dragHolder: FoodCapsuleAdapter.Holder? = null
         val callback = object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT,
             0
@@ -176,16 +175,16 @@ class FoodLibraryActivity : ThemedActivity() {
                     moved = false
                     dragged = foodAdapter.currentList.getOrNull(viewHolder.bindingAdapterPosition)
                     dragFoodOrder = foodAdapter.currentList.map { it.id }.toMutableList()
-                    dragHolder = viewHolder as? FoodCapsuleAdapter.Holder
-                    dragHolder?.enhanceDrag()
+                    dragged?.let { foodAdapter.startDrag(it) }
+                    binding.foodGrid.translationZ = 30f * resources.displayMetrics.density
                     Haptics.longPress(viewHolder.itemView)
                 }
             }
 
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
                 super.clearView(recyclerView, viewHolder)
-                dragHolder?.resetDrag()
-                dragHolder = null
+                foodAdapter.endDrag()
+                binding.foodGrid.translationZ = 0f
                 val food = dragged
                 dragged = null
                 if (food == null) return
