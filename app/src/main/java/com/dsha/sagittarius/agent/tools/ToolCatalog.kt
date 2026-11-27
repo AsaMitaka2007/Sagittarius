@@ -36,7 +36,10 @@ object ToolCatalog {
         "toggle_floating_window" to Meta("切换悬浮窗", "系统", false),
         "navigate_to_tab" to Meta("跳转页面", "系统", true),
         "control_weather_debug" to Meta("天气调试", "系统", false),
-        "remember_preference" to Meta("记住长期偏好", "记忆", false)
+        "remember_preference" to Meta("记住长期偏好", "记忆", false),
+        "manage_daily_goal" to Meta("管理当日目标", "饮食", false),
+        "update_diet_record" to Meta("修改历史饮食", "饮食", false),
+        "delete_diet_record" to Meta("删除历史饮食", "饮食", false)
     )
 
     fun metaFor(tool: AgentTool): Meta = meta[tool.name] ?: Meta(tool.name, "其他", false)

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -31,6 +32,9 @@ class DietHistoryFragment : Fragment() {
     private var recordsJob: Job? = null
     private var startDate: LocalDate = LocalDate.now().withDayOfMonth(1)
     private var endDate: LocalDate = LocalDate.now()
+    private var currentRecords: List<DietRecordEntity> = emptyList()
+    private var missingIds: Set<Long> = emptySet()
+    private var changedIds: Set<Long> = emptySet()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,6 +57,24 @@ class DietHistoryFragment : Fragment() {
         binding.recyclerDiet.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerDiet.adapter = adapter
         attachDrag()
+        binding.btnSyncFoods.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val target = currentRecords
+                if (target.isEmpty()) {
+                    Toast.makeText(requireContext(), "当前范围没有饮食记录", Toast.LENGTH_SHORT).show()
+                    return@launch
+                }
+                val result = repository.syncDietRecords(target)
+                changedIds = result.changedIds
+                missingIds = result.missingIds
+                adapter.setSyncState(missingIds, changedIds)
+                Toast.makeText(
+                    requireContext(),
+                    "同步完成：更新 ${result.changedIds.size} 条，食材缺失 ${result.missingIds.size} 条",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
         DateConsoleBinding.observe(
             this,
             binding.dateConsole,
@@ -72,7 +94,11 @@ class DietHistoryFragment : Fragment() {
         recordsJob = viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 repository.observeRecordsBetween(startDate, endDate).collect { records ->
+                    currentRecords = records
+                    val foodIds = repository.foodIds()
+                    missingIds = records.filter { it.foodId !in foodIds }.mapTo(mutableSetOf()) { it.id }
                     adapter.submit(records)
+                    adapter.setSyncState(missingIds, changedIds)
                     binding.tvDietEmpty.isVisible = records.isEmpty()
                 }
             }

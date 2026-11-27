@@ -59,6 +59,9 @@ object ToolRegistryFactory {
             register(NavigateToTabTool(systemPort))
             register(ControlWeatherDebugTool(systemPort))
             register(RememberPreferenceTool(memorySaver))
+            register(ManageDailyGoalTool(dietRepository))
+            register(UpdateDietRecordTool(dietRepository))
+            register(DeleteDietRecordTool(dietRepository))
             // register(WebSearchTool(...))
         }
     }

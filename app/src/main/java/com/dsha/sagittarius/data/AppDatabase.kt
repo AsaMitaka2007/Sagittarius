@@ -26,9 +26,10 @@ import java.io.File
         ChatHistoryEntity::class,
         CnFoodEntity::class,
         ChatSessionEntity::class,
-        AgentMemoryEntity::class
+        AgentMemoryEntity::class,
+        DailyGoalEntity::class
     ],
-    version = 11,
+    version = 12,
     exportSchema = true
 )
 @TypeConverters(Converters::class)
@@ -50,6 +51,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun cnFoodDao(): CnFoodDao
     abstract fun chatSessionDao(): ChatSessionDao
     abstract fun agentMemoryDao(): AgentMemoryDao
+    abstract fun dailyGoalDao(): DailyGoalDao
 
     companion object {
         private const val DB_NAME = "sagittarius.db"
@@ -513,6 +515,24 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS `daily_goals` (
+                        `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        `title` TEXT NOT NULL,
+                        `nutrientKey` TEXT NOT NULL,
+                        `amount` REAL NOT NULL,
+                        `sortOrder` INTEGER NOT NULL,
+                        `createdAt` INTEGER NOT NULL,
+                        `completedDate` TEXT
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
         private val MIGRATION_7_8 = object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
@@ -545,7 +565,7 @@ abstract class AppDatabase : RoomDatabase() {
                         AppDatabase::class.java,
                         DB_NAME
                     )
-                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
+                        .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
                         .addCallback(object : androidx.room.RoomDatabase.Callback() {
                             override fun onCreate(db: SupportSQLiteDatabase) {
                                 CategoryCatalog.presetEntities.forEach { category ->

@@ -71,6 +71,12 @@
             android:theme="@style/Theme.Sagittarius" />
 
         <activity
+            android:name=".ui.FoodLibraryActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".agent.ui.SagittariusActivity"
             android:exported="false"
             android:launchMode="singleTop"

@@ -1,5 +1,6 @@
 package com.dsha.sagittarius.ui
 
+import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,6 +27,8 @@ class DietHistoryAdapter(
     private var records: List<DietRecordEntity> = emptyList()
     private var openRow: SwipeRevealLayout? = null
     private var dragging = false
+    private var missingIds: Set<Long> = emptySet()
+    private var changedIds: Set<Long> = emptySet()
 
     init {
         setHasStableIds(true)
@@ -34,6 +37,12 @@ class DietHistoryAdapter(
     fun submit(list: List<DietRecordEntity>) {
         records = list.sortedWith(compareBy({ it.mealType.ordinal }, { it.createdAt }, { it.id }))
         rebuild()
+        notifyDataSetChanged()
+    }
+
+    fun setSyncState(missing: Set<Long>, changed: Set<Long>) {
+        missingIds = missing
+        changedIds = changed
         notifyDataSetChanged()
     }
 
@@ -132,6 +141,7 @@ class DietHistoryAdapter(
 
     private inner class RecordHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val row: SwipeRevealLayout = view as SwipeRevealLayout
+        private val historyContent: View = view.findViewById(R.id.historyContent)
         private val icon: ImageView = view.findViewById(R.id.ivFoodIcon)
         private val name: TextView = view.findViewById(R.id.tvFoodName)
         private val amount: TextView = view.findViewById(R.id.tvFoodAmount)
@@ -147,6 +157,11 @@ class DietHistoryAdapter(
                 Locale.CHINA, "%.0f %s · %.1f g", record.amount, record.unit, record.grams
             )
             calories.text = String.format(Locale.CHINA, "%.1f kcal", record.calories)
+            historyContent.backgroundTintList = when {
+                record.id in missingIds -> ColorStateList.valueOf(0x40F59E0B)
+                record.id in changedIds -> ColorStateList.valueOf(0x4034D399)
+                else -> null
+            }
             row.setSwipeEnabled(!dragging)
             row.close(false)
             row.setOnRevealChanged { changed, revealed ->

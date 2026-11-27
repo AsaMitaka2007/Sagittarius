@@ -59,6 +59,9 @@ interface DietRecordDao {
     @Query("SELECT * FROM diet_records WHERE date = :date ORDER BY mealType ASC, createdAt ASC")
     suspend fun getByDate(date: LocalDate): List<DietRecordEntity>
 
+    @Query("SELECT * FROM diet_records WHERE id = :id LIMIT 1")
+    suspend fun getById(id: Long): DietRecordEntity?
+
     @Insert
     suspend fun insertAll(records: List<DietRecordEntity>)
 
@@ -73,6 +76,27 @@ interface DietRecordDao {
 
     @Delete
     suspend fun delete(record: DietRecordEntity)
+}
+
+@Dao
+interface DailyGoalDao {
+    @Query("SELECT * FROM daily_goals ORDER BY sortOrder ASC, id ASC")
+    fun observeAll(): Flow<List<DailyGoalEntity>>
+
+    @Query("SELECT * FROM daily_goals ORDER BY sortOrder ASC, id ASC")
+    suspend fun getAll(): List<DailyGoalEntity>
+
+    @Insert
+    suspend fun insert(goal: DailyGoalEntity): Long
+
+    @Update
+    suspend fun update(goal: DailyGoalEntity)
+
+    @Delete
+    suspend fun delete(goal: DailyGoalEntity)
+
+    @Query("UPDATE daily_goals SET completedDate = :date WHERE id = :id")
+    suspend fun setCompleted(id: Long, date: String?)
 }
 
 @Dao
@@ -149,6 +173,9 @@ interface FoodCategoryDao {
 
     @Update
     suspend fun update(category: FoodCategoryEntity)
+
+    @Query("UPDATE food_categories SET sortOrder = :order WHERE categoryKey = :key")
+    suspend fun setSortOrder(key: String, order: Int)
 
     @Query("DELETE FROM food_categories WHERE id = :id")
     suspend fun deleteById(id: Long)

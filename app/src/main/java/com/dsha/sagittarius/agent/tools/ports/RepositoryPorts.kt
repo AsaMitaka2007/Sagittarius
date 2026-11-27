@@ -62,6 +62,12 @@ class DietRepositoryDietPort(private val repository: DietRepository) : DietPort 
 
     override suspend fun searchFoods(query: String, limit: Int): List<FoodEntity> =
         repository.searchFoods(query, limit)
+
+    override suspend fun moveFood(foodId: Long, targetCategory: String): Boolean =
+        repository.moveFood(foodId, targetCategory)
+
+    override suspend fun copyFood(foodId: Long, newName: String, targetCategory: String?): FoodEntity? =
+        repository.copyFood(foodId, newName, targetCategory)
     override suspend fun getUnits(foodId: Long): List<FoodUnitEntity> = repository.getUnits(foodId)
     override suspend fun addRecord(record: DietRecordEntity): Long = repository.addRecord(record)
     override suspend fun addFood(food: FoodEntity): FoodEntity? = repository.addFood(food)

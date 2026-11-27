@@ -36,6 +36,8 @@ interface DietPort {
     suspend fun ensureSeeded()
     suspend fun findFoodByName(name: String): FoodEntity?
     suspend fun searchFoods(query: String, limit: Int = 20): List<FoodEntity> = emptyList()
+    suspend fun moveFood(foodId: Long, targetCategory: String): Boolean = false
+    suspend fun copyFood(foodId: Long, newName: String, targetCategory: String? = null): FoodEntity? = null
     suspend fun getUnits(foodId: Long): List<FoodUnitEntity>
     suspend fun addRecord(record: DietRecordEntity): Long
     suspend fun addFood(food: FoodEntity): FoodEntity?

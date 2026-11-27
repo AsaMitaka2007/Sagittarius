@@ -69,7 +69,7 @@ export ANDROID_SDK_ROOT=$ANDROID_HOME
 
 - `versionCode`：**单调递增，只增不减**，每次对外发布至少 +1。
 - `versionName`：语义化版本 `MAJOR.MINOR.PATCH`；功能新增升 MINOR，修复升 PATCH。
-- 当前基线：`versionCode = 64`、`versionName = "1.1.1"`（已发布 APK 同为此版本）。
+- 当前基线：`versionCode = 63`、`versionName = "1.1.0"`（1.1 已发布版本；alpha-2.0 测试包保持此版本号，正式 1.2 发布时升到 64/1.2.0）。
 - 改版本号时两处必须同时改，并在发布前核对 `dist/` 下 APK 与 `build.gradle.kts` 一致。
 
 ## 发布签名

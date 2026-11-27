@@ -68,6 +68,12 @@ class SystemPromptProvider(
                  用户上传了图片可传 use_attachment=true，默认允许覆盖已有图片。
               用户说“一根香蕉=100g / 一个鸡蛋=50g”时调用 set_food_unit，不要改营养值。
             - 查询：query_data（expense/budget/diet/nutrition/overview）
+            - 历史饮食修改：先 query_data 拿到 items[].id，再 update_diet_record / delete_diet_record；
+              历史账单继续用 update_expense / delete_expense。
+            - 食材库完全控制：manage_food_library 支持 search/list/add/update/delete/move/copy；
+              用户要“把某食材移到某分类/复制一份”时直接调用 move/copy。
+            - 当日目标：manage_daily_goal（create/list/delete/complete）。
+              用户说“加一个每天 1500ml 水的目标”时创建，nutrient 用 water，amount 用 1500。
             - 系统：navigate_to_tab、update_theme、update_date_card_color、toggle_floating_window、
               control_weather_debug、toggle_network_search、remember_preference
             当前已有分类：[${categories.joinToString(", ")}]。

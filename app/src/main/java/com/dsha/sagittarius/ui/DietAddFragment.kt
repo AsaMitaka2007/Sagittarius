@@ -1,10 +1,12 @@
 package com.dsha.sagittarius.ui
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
@@ -30,6 +32,22 @@ class DietAddFragment : Fragment() {
     private var selectedDate: LocalDate = LocalDate.now()
     private var mealType: MealType = MealType.BREAKFAST
     private val pending = mutableListOf<DietRecordEntity>()
+    private val libraryLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != Activity.RESULT_OK) return@registerForActivityResult
+        val data = result.data ?: return@registerForActivityResult
+        val foodId = data.getLongExtra(FoodLibraryActivity.RESULT_FOOD_ID, 0L)
+        val amount = data.getDoubleExtra(FoodLibraryActivity.RESULT_AMOUNT, 0.0)
+        val unit = data.getStringExtra(FoodLibraryActivity.RESULT_UNIT).orEmpty()
+        val weight = data.getDoubleExtra(FoodLibraryActivity.RESULT_UNIT_WEIGHT, 1.0)
+        if (foodId <= 0L || amount <= 0.0) return@registerForActivityResult
+        viewLifecycleOwner.lifecycleScope.launch {
+            val food = repository.getFood(foodId) ?: return@launch
+            pending += NutritionMath.recordFrom(food, mealType, amount, unit, weight, selectedDate)
+            refresh()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -66,12 +84,11 @@ class DietAddFragment : Fragment() {
             }
         }
         binding.btnCustomFood.setOnClickListener {
-            FoodLibrarySheet.show(requireContext(), repository, selectedDate, mealType) { record ->
-                if (_binding != null) {
-                    pending += record
-                    refresh()
-                }
-            }
+            libraryLauncher.launch(
+                android.content.Intent(requireContext(), FoodLibraryActivity::class.java)
+                    .putExtra(FoodLibraryActivity.EXTRA_DATE, selectedDate.toString())
+                    .putExtra(FoodLibraryActivity.EXTRA_MEAL, mealType.name)
+            )
         }
         binding.btnClearDiet.setOnClickListener {
             pending.clear()

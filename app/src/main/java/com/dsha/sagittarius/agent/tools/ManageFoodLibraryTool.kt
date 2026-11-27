@@ -25,11 +25,21 @@ class ManageFoodLibraryTool(
                 put("enum", buildJsonArray {
                     add(JsonPrimitive("search")); add(JsonPrimitive("list"))
                     add(JsonPrimitive("add")); add(JsonPrimitive("update")); add(JsonPrimitive("delete"))
+                    add(JsonPrimitive("move")); add(JsonPrimitive("copy"))
                 })
             })
             put("food_name", buildJsonObject {
                 put("type", "string")
-                put("description", "add/update/delete 必填；search 为关键词；list 可省略")
+                put("description", "add/update/delete/move/copy 必填；search 为关键词；list 可省略")
+            })
+            put("new_name", buildJsonObject { put("type", "string"); put("description", "copy 时的新名称") })
+            put("target_category", buildJsonObject {
+                put("type", "string")
+                put("enum", buildJsonArray {
+                    add(JsonPrimitive("水果蔬菜")); add(JsonPrimitive("肉禽蛋"))
+                    add(JsonPrimitive("面食")); add(JsonPrimitive("零食")); add(JsonPrimitive("其他"))
+                })
+                put("description", "move/copy 的目标分类")
             })
             put("category", buildJsonObject {
                 put("type", "string")
@@ -63,9 +73,11 @@ class ManageFoodLibraryTool(
         val name = args["food_name"]?.jsonPrimitive?.content?.trim().orEmpty()
         val categoryText = args["category"]?.jsonPrimitive?.content?.trim().orEmpty()
         val categoryKey = categoryKey(categoryText)
+        val targetKey = categoryKey(args["target_category"]?.jsonPrimitive?.content.orEmpty())
+        val newName = args["new_name"]?.jsonPrimitive?.content?.trim().orEmpty()
         val limit = (args["limit"]?.jsonPrimitive?.content?.toIntOrNull() ?: 20).coerceIn(1, 100)
-        if (action !in setOf("search", "list", "add", "update", "delete")) {
-            return@withContext fail("action 只能是 search/list/add/update/delete")
+        if (action !in setOf("search", "list", "add", "update", "delete", "move", "copy")) {
+            return@withContext fail("action 只能是 search/list/add/update/delete/move/copy")
         }
         diet.ensureSeeded()
         when (action) {
@@ -85,6 +97,14 @@ class ManageFoodLibraryTool(
                 }
             }
             "update" -> if (name.isEmpty()) return@withContext fail("缺少 food_name")
+            "move" -> {
+                if (name.isEmpty()) return@withContext fail("缺少 food_name")
+                if (targetKey == null) return@withContext fail("move 需要 target_category")
+            }
+            "copy" -> {
+                if (name.isEmpty()) return@withContext fail("缺少 food_name")
+                if (newName.isEmpty()) return@withContext fail("copy 需要 new_name")
+            }
             else -> if (name.isEmpty()) return@withContext fail("缺少 food_name")
         }
         val existing = diet.findFoodByName(name)
@@ -139,6 +159,19 @@ class ManageFoodLibraryTool(
                 )
                 val missing = nutritionKeys.filter { args[it] == null }
                 return@withContext success("食材库已更新", "update", name, missing)
+            }
+            "move" -> {
+                if (existing == null) return@withContext fail("食材「$name」不存在")
+                if (!diet.moveFood(existing.id, targetKey!!)) {
+                    return@withContext fail("移动失败")
+                }
+                return@withContext success("食材已移动", "move", name, emptyList())
+            }
+            "copy" -> {
+                if (existing == null) return@withContext fail("食材「$name」不存在")
+                val copied = diet.copyFood(existing.id, newName, targetKey)
+                    ?: return@withContext fail("复制失败")
+                return@withContext success("食材已复制为 ${copied.name}", "copy", copied.name, emptyList())
             }
             else -> {
                 if (existing == null) return@withContext fail("食材「$name」不存在")

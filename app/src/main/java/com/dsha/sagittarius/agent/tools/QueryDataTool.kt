@@ -311,6 +311,7 @@ class QueryDataTool(
                 put("items", buildJsonArray {
                     list.sortedByDescending { it.date }.take(limit).forEach { item ->
                         add(buildJsonObject {
+                            put("id", item.id)
                             put("date", item.date.toString())
                             put("food", item.foodName)
                             put("meal", item.mealType.name.lowercase())

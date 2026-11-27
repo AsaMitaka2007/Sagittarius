@@ -12,8 +12,8 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.dsha.sagittarius.SagittariusApp
 import com.dsha.sagittarius.R
@@ -22,7 +22,7 @@ import com.dsha.sagittarius.data.FoodEntity
 import com.dsha.sagittarius.data.FoodUnitEntity
 import kotlinx.coroutines.launch
 
-class FoodEditActivity : ComponentActivity() {
+class FoodEditActivity : ThemedActivity() {
 
     private lateinit var repository: DietRepository
     private var category: String = "STAPLE"
@@ -34,6 +34,7 @@ class FoodEditActivity : ComponentActivity() {
     private lateinit var titleView: TextView
     private val fields = mutableMapOf<String, EditText>()
     private val units = mutableListOf<FoodUnitEntity>()
+    private var syncingCalories = false
 
     private val pickImage = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
@@ -85,21 +86,33 @@ class FoodEditActivity : ComponentActivity() {
             setPadding(0, dp(6f), 0, dp(8f))
             setOnClickListener { chooseImage() }
         })
-        field(root, "name", "食物名称", InputType.TYPE_CLASS_TEXT, "")
-        field(root, "kcal", "热量", num(), "0", "kcal / 100g")
-        field(root, "carbs", "碳水化合物", num(), "0", "g / 100g")
-        field(root, "fat", "脂肪", num(), "0", "g / 100g")
-        field(root, "protein", "蛋白质", num(), "0", "g / 100g")
-        field(root, "fiber", "纤维素", num(), "0", "g / 100g")
-        field(root, "vitamin", "维生素总量", num(), "0", "mg / 100g")
-        field(root, "water", "水", num(), "0", "g / 100g")
-        field(root, "sodium", "钠", num(), "0", "mg / 100g")
-        field(root, "vitA", "维生素 A", num(), "0", "μg RE / 100g")
-        field(root, "vitB1", "维生素 B1", num(), "0", "mg / 100g")
-        field(root, "vitB2", "维生素 B2", num(), "0", "mg / 100g")
-        field(root, "vitB3", "烟酸 B3", num(), "0", "mg / 100g")
-        field(root, "vitC", "维生素 C", num(), "0", "mg / 100g")
-        field(root, "vitE", "维生素 E", num(), "0", "mg / 100g")
+        val formCard = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(14f), dp(4f), dp(14f), dp(8f))
+            background = android.graphics.drawable.GradientDrawable().apply {
+                cornerRadius = dp(20f).toFloat()
+                setColor(tokens.cardFillTop)
+                setStroke(dp(1f), tokens.cardStrokeStart)
+            }
+        }
+        root.addView(formCard, LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+        ).apply { topMargin = dp(6f) })
+        field(formCard, "name", "食物名称", InputType.TYPE_CLASS_TEXT, "")
+        calorieField(formCard)
+        field(formCard, "carbs", "碳水化合物", num(), "0", "g / 100g")
+        field(formCard, "fat", "脂肪", num(), "0", "g / 100g")
+        field(formCard, "protein", "蛋白质", num(), "0", "g / 100g")
+        field(formCard, "fiber", "纤维素", num(), "0", "g / 100g")
+        field(formCard, "vitamin", "维生素总量", num(), "0", "mg / 100g")
+        field(formCard, "water", "水", num(), "0", "g / 100g")
+        field(formCard, "sodium", "钠", num(), "0", "mg / 100g")
+        field(formCard, "vitA", "维生素 A", num(), "0", "μg RE / 100g")
+        field(formCard, "vitB1", "维生素 B1", num(), "0", "mg / 100g")
+        field(formCard, "vitB2", "维生素 B2", num(), "0", "mg / 100g")
+        field(formCard, "vitB3", "烟酸 B3", num(), "0", "mg / 100g")
+        field(formCard, "vitC", "维生素 C", num(), "0", "mg / 100g")
+        field(formCard, "vitE", "维生素 E", num(), "0", "mg / 100g")
 
         root.addView(TextView(this).apply {
             text = "单位换算"
@@ -163,6 +176,80 @@ class FoodEditActivity : ComponentActivity() {
     }
 
     private fun num(): Int = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_DECIMAL
+
+    private fun calorieField(root: LinearLayout) {
+        val tokens = ThemeTokens.of(this)
+        val density = resources.displayMetrics.density
+        fun dp(v: Float) = (v * density).toInt()
+        val row = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, dp(3f), 0, 0)
+        }
+        row.addView(TextView(this).apply {
+            text = "热量"
+            setTextColor(tokens.textSecondary)
+            textSize = 12f
+        }, LinearLayout.LayoutParams(0, dp(46f), 1f))
+        val kj = EditText(this).apply {
+            hint = "kJ"
+            inputType = num()
+            setText("0")
+            setTextColor(tokens.textPrimary)
+            setHintTextColor(tokens.textTertiary)
+            textSize = 13f
+            gravity = Gravity.END
+        }
+        val kcal = EditText(this).apply {
+            hint = "kcal"
+            inputType = num()
+            setText("0")
+            setTextColor(tokens.textPrimary)
+            setHintTextColor(tokens.textTertiary)
+            textSize = 13f
+            gravity = Gravity.END
+        }
+        fields["kcal"] = kcal
+        row.addView(kj, LinearLayout.LayoutParams(dp(78f), dp(46f)))
+        row.addView(TextView(this).apply {
+            text = "kJ ="
+            setTextColor(tokens.textTertiary)
+            textSize = 10f
+            gravity = Gravity.CENTER
+        }, LinearLayout.LayoutParams(dp(34f), dp(46f)))
+        row.addView(kcal, LinearLayout.LayoutParams(dp(78f), dp(46f)))
+        row.addView(TextView(this).apply {
+            text = "kcal"
+            setTextColor(tokens.textTertiary)
+            textSize = 10f
+            setPadding(dp(3f), 0, 0, 0)
+        }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, dp(46f)))
+        root.addView(row)
+
+        fun format(value: Double): String =
+            if (value == value.toLong().toDouble()) value.toLong().toString()
+            else String.format(java.util.Locale.CHINA, "%.2f", value)
+
+        kj.doAfterTextChanged { editable ->
+            if (syncingCalories) return@doAfterTextChanged
+            val value = editable?.toString()?.toDoubleOrNull()
+            if (value == null) return@doAfterTextChanged
+            syncingCalories = true
+            kcal.setText(format(value / 4.184))
+            syncingCalories = false
+        }
+        kcal.doAfterTextChanged { editable ->
+            if (syncingCalories) return@doAfterTextChanged
+            val value = editable?.toString()?.toDoubleOrNull()
+            if (value == null) return@doAfterTextChanged
+            syncingCalories = true
+            kj.setText(format(value * 4.184))
+            syncingCalories = false
+        }
+        this.kcalField = kj
+    }
+
+    private var kcalField: EditText? = null
 
     private fun field(root: LinearLayout, key: String, label: String, type: Int, initial: String, suffix: String? = null) {
         val tokens = ThemeTokens.of(this)

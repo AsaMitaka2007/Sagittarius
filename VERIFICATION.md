@@ -753,3 +753,15 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 版本：`versionCode = 64`、`versionName = 1.1.1`；release APK 沿用 1.0 证书，可直接覆盖 1.1.0。
 - 验证：`assembleDebug` BUILD SUCCESSFUL；`testDebugUnitTest` **24 个测试类 / 60 用例 / 0 失败**（新增 LlmJson 工具消息、食材全营养字段测试）；`lintDebug` 0 error / 447 warning；`assembleRelease` BUILD SUCCESSFUL；APK `dist/sgr-release-1.1.1.apk`（SHA256 `00A99CDB…483D`，14.7MB）。
 - 未推送：1.1.1 尚未 push / 发 Release，等待确认。
+
+
+## 3.2 alpha-2.0 食材库/既定事项/体验（2026-11-27）
+
+- 食材库重做：全屏 `FoodLibraryActivity`，分类胶囊横排可拖拽排序；食材为两列胶囊，点击弹性动画进详情，长按进入拖动（缩小胶囊）可跨分类移动/排序，原地松手显示删除按钮；分类长按原地松手弹出重命名/删除。新增 `FoodCategoryAdapter`/`FoodCapsuleAdapter`，列表数据写入 `foods.sortOrder`/`categories.sortOrder`。
+- AI 完全控制食材库：`manage_food_library` 增加 search/list/move/copy，add/update 支持全部营养字段；`manage_food_category` 保持增删；新增历史饮食 `update_diet_record`/`delete_diet_record`，`query_data` 明细返回 id，历史账单继续用 update/delete_expense。
+- 历史饮食同步：新增“同步食材库”按钮，按当前食材重算记录营养并写回；食材已删除的记录背景黄色，同步后数据变化的记录背景绿色。
+- 既定事项：Room v12 新增 `daily_goals`；营养页删除饮食记录列表，新增“当日目标”卡片，可新增多个目标（营养素 + 数量）、勾选完成（变暗 + 删除线 + 沉底），完成目标当日会把数量加到营养环（验收：1500g 水 → 水 +1500g）；每日按 `completedDate` 自动恢复未完成。AI 新增 `manage_daily_goal`。
+- 食材详情：热量改为 kJ / kcal 双输入，编辑任意一栏按 1 kcal = 4.184 kJ 自动换算；详情页改为跟随主题的卡片式表单。
+- 版本：alpha-2.0 保持安装版本号 `versionCode 63 / versionName 1.1.0`（按约定 alpha 不改）；签名沿用 1.0 证书。
+- 验证：`assembleDebug` / `assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` **25 个测试类 / 63 用例 / 0 失败**（新增 DailyGoalMath 3 例）；`lintDebug` 0 error / 467 warning；Room v12 schema 已导出，11→12 迁移 SQL 用 sqlite3 校验通过。
+- 产物：`dist/sgr-alpha-2.0.apk`，14,750,184 bytes，SHA256 `4211CB7F…87CD`；未 push / 未发 Release。
