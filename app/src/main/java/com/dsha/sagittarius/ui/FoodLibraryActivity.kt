@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
+import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -28,6 +29,7 @@ import com.dsha.sagittarius.databinding.ActivityFoodLibraryBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import kotlin.math.abs
 
 /** 新版食材库：分类/食材胶囊、长按拖动、点击详情、长按松手删除。 */
 class FoodLibraryActivity : ThemedActivity() {
@@ -43,6 +45,7 @@ class FoodLibraryActivity : ThemedActivity() {
     private var meal: MealType = MealType.BREAKFAST
     private var dragCategoryOrder: MutableList<String> = mutableListOf()
     private var dragFoodOrder: MutableList<Long> = mutableListOf()
+    private lateinit var categoryGesture: GestureDetector
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,8 +59,25 @@ class FoodLibraryActivity : ThemedActivity() {
         binding.btnManageCategories.setTextColor(accent.textColor)
 
         setupCategories()
+        categoryGesture = GestureDetector(this, object : GestureDetector.SimpleOnGestureListener() {
+            override fun onFling(e1: MotionEvent?, e2: MotionEvent, velocityX: Float, velocityY: Float): Boolean {
+                val start = e1 ?: return false
+                val dx = e2.x - start.x
+                val dy = e2.y - start.y
+                if (!foodAdapter.isDragging() && abs(dx) > abs(dy) * 1.4f &&
+                    abs(dx) > 80f * resources.displayMetrics.density
+                ) {
+                    stepCategory(if (dx < 0) 1 else -1)
+                    return true
+                }
+                return false
+            }
+        })
+        binding.root.isClickable = true
+        binding.root.setOnClickListener { foodAdapter.clearPendingDelete() }
         binding.foodGrid.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
+                categoryGesture.onTouchEvent(e)
                 if (e.actionMasked == MotionEvent.ACTION_DOWN &&
                     foodAdapter.hasPendingDelete() &&
                     rv.findChildViewUnder(e.x, e.y) == null
@@ -69,6 +89,8 @@ class FoodLibraryActivity : ThemedActivity() {
 
         })
         setupFoods()
+        binding.foodGrid.isClickable = true
+        binding.foodGrid.setOnClickListener { foodAdapter.clearPendingDelete() }
         binding.btnAddFood.setOnClickListener { openEditor(null) }
         binding.btnManageCategories.setOnClickListener { showAddCategory() }
         observe()
@@ -222,6 +244,15 @@ class FoodLibraryActivity : ThemedActivity() {
             .sortedBy { it.sortOrder }
         foodAdapter.submitList(list)
         binding.tvFoodEmpty.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    private fun stepCategory(delta: Int) {
+        if (categories.isEmpty()) return
+        val keys = categories.map { it.categoryKey }
+        val index = keys.indexOf(selectedKey)
+        if (index < 0) return
+        val next = (index + delta).coerceIn(0, keys.lastIndex)
+        if (next != index) selectCategory(keys[next])
     }
 
     private fun selectCategory(key: String) {

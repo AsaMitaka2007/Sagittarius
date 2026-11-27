@@ -1,6 +1,8 @@
 package com.dsha.sagittarius.ui
 
 import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +26,8 @@ class FoodCapsuleAdapter(
 
     private var pendingDeleteId: Long? = null
     private var draggingId: Long? = null
+    private var suppressClick = false
+    private val handler = Handler(Looper.getMainLooper())
 
     fun ids(): List<Long> = currentList.map { it.id }
 
@@ -38,6 +42,7 @@ class FoodCapsuleAdapter(
     fun startDrag(food: FoodEntity) {
         pendingDeleteId = null
         draggingId = food.id
+        suppressClick = true
         // 不能在这里 notifyItemChanged：会把正在拖动的 ViewHolder 重绑，
         // ItemTouchHelper 会立刻丢失拖动并当成“原地松手”。
     }
@@ -45,9 +50,13 @@ class FoodCapsuleAdapter(
     fun endDrag() {
         val id = draggingId ?: return
         draggingId = null
+        suppressClick = true
+        handler.postDelayed({ suppressClick = false }, 250L)
         val index = currentList.indexOfFirst { it.id == id }
         if (index >= 0) notifyItemChanged(index)
     }
+
+    fun isDragging(): Boolean = draggingId != null
 
     fun showDelete(position: Int) {
         val food = getItemOrNull(position) ?: return
@@ -99,8 +108,8 @@ class FoodCapsuleAdapter(
             card.scaleY = 1f
             name.alpha = 1f
             kcal.alpha = 1f
-            quickAdd.visibility = View.VISIBLE
             actionRow.visibility = if (pendingDeleteId == food.id) View.VISIBLE else View.GONE
+            quickAdd.visibility = if (pendingDeleteId == food.id) View.GONE else View.VISIBLE
             delete.visibility = View.VISIBLE
             move.visibility = View.VISIBLE
             move.setTextColor(accent.textColor)
@@ -110,6 +119,10 @@ class FoodCapsuleAdapter(
             name.text = food.name
             kcal.text = String.format(Locale.CHINA, "%.0f kcal / 100g", food.caloriesPer100g)
             card.setOnClickListener {
+                if (suppressClick) {
+                    suppressClick = false
+                    return@setOnClickListener
+                }
                 if (pendingDeleteId != null) {
                     val wasPending = pendingDeleteId == food.id
                     clearPendingDelete()

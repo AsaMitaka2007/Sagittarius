@@ -4,6 +4,8 @@ import android.content.Context
 import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -33,8 +35,14 @@ object FoodAmountSheet {
             FoodUnitEntity(foodId = food.id, unitName = "g", weightInGrams = 1.0)
         ) + units
         val tokens = ThemeTokens.of(context)
+        val accent = ButtonAccentManager.current
         val density = context.resources.displayMetrics.density
         fun dp(v: Float) = (v * density).toInt()
+        fun rounded(fill: Int, radius: Float): GradientDrawable = GradientDrawable().apply {
+            cornerRadius = radius
+            setColor(fill)
+            setStroke((1.2f * density).toInt().coerceAtLeast(1), accent.borderColor)
+        }
         val sheet = BottomSheetDialog(context)
         val root = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -54,29 +62,46 @@ object FoodAmountSheet {
             setHintTextColor(tokens.textTertiary)
             textSize = 24f
             gravity = Gravity.START
+            background = rounded(tokens.inputFill, 16f * density)
+            setPadding(dp(14f), 0, dp(14f), 0)
         }
-        root.addView(amount, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(56f)))
-        val spinner = Spinner(context)
-        spinner.adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, safeUnits.map { it.unitName })
-        root.addView(spinner, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(44f)))
+        root.addView(amount, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(60f)).apply {
+            topMargin = dp(12f)
+        })
+        val spinner = Spinner(context).apply {
+            adapter = ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, safeUnits.map { it.unitName })
+            background = rounded(tokens.inputFill, 14f * density)
+            setPadding(dp(8f), 0, dp(8f), 0)
+        }
+        root.addView(spinner, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48f)).apply {
+            topMargin = dp(8f)
+        })
+        val kcalCard = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER
+            setPadding(dp(14f), dp(12f), dp(14f), dp(12f))
+            background = rounded(tokens.cardFillTop, 18f * density)
+        }
         val kcal = TextView(context).apply {
-            setTextColor(tokens.textPrimary)
+            setTextColor(accent.textColor)
             textSize = 34f
             gravity = Gravity.CENTER
             setTypeface(typeface, android.graphics.Typeface.BOLD)
-            setPadding(0, dp(12f), 0, 0)
         }
-        root.addView(kcal)
-        root.addView(TextView(context).apply {
+        kcalCard.addView(kcal)
+        kcalCard.addView(TextView(context).apply {
             text = "kcal"
             setTextColor(tokens.textTertiary)
             textSize = 11f
             gravity = Gravity.CENTER
         })
+        root.addView(kcalCard, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+            topMargin = dp(10f)
+        })
         val toggle = TextView(context).apply {
             text = "展开查看详细营养  ▼"
             gravity = Gravity.CENTER
-            setTextColor(tokens.accent)
+            setTextColor(accent.textColor)
             textSize = 12f
             setPadding(0, dp(10f), 0, dp(6f))
         }
@@ -84,7 +109,8 @@ object FoodAmountSheet {
         val grid = GridLayout(context).apply {
             columnCount = 2
             visibility = android.view.View.GONE
-            setPadding(0, dp(4f), 0, dp(4f))
+            setPadding(dp(8f), dp(8f), dp(8f), dp(8f))
+            background = rounded(tokens.cardFillTop, 16f * density)
         }
         val detailKeys = listOf(
             "碳水", "脂肪", "蛋白质", "纤维素", "维生素", "水", "钠",
@@ -116,12 +142,15 @@ object FoodAmountSheet {
         val confirm = TextView(context).apply {
             text = "确认添加"
             gravity = Gravity.CENTER
-            setTextColor(android.graphics.Color.WHITE)
+            setTextColor(accent.textColor)
             textSize = 14f
-            background = android.graphics.drawable.GradientDrawable(
-                android.graphics.drawable.GradientDrawable.Orientation.LEFT_RIGHT,
-                intArrayOf(tokens.gradientStart, tokens.gradientMid)
-            ).apply { cornerRadius = dp(15f).toFloat() }
+            background = GradientDrawable(
+                GradientDrawable.Orientation.LEFT_RIGHT,
+                accent.colors
+            ).apply {
+                cornerRadius = dp(22f).toFloat()
+                setStroke(dp(1.2f), accent.borderColor)
+            }
         }
         root.addView(confirm, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(48f)).apply {
             topMargin = dp(14f)

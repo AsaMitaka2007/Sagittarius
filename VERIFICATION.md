@@ -814,3 +814,14 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 保留点击胶囊主体收起按钮、点空白/分类/其他胶囊收起等行为。
 - 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 470 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,739 bytes，SHA256 `292A10F4…9730`，versionCode 63 / 1.1.0）。
 - 未 push。
+
+
+## 3.8 alpha-2.0 食材库布局与交互修正（2026-11-27）
+
+- 长按操作显示「删除 / 移动至」时隐藏加号，避免按钮重叠；移动至弹窗选择分类后移动并切页。
+- 恢复 `foodGrid` 的正常裁剪，食材卡片不再绘制到标题/分类栏上方。
+- 增加长按后的点击抑制：长按松手不会误进详情页；点击胶囊主体/空白/分类可收起删除与移动按钮。
+- 食材数量弹层改为与食材库一致的主题化样式：圆角输入框、主题色描边、按钮色渐变确认按钮。
+- 食材库支持左右滑动切换分类（GestureDetector，排除拖动状态）。
+- 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 470 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,719 bytes，SHA256 `50353551…9A22`，versionCode 63 / 1.1.0）。
+- 未 push。
