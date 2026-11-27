@@ -805,3 +805,12 @@ ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
 - 删除按钮增加收起逻辑：点击同一胶囊主体先收起删除按钮；点击其他胶囊、分类、添加/分类或列表空白处都会清除；点删除按钮本身仍执行删除。
 - 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 467 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,579 bytes，SHA256 `D0062FBD…D651`，versionCode 63 / 1.1.0）。
 - 未 push。
+
+
+## 3.7 alpha-2.0 食材跨分类改为按钮（2026-11-27）
+
+- 放弃不稳定的“拖到上方分类”交互：拖动只负责当前分类内排序；长按原地松手后在胶囊上显示「删除」和「移动至」两个按钮。
+- 点击「移动至」弹出分类选择对话框（自动排除当前分类），选择后调用 `repository.moveFood` 并切到目标分类页面。
+- 保留点击胶囊主体收起按钮、点空白/分类/其他胶囊收起等行为。
+- 验证：`assembleRelease` BUILD SUCCESSFUL；`testDebugUnitTest` 25 类 / 64 用例 / 0 失败；`lintDebug` 0 error / 470 warning；APK `dist/sgr-alpha-2.0.apk`（14,853,739 bytes，SHA256 `292A10F4…9730`，versionCode 63 / 1.1.0）。
+- 未 push。

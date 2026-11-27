@@ -18,7 +18,8 @@ import java.util.Locale
 class FoodCapsuleAdapter(
     private val onClick: (FoodEntity, View) -> Unit,
     private val onQuickAdd: (FoodEntity) -> Unit,
-    private val onDelete: (FoodEntity) -> Unit
+    private val onDelete: (FoodEntity) -> Unit,
+    private val onMove: (FoodEntity) -> Unit
 ) : ListAdapter<FoodEntity, FoodCapsuleAdapter.Holder>(Diff) {
 
     private var pendingDeleteId: Long? = null
@@ -83,7 +84,9 @@ class FoodCapsuleAdapter(
         private val name: TextView = view.findViewById(R.id.tvFoodName)
         private val kcal: TextView = view.findViewById(R.id.tvFoodKcal)
         private val quickAdd: TextView = view.findViewById(R.id.btnQuickAdd)
+        private val actionRow: android.widget.LinearLayout = view.findViewById(R.id.actionRow)
         private val delete: TextView = view.findViewById(R.id.btnDelete)
+        private val move: TextView = view.findViewById(R.id.btnMove)
         private val density = view.resources.displayMetrics.density
 
         fun bind(food: FoodEntity) {
@@ -97,7 +100,10 @@ class FoodCapsuleAdapter(
             name.alpha = 1f
             kcal.alpha = 1f
             quickAdd.visibility = View.VISIBLE
-            delete.visibility = if (pendingDeleteId == food.id) View.VISIBLE else View.GONE
+            actionRow.visibility = if (pendingDeleteId == food.id) View.VISIBLE else View.GONE
+            delete.visibility = View.VISIBLE
+            move.visibility = View.VISIBLE
+            move.setTextColor(accent.textColor)
             val bitmap = FoodImageLoader.load(itemView.context, food.imageUri)
             if (bitmap != null) image.setImageBitmap(bitmap)
             else image.setImageResource(R.drawable.ic_food_placeholder)
@@ -116,21 +122,23 @@ class FoodCapsuleAdapter(
                 }.start()
             }
             quickAdd.setOnClickListener {
-                delete.visibility = View.GONE
-                pendingDeleteId = null
+                clearPendingDelete()
                 onQuickAdd(food)
             }
             delete.setOnClickListener {
-                pendingDeleteId = null
-                delete.visibility = View.GONE
+                clearPendingDelete()
                 onDelete(food)
+            }
+            move.setOnClickListener {
+                clearPendingDelete()
+                onMove(food)
             }
             if (food.id == draggingId) {
                 name.alpha = 0f
                 kcal.alpha = 0f
                 image.alpha = 0f
                 quickAdd.visibility = View.GONE
-                delete.visibility = View.GONE
+                actionRow.visibility = View.GONE
                 card.radius = itemView.height / 2f
                 itemView.post {
                     if (food.id != draggingId) return@post
@@ -160,7 +168,7 @@ class FoodCapsuleAdapter(
             kcal.alpha = 0f
             image.alpha = 0f
             quickAdd.visibility = View.GONE
-            delete.visibility = View.GONE
+            actionRow.visibility = View.GONE
         }
 
         fun resetDrag() {

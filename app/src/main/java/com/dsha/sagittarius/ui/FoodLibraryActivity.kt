@@ -2,18 +2,12 @@ package com.dsha.sagittarius.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.Canvas
-import android.graphics.Rect
 import android.os.Bundle
 import android.text.InputType
-import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
@@ -49,10 +43,6 @@ class FoodLibraryActivity : ThemedActivity() {
     private var meal: MealType = MealType.BREAKFAST
     private var dragCategoryOrder: MutableList<String> = mutableListOf()
     private var dragFoodOrder: MutableList<Long> = mutableListOf()
-    private var lastTouchX = 0f
-    private var lastTouchY = 0f
-    private var lastDragCenterX = 0f
-    private var lastDragCenterY = 0f
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,8 +58,6 @@ class FoodLibraryActivity : ThemedActivity() {
         setupCategories()
         binding.foodGrid.addOnItemTouchListener(object : RecyclerView.SimpleOnItemTouchListener() {
             override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-                lastTouchX = e.rawX
-                lastTouchY = e.rawY
                 if (e.actionMasked == MotionEvent.ACTION_DOWN &&
                     foodAdapter.hasPendingDelete() &&
                     rv.findChildViewUnder(e.x, e.y) == null
@@ -79,10 +67,6 @@ class FoodLibraryActivity : ThemedActivity() {
                 return false
             }
 
-            override fun onTouchEvent(rv: RecyclerView, e: MotionEvent) {
-                lastTouchX = e.rawX
-                lastTouchY = e.rawY
-            }
         })
         setupFoods()
         binding.btnAddFood.setOnClickListener { openEditor(null) }
@@ -151,7 +135,8 @@ class FoodLibraryActivity : ThemedActivity() {
         foodAdapter = FoodCapsuleAdapter(
             onClick = { food, _ -> openEditor(food) },
             onQuickAdd = { food -> quickAdd(food) },
-            onDelete = { food -> confirmDelete(food) }
+            onDelete = { food -> confirmDelete(food) },
+            onMove = { food -> showMoveDialog(food) }
         )
         binding.foodGrid.layoutManager = GridLayoutManager(this, 2)
         binding.foodGrid.adapter = foodAdapter
@@ -178,24 +163,6 @@ class FoodLibraryActivity : ThemedActivity() {
                 return ok
             }
 
-            override fun onChildDraw(
-                c: Canvas,
-                recyclerView: RecyclerView,
-                viewHolder: RecyclerView.ViewHolder,
-                dX: Float,
-                dY: Float,
-                actionState: Int,
-                isCurrentlyActive: Boolean
-            ) {
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-                if (isCurrentlyActive) {
-                    val location = IntArray(2)
-                    viewHolder.itemView.getLocationOnScreen(location)
-                    lastDragCenterX = location[0] + viewHolder.itemView.width / 2f
-                    lastDragCenterY = location[1] + viewHolder.itemView.height / 2f
-                }
-            }
-
             override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
                 super.onSelectedChanged(viewHolder, actionState)
                 if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && viewHolder != null) {
@@ -204,7 +171,6 @@ class FoodLibraryActivity : ThemedActivity() {
                     dragFoodOrder = foodAdapter.currentList.map { it.id }.toMutableList()
                     dragged?.let { foodAdapter.startDrag(it) }
                     (viewHolder as? FoodCapsuleAdapter.Holder)?.enhanceDrag()
-                    binding.foodGrid.translationZ = 30f * resources.displayMetrics.density
                     Haptics.longPress(viewHolder.itemView)
                 }
             }
@@ -212,29 +178,13 @@ class FoodLibraryActivity : ThemedActivity() {
             override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
                 super.clearView(recyclerView, viewHolder)
                 foodAdapter.endDrag()
-                binding.foodGrid.translationZ = 0f
                 val food = dragged
                 dragged = null
                 if (food == null) return
                 if (!moved) {
                     foodAdapter.showDelete(foodAdapter.currentList.indexOfFirst { it.id == food.id })
                 } else {
-                    val targetKey = categoryKeyAt(lastDragCenterX, lastDragCenterY)
-                        ?: categoryKeyAt(lastTouchX, lastTouchY)
-                        ?: categoryKeyAt(viewHolder.itemView)
-                    if (targetKey != null && targetKey != selectedKey) {
-                        lifecycleScope.launch {
-                            repository.moveFood(food.id, targetKey)
-                            selectCategory(targetKey)
-                            Toast.makeText(
-                                this@FoodLibraryActivity,
-                                "已移动到 ${categories.firstOrNull { it.categoryKey == targetKey }?.name }",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    } else {
-                        lifecycleScope.launch { repository.reorderFoods(dragFoodOrder) }
-                    }
+                    lifecycleScope.launch { repository.reorderFoods(dragFoodOrder) }
                 }
                 moved = false
             }
@@ -242,25 +192,6 @@ class FoodLibraryActivity : ThemedActivity() {
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) = Unit
         }
         ItemTouchHelper(callback).attachToRecyclerView(binding.foodGrid)
-    }
-
-    private fun categoryKeyAt(itemView: View): String? {
-        val r = Rect()
-        itemView.getGlobalVisibleRect(r)
-        return categoryKeyAt((r.left + r.right) / 2f, (r.top + r.bottom) / 2f)
-    }
-
-    private fun categoryKeyAt(x: Float, y: Float): String? {
-        for (index in 0 until binding.categoryList.childCount) {
-            val child = binding.categoryList.getChildAt(index) ?: continue
-            val cr = Rect()
-            child.getGlobalVisibleRect(cr)
-            if (cr.contains(x.toInt(), y.toInt())) {
-                val position = binding.categoryList.getChildAdapterPosition(child)
-                return categoryAdapter.currentList.getOrNull(position)?.categoryKey
-            }
-        }
-        return null
     }
 
     private fun observe() {
@@ -333,6 +264,30 @@ class FoodLibraryActivity : ThemedActivity() {
                 finish()
             }
         }
+    }
+
+    private fun showMoveDialog(food: FoodEntity) {
+        val targets = categories.filter { it.categoryKey != food.category }
+        if (targets.isEmpty()) {
+            Toast.makeText(this, "没有其他分类可移动", Toast.LENGTH_SHORT).show()
+            return
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle("移动「${food.name}」至")
+            .setItems(targets.map { it.name }.toTypedArray()) { _, which ->
+                val target = targets.getOrNull(which) ?: return@setItems
+                lifecycleScope.launch {
+                    repository.moveFood(food.id, target.categoryKey)
+                    selectCategory(target.categoryKey)
+                    Toast.makeText(
+                        this@FoodLibraryActivity,
+                        "已移动到 ${target.name}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+            .setNegativeButton("取消", null)
+            .show()
     }
 
     private fun confirmDelete(food: FoodEntity) {

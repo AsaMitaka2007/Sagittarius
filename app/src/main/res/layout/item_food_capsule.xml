@@ -58,19 +58,39 @@
                     android:textColor="?attr/blTextTertiary"
                     android:textSize="10sp" />
 
-                <TextView
-                    android:id="@+id/btnDelete"
+                <LinearLayout
+                    android:id="@+id/actionRow"
                     android:layout_width="wrap_content"
                     android:layout_height="28dp"
                     android:layout_marginTop="2dp"
-                    android:background="@drawable/bg_delete_chip"
-                    android:gravity="center"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
-                    android:text="删除"
-                    android:textColor="#FFFFFF"
-                    android:textSize="11sp"
-                    android:visibility="gone" />
+                    android:orientation="horizontal"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/btnDelete"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:background="@drawable/bg_delete_chip"
+                        android:gravity="center"
+                        android:paddingStart="9dp"
+                        android:paddingEnd="9dp"
+                        android:text="删除"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10sp" />
+
+                    <TextView
+                        android:id="@+id/btnMove"
+                        android:layout_width="wrap_content"
+                        android:layout_height="28dp"
+                        android:layout_marginStart="6dp"
+                        android:background="?attr/blFloatingButtonBackground"
+                        android:gravity="center"
+                        android:paddingStart="9dp"
+                        android:paddingEnd="9dp"
+                        android:text="移动至"
+                        android:textColor="?attr/blAccent"
+                        android:textSize="10sp" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
